@@ -1,0 +1,38 @@
+{
+  "protocol_version": "0.3",
+  "status": "blocked",
+  "task_id": "example-blocked",
+  "task_summary": "Task lacks acceptance criteria and permission boundaries.",
+  "scope_followed": true,
+  "files_read": [
+    "ai/task.md",
+    "ai/runtime.md"
+  ],
+  "refs_read": [],
+  "files_changed": [],
+  "commands_run": [],
+  "verification": {
+    "level": "none",
+    "passed": false,
+    "evidence": []
+  },
+  "evidence": {
+    "git_diff_summary": "",
+    "changed_files_from_git": [],
+    "command_outputs": [],
+    "unverified_claims": []
+  },
+  "assumptions": [],
+  "issues": [
+    "Acceptance criteria missing",
+    "Modify permission not specified"
+  ],
+  "next": [
+    "Clarify ai/task.md acceptance and permission allowlist."
+  ],
+  "runtime_update": {
+    "required": false,
+    "changes": [],
+    "reason": ""
+  }
+}

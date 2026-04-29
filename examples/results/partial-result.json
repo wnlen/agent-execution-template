@@ -1,0 +1,51 @@
+{
+  "protocol_version": "0.3",
+  "status": "partial",
+  "task_id": "example-partial-manual-verification",
+  "task_summary": "Code change completed but manual UI verification is required.",
+  "scope_followed": true,
+  "files_read": [
+    "ai/task.md",
+    "ai/runtime.md",
+    "src/auth/session.ts"
+  ],
+  "refs_read": [
+    {
+      "file": "ai/refs/constraints.md",
+      "reason": "Task touches authentication/session behavior."
+    }
+  ],
+  "files_changed": [
+    {
+      "file": "src/auth/session.ts",
+      "change_type": "modified",
+      "reason": "Handle expired session redirect."
+    }
+  ],
+  "commands_run": [],
+  "verification": {
+    "level": "manual",
+    "passed": false,
+    "evidence": [
+      "Static read completed; browser session expiration flow needs manual verification."
+    ]
+  },
+  "evidence": {
+    "git_diff_summary": "",
+    "changed_files_from_git": [],
+    "command_outputs": [],
+    "unverified_claims": []
+  },
+  "assumptions": [],
+  "issues": [
+    "Manual UI verification not completed."
+  ],
+  "next": [
+    "Test expired session redirect in browser."
+  ],
+  "runtime_update": {
+    "required": false,
+    "changes": [],
+    "reason": ""
+  }
+}

@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Execution Template Result Schema",
+  "type": "object",
+  "required": [
+    "protocol_version",
+    "status",
+    "scope_followed",
+    "files_read",
+    "refs_read",
+    "files_changed",
+    "commands_run",
+    "verification",
+    "assumptions",
+    "issues",
+    "next",
+    "runtime_update"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": "0.3"
+    },
+    "status": {
+      "enum": [
+        "success",
+        "partial",
+        "failed",
+        "blocked"
+      ]
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "task_summary": {
+      "type": "string"
+    },
+    "scope_followed": {
+      "type": "boolean"
+    },
+    "files_read": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "refs_read": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "reason"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "files_changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "change_type",
+          "reason"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "change_type": {
+            "enum": [
+              "created",
+              "modified",
+              "deleted"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "commands_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "command",
+          "result",
+          "notes"
+        ],
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "result": {
+            "enum": [
+              "passed",
+              "failed",
+              "skipped"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": [
+        "level",
+        "passed",
+        "evidence"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "none",
+            "read_only",
+            "static",
+            "command",
+            "test",
+            "manual"
+          ]
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "git_diff_summary": {
+          "type": "string"
+        },
+        "changed_files_from_git": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "command_outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unverified_claims": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "runtime_update": {
+      "type": "object",
+      "required": [
+        "required",
+        "changes",
+        "reason"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "success"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "verification": {
+            "properties": {
+              "passed": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

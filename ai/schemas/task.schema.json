@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Execution Template Task Front Matter Schema",
+  "type": "object",
+  "required": [
+    "task_id",
+    "type",
+    "priority",
+    "risk_level",
+    "depends_on_previous_result",
+    "refs",
+    "permission"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "bugfix",
+        "feature",
+        "refactor",
+        "docs",
+        "config",
+        "test",
+        "research"
+      ]
+    },
+    "priority": {
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3"
+      ]
+    },
+    "risk_level": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "depends_on_previous_result": {
+      "type": "boolean"
+    },
+    "refs": {
+      "type": "object",
+      "required": [
+        "required",
+        "optional"
+      ],
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optional": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "permission": {
+      "type": "object",
+      "required": [
+        "modify",
+        "commands",
+        "network",
+        "destructive_actions",
+        "runtime_update"
+      ],
+      "properties": {
+        "modify": {
+          "type": "object",
+          "required": [
+            "allowed",
+            "denied"
+          ],
+          "properties": {
+            "allowed": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "denied": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "commands": {
+          "type": "object",
+          "required": [
+            "allowed",
+            "denied"
+          ],
+          "properties": {
+            "allowed": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "denied": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "network": {
+          "type": "boolean"
+        },
+        "destructive_actions": {
+          "type": "boolean"
+        },
+        "runtime_update": {
+          "enum": [
+            "no",
+            "propose_only",
+            "allowed"
+          ]
+        }
+      }
+    }
+  }
+}
