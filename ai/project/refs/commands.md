@@ -1,7 +1,7 @@
 # Commands
 
 Commands are permissioned by category.
-AI may run only commands allowed by `ai/task.md` and this file.
+AI may run only commands allowed by `ai/project/task.md` and this file.
 
 ## Safe Verify Commands
 

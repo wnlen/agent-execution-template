@@ -10,6 +10,9 @@
     "model_tier",
     "escalated",
     "escalation_reason",
+    "model_policy_followed",
+    "escalation_trigger_hit",
+    "strong_model_role",
     "input_tokens_estimated",
     "output_tokens_estimated",
     "duration_minutes",
@@ -21,7 +24,7 @@
   ],
   "properties": {
     "protocol_version": {
-      "const": "0.4"
+      "const": "0.5"
     },
     "task_id": {
       "type": "string"
@@ -43,6 +46,15 @@
       "type": "boolean"
     },
     "escalation_reason": {
+      "type": "string"
+    },
+    "model_policy_followed": {
+      "type": "boolean"
+    },
+    "escalation_trigger_hit": {
+      "type": "string"
+    },
+    "strong_model_role": {
       "type": "string"
     },
     "input_tokens_estimated": {
@@ -92,6 +104,12 @@
       "then": {
         "properties": {
           "escalation_reason": {
+            "minLength": 1
+          },
+          "escalation_trigger_hit": {
+            "minLength": 1
+          },
+          "strong_model_role": {
             "minLength": 1
           }
         }

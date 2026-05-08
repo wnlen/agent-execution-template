@@ -2,7 +2,7 @@
 
 > The missing execution contract between AI coding agents and your codebase.
 
-[![Protocol](https://img.shields.io/badge/protocol-v0.4-blue)](#protocol)
+[![Protocol](https://img.shields.io/badge/protocol-v0.5-blue)](#protocol)
 [![Agent Ready](https://img.shields.io/badge/agents-Codex%20%7C%20Claude%20Code%20%7C%20Cursor-green)](#works-with)
 [![Token Efficient](https://img.shields.io/badge/token--efficient-profile%20v0.1-orange)](docs/token-efficient-protocol-v0.1.md)
 [![License](https://img.shields.io/badge/license-TBD-lightgrey)](#license)
@@ -10,14 +10,12 @@
 AI Execution Template is a tiny file-based protocol that makes AI coding work
 bounded, auditable, and repeatable.
 
-Instead of asking an agent to "just fix it", give it a task contract:
-
 ```text
-Plan -> Execute -> Review -> Result
+ai/template/ = reusable execution protocol
+ai/project/  = current project execution workspace
 ```
 
-The goal is not cheaper prompts. The goal is more accepted work per unit of
-model cost.
+Template is protocol. Project is the field workspace.
 
 ## Why
 
@@ -33,13 +31,13 @@ This repo gives agents a small operating system made of files.
 
 ## What You Get
 
-- **Clear task boundaries** through `ai/task.md`
-- **Compressed project context** through `ai/runtime.md`
-- **Lazy-loaded references** through `ai/refs/`
-- **Machine-readable results** through `ai/result.json`
-- **Human-readable summaries** through `ai/result.md`
-- **Token-efficiency metrics** through `ai/metrics.json`
-- **Optional schemas** for validation and automation
+- **Reusable protocol** through `ai/template/`
+- **Project-local workspace** through `ai/project/`
+- **Minimal human input** through `ai/project/intake.md`
+- **Clear task boundaries** through `ai/project/task.md`
+- **Compressed project context** through `ai/project/runtime.md`
+- **Lazy-loaded references** through `ai/project/refs/`
+- **Auditable outputs** through `ai/project/result.json`, `ai/project/result.md`, and `ai/project/metrics.json`
 
 ## Quick Start
 
@@ -49,67 +47,90 @@ Copy the `ai/` directory into any software project:
 cp -R ai /path/to/your/project/
 ```
 
-Then edit:
+Fast path:
 
 ```text
-ai/runtime.md   # stable project context
-ai/task.md      # current task, scope, permissions, acceptance
+ai/project/intake.md    # one or two sentences plus known constraints
+```
+
+Strict path:
+
+```text
+ai/project/project.md   # stable project identity
+ai/project/runtime.md   # current execution context
+ai/project/task.md      # scope, permissions, acceptance, model policy
 ```
 
 Start your AI coding agent with:
 
 ```text
-ai/prompt.md
+Read ai/template/prompt.md
 ```
 
 After execution, review:
 
 ```text
-ai/result.json    # authoritative machine-readable result
-ai/result.md      # human-readable summary
-ai/metrics.json   # model, token, time, success, reuse signals
+ai/project/result.json    # authoritative machine-readable result
+ai/project/result.md      # human-readable summary
+ai/project/metrics.json   # model, token, time, success, reuse signals
 ```
-
-## The Core Idea
-
-Default to cheap execution. Escalate only at critical judgment points.
-
-- Strong models act as planner, reviewer, failure analyst, or architecture auditor.
-- Low-cost models execute bounded tasks with clear context and acceptance criteria.
-- Every execution leaves enough evidence to verify the result and improve the protocol.
-
-See [Token-Efficient AI Execution Protocol v0.1](docs/token-efficient-protocol-v0.1.md).
 
 ## Protocol
 
 ```text
-Read task
--> Check readiness
--> Check risk
--> Decide execution tier
--> Read runtime
--> Read refs only when needed
--> Read related project files
--> Execute within permission boundaries
--> Verify when possible
+Intake
+-> Plan
+-> Check readiness, risk, model policy, refs, permissions
+-> Execute
+-> Verify
 -> Write result.json / result.md / metrics.json
 -> Propose runtime update only when needed
 ```
+
+Default cheap. Escalate for judgment. Record why.
+
+See [Token-Efficient AI Execution Protocol v0.1](docs/token-efficient-protocol-v0.1.md).
 
 ## File Layout
 
 ```text
 ai/
-  prompt.md              # agent startup prompt
-  task.md                # current task contract
-  runtime.md             # compact always-read context
-  refs/                  # detailed docs loaded only when needed
-  result.json            # latest authoritative result
-  result.md              # latest human-readable result
-  metrics.json           # model/cost/time/success signals
-  schemas/               # optional validation schemas
-  archive/               # old tasks and results
+  README.md
+
+  template/
+    prompt.md
+    protocol.md
+    rules/
+      core.md
+      output.md
+    schemas/
+      task.schema.json
+      result.schema.json
+      metrics.schema.json
+
+  project/
+    project.md
+    runtime.md
+    intake.md
+    task.md
+    result.json
+    result.md
+    metrics.json
+    refs/
+    archive/
 ```
+
+## Sync Rules
+
+From this template repo into a real project:
+
+- Overwrite only `ai/template/**`.
+- Never overwrite `ai/project/**`.
+
+From a real project back into this template repo:
+
+- Return only `ai/template/**`.
+- Never return `ai/project/**`.
 
 ## Works With
 
@@ -123,15 +144,17 @@ AI Execution Template is tool-agnostic. It is designed to work with:
 
 ## Core Rules
 
-- Default read set is minimal: `prompt.md`, `task.md`, `runtime.md`.
+- The startup entry is `ai/template/prompt.md`.
+- Human input should start from `ai/project/intake.md` unless strict permissions are needed.
+- The agent should ask at most 3 clarification questions before execution.
 - Task must pass readiness before code edits.
 - Risk must be acceptable before execution.
-- Strong-model escalation is reserved for unclear requirements, high-risk changes, architecture judgment, repeated failure, or acceptance disputes.
+- Model division is declared in `ai/project/task.md.model_policy`.
+- Strong-model escalation must be recorded in `ai/project/metrics.json`.
 - Permissions are allowlist/denylist-based, not simple yes/no.
 - `success` requires verification evidence.
-- `runtime.md` is not a project diary.
-- `result.json` is the single authoritative latest result.
-- `metrics.json` records whether the execution produced acceptable output for the cost.
+- `ai/project/runtime.md` is not a project diary.
+- `ai/project/result.json` is the single authoritative latest result.
 
 ## Who This Is For
 
@@ -157,4 +180,4 @@ but better execution protocols.
 
 License is not set yet.
 
-Protocol: v0.4 file scaffold with Token-Efficient profile v0.1.
+Protocol: v0.5 template/project scaffold with Token-Efficient profile v0.1.

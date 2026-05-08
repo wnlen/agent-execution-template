@@ -1,5 +1,5 @@
 {
-  "protocol_version": "0.4",
+  "protocol_version": "0.5",
   "status": "blocked",
   "task_id": "",
   "task_summary": "No task has been executed yet.",
@@ -24,7 +24,7 @@
     "No current task executed."
   ],
   "next": [
-    "Fill ai/task.md and run the AI Execution Prompt."
+    "Fill ai/project/task.md and run ai/template/prompt.md."
   ],
   "runtime_update": {
     "required": false,

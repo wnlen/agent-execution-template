@@ -29,4 +29,4 @@ No task has been executed yet.
 
 ## Next
 
-- Fill `ai/task.md` and run the AI Execution Prompt.
+- Fill `ai/project/task.md` and run `ai/template/prompt.md`.

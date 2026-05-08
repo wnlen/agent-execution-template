@@ -1,17 +1,17 @@
 {
-  "protocol_version": "0.3",
+  "protocol_version": "0.5",
   "status": "partial",
   "task_id": "example-partial-manual-verification",
   "task_summary": "Code change completed but manual UI verification is required.",
   "scope_followed": true,
   "files_read": [
-    "ai/task.md",
-    "ai/runtime.md",
+    "ai/project/task.md",
+    "ai/project/runtime.md",
     "src/auth/session.ts"
   ],
   "refs_read": [
     {
-      "file": "ai/refs/constraints.md",
+      "file": "ai/project/refs/constraints.md",
       "reason": "Task touches authentication/session behavior."
     }
   ],
