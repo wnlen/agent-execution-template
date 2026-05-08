@@ -58,7 +58,7 @@ Run only commands listed in the YAML front matter and allowed by `ai/refs/comman
 
 ## Stop Conditions
 
-Stop and write `ai/result.json` with `status = "blocked"` if:
+Stop and write `ai/result.json`, `ai/result.md`, and `ai/metrics.json` with blocked status if:
 
 - Required files are missing.
 - Goal is ambiguous.

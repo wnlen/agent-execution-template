@@ -7,6 +7,11 @@ Read first:
 
 Execute only the current task.
 
+Default to the lowest-cost capable execution tier. Escalate to a stronger model
+only for unclear requirements, high-risk changes, architecture judgment,
+repeated failure, or acceptance disputes. Record any escalation in
+`ai/metrics.json`.
+
 ## 1. Task Readiness Gate
 
 Before editing code, check that `ai/task.md` clearly defines:
@@ -17,6 +22,7 @@ Before editing code, check that `ai/task.md` clearly defines:
 - Permission
 
 If readiness fails, do not edit code. Write `ai/result.json` with `status = "blocked"`.
+Also write `ai/result.md` and `ai/metrics.json`.
 
 ## 2. Risk Gate
 
@@ -31,6 +37,7 @@ Before editing code or running commands, check whether the task involves:
 - Irreversible or destructive actions
 
 If risk is high and not explicitly authorized in `task.md`, do not execute. Write `ai/result.json` with `status = "blocked"`.
+Also write `ai/result.md` and `ai/metrics.json`.
 
 ## 3. Ref Loading
 
@@ -58,7 +65,9 @@ Record every ref read in `result.json.refs_read` with a reason.
 - Do not mark `status = "success"` unless verification passed.
 - Do not edit `ai/runtime.md` unless `task.md` explicitly allows it.
 - If runtime changes are needed, propose them in `result.json.runtime_update`.
-- Write final result to `ai/result.json`.
+- Write final machine-readable result to `ai/result.json`.
+- Write final human-readable result to `ai/result.md`.
+- Write execution economics to `ai/metrics.json`.
 
 ## 5. Terminal Output
 
