@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Execution Template Metrics Schema",
+  "type": "object",
+  "required": [
+    "protocol_version",
+    "task_id",
+    "task_type",
+    "model",
+    "model_tier",
+    "escalated",
+    "escalation_reason",
+    "input_tokens_estimated",
+    "output_tokens_estimated",
+    "duration_minutes",
+    "success",
+    "human_fix_required",
+    "failure_reason",
+    "reuse_potential",
+    "notes"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": "0.4"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "task_type": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "model_tier": {
+      "enum": [
+        "cheap",
+        "standard",
+        "strong"
+      ]
+    },
+    "escalated": {
+      "type": "boolean"
+    },
+    "escalation_reason": {
+      "type": "string"
+    },
+    "input_tokens_estimated": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "output_tokens_estimated": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "duration_minutes": {
+      "type": "number",
+      "minimum": 0
+    },
+    "success": {
+      "type": "boolean"
+    },
+    "human_fix_required": {
+      "type": "boolean"
+    },
+    "failure_reason": {
+      "type": "string"
+    },
+    "reuse_potential": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "escalated": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "escalation_reason": {
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

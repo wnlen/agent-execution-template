@@ -10,6 +10,7 @@
   - Polluting runtime context with historical process notes
   - Marking success without verification evidence
   - Running commands outside explicit permission
+  - Optimizing for token savings instead of acceptable output per cost
 
 ## Hard Rules
 
@@ -26,6 +27,7 @@
 - Do not edit `runtime.md` unless explicitly allowed by `task.md`.
 - If `status = "success"`, `verification.passed` must be `true`.
 - If verification requires manual checking, use `status = "partial"` unless manual verification has been completed.
+- Default to cheap execution and escalate only for planning, judgment, repeated failure, or acceptance disputes.
 
 ## Project Constraints
 
@@ -33,6 +35,8 @@
 - `refs/` files are loaded only when required by task or triggered by task type.
 - `archive/` is never read by default.
 - `result.json` is the only authoritative latest result.
+- `result.md` is the latest human-readable summary.
+- `metrics.json` is the latest token-efficiency and reuse record.
 - `runtime.md` stores stable, currently valid context only.
 - Historical tasks and results belong in `ai/archive/`.
 
@@ -41,6 +45,7 @@
 This project is a protocol/template, not a complex agent framework.
 The MVP should remain file-based and tool-agnostic.
 Do not add CLI, UI, cloud sync, or multi-agent orchestration until the file protocol proves useful in real projects.
+The current product position is: minimal auditable execution protocol for AI Coding Agents.
 
 ## Ref Routing
 
