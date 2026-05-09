@@ -1,5 +1,9 @@
 # Project
 
+This file is the stable project identity used by AI Execution Template.
+Prefer generating it in Bootstrap Mode from existing repository docs and
+manifests, then have a human review it. Mark unknown facts as `Unknown`.
+
 ## Identity
 
 - Name:
@@ -21,6 +25,10 @@
 - Documentation:
 
 ## Stable Constraints
+
+- 
+
+## Unknowns
 
 - 
 

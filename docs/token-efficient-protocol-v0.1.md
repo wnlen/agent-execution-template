@@ -55,7 +55,7 @@ Record model policy execution in `ai/project/metrics.json`.
 ## Execution Shape
 
 ```text
-Task -> Plan -> Execute -> Review -> Result
+Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
 ```
 
 Do not add dynamic DAGs, multi-agent communication, or model matrices until the
@@ -84,9 +84,10 @@ Record escalation in `ai/project/metrics.json`.
 
 ## Human-Minimal Rule
 
-Humans should normally edit only `ai/project/project.md` and
-`ai/project/task.md`. The agent should derive everything else from project
-context, previous results, and refs.
+Humans should normally confirm generated project context and task contracts.
+The agent should draft `ai/project/project.md`, refs, and `ai/project/task.md`
+from existing docs, manifests, bounded code reads, project context, previous
+results, and refs.
 
 - Ask at most 3 clarification questions.
 - Ask only when the answer changes scope, risk, permission, or acceptance.

@@ -35,7 +35,8 @@
 
 ## Project Constraints
 
-- Default read set is `ai/template/prompt.md`, `ai/template/protocol.md`, `ai/template/rules/core.md`, `ai/project/project.md`, `ai/project/runtime.md`, and `ai/project/task.md`.
+- Bootstrap read set starts from `ai/template/bootstrap.md`, `ai/template/protocol.md`, `ai/template/rules/core.md`, root docs, manifests, docs, refs, and bounded source-structure inspection when docs are insufficient.
+- Execution read set is `ai/template/prompt.md`, `ai/template/protocol.md`, `ai/template/rules/core.md`, `ai/project/project.md`, `ai/project/runtime.md`, and `ai/project/task.md`.
 - `ai/project/refs/` files are loaded only when required by task or triggered by task type.
 - `ai/project/archive/` is never read by default.
 - `ai/project/result.json` is the only authoritative latest result.

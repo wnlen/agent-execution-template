@@ -29,4 +29,4 @@ No task has been executed yet.
 
 ## Next
 
-- Fill `ai/project/task.md` and run `ai/template/prompt.md`.
+- Read `ai/template/bootstrap.md`, confirm project context, then draft and confirm `ai/project/task.md` before running `ai/template/prompt.md`.

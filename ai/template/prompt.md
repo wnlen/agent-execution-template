@@ -6,9 +6,32 @@ First read:
 
 1. `ai/template/protocol.md`
 2. `ai/template/rules/core.md`
-3. `ai/project/project.md`
-4. `ai/project/runtime.md`
-5. `ai/project/task.md`
+
+Then choose the mode:
+
+- If the user asks to bootstrap project context, or if `ai/project/project.md`
+  is empty, placeholder-only, or incomplete, follow `ai/template/bootstrap.md`
+  and stop after project-context confirmation.
+- If `ai/project/task.md` is empty, placeholder-only, or incomplete, draft it
+  from the user's current goal and confirmed project context, then stop for
+  human confirmation.
+- Use Execution Mode only after `ai/project/project.md` and
+  `ai/project/task.md` are ready enough to define identity, goal, scope,
+  permission, and acceptance.
+
+In Task Draft Mode:
+
+1. Read confirmed `ai/project/project.md` and relevant `ai/project/refs/*.md`.
+2. Draft `ai/project/task.md` from the user's current goal.
+3. Ask at most 3 questions only for scope, risk, permission, or acceptance
+   blockers.
+4. Stop for human confirmation. Do not modify source or business files.
+
+In Execution Mode, read:
+
+1. `ai/project/project.md`
+2. `ai/project/runtime.md`
+3. `ai/project/task.md`
 
 Then execute the task and write results to:
 
