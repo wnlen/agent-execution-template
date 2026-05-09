@@ -1,0 +1,20 @@
+{
+  "protocol_version": "0.7",
+  "task_id": "",
+  "task_type": "",
+  "model": "",
+  "model_tier": "cheap",
+  "escalated": false,
+  "escalation_reason": "",
+  "model_policy_followed": true,
+  "escalation_trigger_hit": "",
+  "strong_model_role": "",
+  "input_tokens_estimated": 0,
+  "output_tokens_estimated": 0,
+  "duration_minutes": 0,
+  "success": false,
+  "human_fix_required": false,
+  "failure_reason": "",
+  "reuse_potential": "low",
+  "notes": []
+}

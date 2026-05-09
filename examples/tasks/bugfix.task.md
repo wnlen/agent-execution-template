@@ -4,11 +4,27 @@ type: "bugfix"
 priority: "P1"
 risk_level: "medium"
 depends_on_previous_result: false
+model_policy:
+  default_tier: "cheap"
+  allowed_tiers:
+    - cheap
+    - standard
+    - strong
+  escalation_allowed: true
+  escalation_triggers:
+    - ambiguous_acceptance
+    - high_risk_change
+    - repeated_failure
+    - verification_dispute
+  strong_model_roles:
+    - risk_judgment
+    - failure_review
+    - acceptance_judgment
 refs:
   required:
-    - ai/refs/constraints.md
+    - ai/project/refs/constraints.md
   optional:
-    - ai/refs/architecture.md
+    - ai/project/refs/architecture.md
 permission:
   modify:
     allowed:
