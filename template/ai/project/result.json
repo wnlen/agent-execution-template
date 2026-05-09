@@ -1,13 +1,10 @@
 {
   "protocol_version": "0.7",
   "status": "blocked",
-  "task_id": "example-blocked",
-  "task_summary": "Task lacks acceptance criteria and permission boundaries.",
+  "task_id": "",
+  "task_summary": "No task has been executed yet.",
   "scope_followed": true,
-  "files_read": [
-    "ai/project/task.md",
-    "ai/project/runtime.md"
-  ],
+  "files_read": [],
   "refs_read": [],
   "files_changed": [],
   "commands_run": [],
@@ -24,11 +21,10 @@
   },
   "assumptions": [],
   "issues": [
-    "Acceptance criteria missing",
-    "Modify permission not specified"
+    "No current task executed."
   ],
   "next": [
-    "Clarify ai/project/task.md acceptance and permission allowlist."
+    "Fill ai/project/task.md and run ai/template/prompt.md."
   ],
   "runtime_update": {
     "required": false,
