@@ -8,6 +8,7 @@
     "priority",
     "risk_level",
     "depends_on_previous_result",
+    "model_policy",
     "refs",
     "permission"
   ],
@@ -43,6 +44,50 @@
     },
     "depends_on_previous_result": {
       "type": "boolean"
+    },
+    "model_policy": {
+      "type": "object",
+      "required": [
+        "default_tier",
+        "allowed_tiers",
+        "escalation_allowed",
+        "escalation_triggers",
+        "strong_model_roles"
+      ],
+      "properties": {
+        "default_tier": {
+          "enum": [
+            "cheap",
+            "standard",
+            "strong"
+          ]
+        },
+        "allowed_tiers": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "cheap",
+              "standard",
+              "strong"
+            ]
+          }
+        },
+        "escalation_allowed": {
+          "type": "boolean"
+        },
+        "escalation_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "strong_model_roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "refs": {
       "type": "object",

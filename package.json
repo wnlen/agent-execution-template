@@ -1,0 +1,33 @@
+{
+  "name": "@wnlen/ai-execution-template",
+  "version": "0.7.0",
+  "description": "Low-friction AI execution protocol template for coding agents.",
+  "bin": {
+    "ai-execution-template": "bin/ai-execution-template.js"
+  },
+  "files": [
+    "bin",
+    "template",
+    "README.md"
+  ],
+  "scripts": {
+    "doctor": "node bin/ai-execution-template.js doctor",
+    "test": "node test/selftest.js"
+  },
+  "keywords": [
+    "ai",
+    "coding-agent",
+    "codex",
+    "claude-code",
+    "template"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wnlen/ai-execution-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wnlen/ai-execution-template/issues"
+  },
+  "homepage": "https://github.com/wnlen/ai-execution-template#readme",
+  "license": "MIT"
+}

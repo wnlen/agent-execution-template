@@ -1,12 +1,12 @@
 {
-  "protocol_version": "0.3",
+  "protocol_version": "0.5",
   "status": "blocked",
   "task_id": "example-blocked",
   "task_summary": "Task lacks acceptance criteria and permission boundaries.",
   "scope_followed": true,
   "files_read": [
-    "ai/task.md",
-    "ai/runtime.md"
+    "ai/project/task.md",
+    "ai/project/runtime.md"
   ],
   "refs_read": [],
   "files_changed": [],
@@ -28,7 +28,7 @@
     "Modify permission not specified"
   ],
   "next": [
-    "Clarify ai/task.md acceptance and permission allowlist."
+    "Clarify ai/project/task.md acceptance and permission allowlist."
   ],
   "runtime_update": {
     "required": false,
