@@ -1,97 +1,65 @@
 # AI Execution Template
 
-> The missing execution contract between AI coding agents and your codebase.
-
-[![Protocol](https://img.shields.io/badge/protocol-v0.5-blue)](#protocol)
-[![Agent Ready](https://img.shields.io/badge/agents-Codex%20%7C%20Claude%20Code%20%7C%20Cursor-green)](#works-with)
-[![Token Efficient](https://img.shields.io/badge/token--efficient-profile%20v0.1-orange)](docs/token-efficient-protocol-v0.1.md)
-[![License](https://img.shields.io/badge/license-TBD-lightgrey)](#license)
-
-AI Execution Template is a tiny file-based protocol that makes AI coding work
-bounded, auditable, and repeatable.
-
-```text
-ai/template/ = reusable execution protocol
-ai/project/  = current project execution workspace
-```
-
-Template is protocol. Project is the field workspace.
-
-## Why
-
-AI coding agents are powerful, but raw chat sessions are hard to trust:
-
-- The task boundary drifts.
-- The agent reads too much or too little context.
-- Success is claimed without verification.
-- Good execution history disappears into chat logs.
-- Expensive models do routine work that cheaper models could handle.
-
-This repo gives agents a small operating system made of files.
-
-## What You Get
-
-- **Reusable protocol** through `ai/template/`
-- **Project-local workspace** through `ai/project/`
-- **Minimal human input** through `ai/project/intake.md`
-- **Clear task boundaries** through `ai/project/task.md`
-- **Compressed project context** through `ai/project/runtime.md`
-- **Lazy-loaded references** through `ai/project/refs/`
-- **Auditable outputs** through `ai/project/result.json`, `ai/project/result.md`, and `ai/project/metrics.json`
-
-## Quick Start
-
-Copy the `ai/` directory into any software project:
+> 30-second installable execution protocol for AI coding agents.
 
 ```bash
-cp -R ai /path/to/your/project/
+npx ai-execution-template init
 ```
 
-Fast path:
+Then edit only:
 
 ```text
-ai/project/intake.md    # one or two sentences plus known constraints
+ai/project/project.md
+ai/project/task.md
 ```
 
-Strict path:
-
-```text
-ai/project/project.md   # stable project identity
-ai/project/runtime.md   # current execution context
-ai/project/task.md      # scope, permissions, acceptance, model policy
-```
-
-Start your AI coding agent with:
+Run your agent with:
 
 ```text
 Read ai/template/prompt.md
 ```
 
-After execution, review:
+Full spec: [docs/SPEC.md](docs/SPEC.md)
 
-```text
-ai/project/result.json    # authoritative machine-readable result
-ai/project/result.md      # human-readable summary
-ai/project/metrics.json   # model, token, time, success, reuse signals
+## Why
+
+AI coding agents need a small execution contract:
+
+- `ai/template/` is the reusable protocol area.
+- `ai/project/` is your project workspace.
+- `update` only overwrites `ai/template/**`.
+- `update` never touches `ai/project/**`.
+
+## Commands
+
+```bash
+npx ai-execution-template init
 ```
 
-## Protocol
+Creates `ai/` in the current project. Existing `ai/project/**` files are kept.
 
-```text
-Intake
--> Plan
--> Check readiness, risk, model policy, refs, permissions
--> Execute
--> Verify
--> Write result.json / result.md / metrics.json
--> Propose runtime update only when needed
+```bash
+npx ai-execution-template update
 ```
 
-Default cheap. Escalate for judgment. Record why.
+Updates only `ai/template/**`.
 
-See [Token-Efficient AI Execution Protocol v0.1](docs/token-efficient-protocol-v0.1.md).
+```bash
+npx ai-execution-template doctor
+```
 
-## File Layout
+Checks whether the required template and project files exist.
+
+## Verify
+
+```bash
+npx ai-execution-template doctor
+```
+
+`doctor` prints the installed template version and reports `[OK]`, `[WARN]`, or
+`[MISSING]` for required files.
+
+## Installed Layout
 
 ```text
 ai/
@@ -104,14 +72,12 @@ ai/
       core.md
       output.md
     schemas/
-      task.schema.json
       result.schema.json
       metrics.schema.json
 
   project/
     project.md
     runtime.md
-    intake.md
     task.md
     result.json
     result.md
@@ -120,64 +86,18 @@ ai/
     archive/
 ```
 
-## Sync Rules
+## Daily Use
 
-From this template repo into a real project:
+1. Edit `ai/project/project.md` once for stable project context.
+2. Edit `ai/project/task.md` for the current task.
+3. Ask Codex, Claude Code, Cursor, or another agent to read `ai/template/prompt.md`.
+4. Review `ai/project/result.md`, `ai/project/result.json`, and `ai/project/metrics.json`.
 
-- Overwrite only `ai/template/**`.
-- Never overwrite `ai/project/**`.
+## Safety
 
-From a real project back into this template repo:
+- `init` creates missing project files but does not overwrite existing `ai/project/**`.
+- `update` only updates `ai/template/**`.
+- `doctor` shows `[OK]`, `[WARN]`, and `[MISSING]` status lines.
+- `template/ai/**` is the npm install source. Root `ai/**` is this repo's dogfood workspace.
 
-- Return only `ai/template/**`.
-- Never return `ai/project/**`.
-
-## Works With
-
-AI Execution Template is tool-agnostic. It is designed to work with:
-
-- Codex
-- Claude Code
-- Cursor
-- Aider
-- Any coding agent that can read and write project files
-
-## Core Rules
-
-- The startup entry is `ai/template/prompt.md`.
-- Human input should start from `ai/project/intake.md` unless strict permissions are needed.
-- The agent should ask at most 3 clarification questions before execution.
-- Task must pass readiness before code edits.
-- Risk must be acceptable before execution.
-- Model division is declared in `ai/project/task.md.model_policy`.
-- Strong-model escalation must be recorded in `ai/project/metrics.json`.
-- Permissions are allowlist/denylist-based, not simple yes/no.
-- `success` requires verification evidence.
-- `ai/project/runtime.md` is not a project diary.
-- `ai/project/result.json` is the single authoritative latest result.
-
-## Who This Is For
-
-- Developers using AI agents for real code changes
-- Teams that need auditable AI execution records
-- Builders experimenting with multi-agent or low-cost model workflows
-- Anyone tired of losing important decisions inside chat history
-
-## Roadmap
-
-- More example tasks and results
-- Schema validation examples
-- Archive conventions
-- Model escalation playbooks
-- Evaluation templates for accepted work per cost
-
-## Star This Repo
-
-Star this repo if you believe the next step for AI coding is not stronger chat,
-but better execution protocols.
-
-## License
-
-License is not set yet.
-
-Protocol: v0.5 template/project scaffold with Token-Efficient profile v0.1.
+Protocol: v0.7 installable template with Token-Efficient profile v0.1.
