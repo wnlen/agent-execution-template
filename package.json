@@ -1,13 +1,15 @@
 {
   "name": "@wnlen/ai-execution-template",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Low-friction AI execution protocol template for coding agents.",
   "bin": {
     "ai-execution-template": "bin/ai-execution-template.js"
   },
   "files": [
     "bin",
+    "docs",
     "template",
+    "test",
     "README.md"
   ],
   "scripts": {

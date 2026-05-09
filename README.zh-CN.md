@@ -4,7 +4,7 @@
 
 [![npm](https://img.shields.io/npm/v/@wnlen/ai-execution-template?color=cb3837)](https://www.npmjs.com/package/@wnlen/ai-execution-template)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![protocol](https://img.shields.io/badge/protocol-v0.7-blue.svg)](docs/SPEC.md)
+[![protocol](https://img.shields.io/badge/protocol-v0.8-blue.svg)](docs/SPEC.md)
 [![agent agnostic](https://img.shields.io/badge/agent-agnostic-111111.svg)](#适配工具)
 
 > 一个 30 秒可安装的 AI Coding Agent 执行协议。
@@ -271,7 +271,7 @@ AI Execution Template 不是：
 
 ```text
 Package:  @wnlen/ai-execution-template
-Protocol: v0.7
+Protocol: v0.8
 License:  MIT
 ```
 

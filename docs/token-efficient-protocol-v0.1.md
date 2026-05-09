@@ -1,6 +1,6 @@
 # Token-Efficient AI Execution Protocol v0.1
 
-This profile sits on top of the AI Execution Template file protocol v0.7.
+This profile sits on top of the AI Execution Template file protocol v0.8.
 The goal is not to minimize token use in isolation. The goal is to produce
 more acceptable work per unit of model cost while reducing human interaction
 frequency and input size.

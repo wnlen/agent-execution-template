@@ -1,6 +1,6 @@
 # Protocol
 
-AI Execution Template v0.7 separates reusable protocol from project-specific
+AI Execution Template v0.8 separates reusable protocol from project-specific
 execution context.
 
 ```text

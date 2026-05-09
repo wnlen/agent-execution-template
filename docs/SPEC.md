@@ -1,6 +1,6 @@
 # AI Execution Template Specification
 
-Current protocol: v0.7
+Current protocol: v0.8
 
 ## 1. 项目名称
 
@@ -21,12 +21,12 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 ## 3. 当前版本
 
 ```text
-Protocol: v0.7
-Package: @wnlen/ai-execution-template@0.7.0
+Protocol: v0.8
+Package: @wnlen/ai-execution-template@0.8.0
 Install: npx @wnlen/ai-execution-template init
 ```
 
-当前 v0.7 已经具备：
+当前 v0.8 已经具备：
 
 - npm `bin` 入口；
 - `init` / `update` / `doctor` 三个命令；
@@ -280,7 +280,7 @@ npx @wnlen/ai-execution-template doctor
 ```text
 AI Execution Template Doctor
 
-Template version: 0.7.0
+Template version: 0.8.0
 
 [OK] ai/template/VERSION
 [OK] ai/template/bootstrap.md
@@ -714,7 +714,7 @@ git diff --check
 
 ## 24. 最终判断
 
-AI Execution Template v0.7 已经从一个 prompt/template 原型，升级为：
+AI Execution Template v0.8 已经从一个 prompt/template 原型，升级为：
 
 ```text
 低摩擦、可安装、可升级、保护用户现场的 AI 执行协议 npm 包雏形。
