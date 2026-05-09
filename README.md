@@ -3,7 +3,7 @@
 > 30-second installable execution protocol for AI coding agents.
 
 ```bash
-npx ai-execution-template init
+npx @wnlen/ai-execution-template init
 ```
 
 Then edit only:
@@ -33,19 +33,19 @@ AI coding agents need a small execution contract:
 ## Commands
 
 ```bash
-npx ai-execution-template init
+npx @wnlen/ai-execution-template init
 ```
 
 Creates `ai/` in the current project. Existing `ai/project/**` files are kept.
 
 ```bash
-npx ai-execution-template update
+npx @wnlen/ai-execution-template update
 ```
 
 Updates only `ai/template/**`.
 
 ```bash
-npx ai-execution-template doctor
+npx @wnlen/ai-execution-template doctor
 ```
 
 Checks whether the required template and project files exist.
@@ -53,7 +53,7 @@ Checks whether the required template and project files exist.
 ## Verify
 
 ```bash
-npx ai-execution-template doctor
+npx @wnlen/ai-execution-template doctor
 ```
 
 `doctor` prints the installed template version and reports `[OK]`, `[WARN]`, or

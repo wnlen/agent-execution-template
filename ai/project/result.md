@@ -2,31 +2,34 @@
 
 ## Status
 
-blocked
+success
 
 ## Summary
 
-No task has been executed yet.
+Changed the npm package name to `@wnlen/ai-execution-template` and updated the
+README, SPEC, and CLI guidance to use scoped `npx` commands.
 
 ## Changed
 
-- None
+- `package.json`
+- `README.md`
+- `docs/SPEC.md`
+- `bin/ai-execution-template.js`
+- `ai/project/result.json`
+- `ai/project/result.md`
 
 ## Verified
 
-- Not verified
-
-## Metrics
-
-- Model: not recorded
-- Duration: 0 minutes
-- Success: false
-- Human fix required: false
+- `npm test`
+- `node bin/ai-execution-template.js doctor`
+- JSON parse checks
+- `npm_config_cache=/tmp/npm-cache-ai-execution-template npm pack --dry-run`
+- `git diff --check`
 
 ## Issues
 
-- No current task executed.
+- None.
 
 ## Next
 
-- Fill `ai/project/task.md` and run `ai/template/prompt.md`.
+- Run `npm publish --access public`.

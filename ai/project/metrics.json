@@ -1,20 +1,23 @@
 {
-  "protocol_version": "0.5",
-  "task_id": "",
-  "task_type": "",
-  "model": "",
-  "model_tier": "cheap",
+  "protocol_version": "0.7",
+  "task_id": "scope-npm-package-for-publish",
+  "task_type": "config",
+  "model": "GPT-5 Codex",
+  "model_tier": "strong",
   "escalated": false,
   "escalation_reason": "",
   "model_policy_followed": true,
   "escalation_trigger_hit": "",
-  "strong_model_role": "",
+  "strong_model_role": "implementation",
   "input_tokens_estimated": 0,
   "output_tokens_estimated": 0,
   "duration_minutes": 0,
-  "success": false,
+  "success": true,
   "human_fix_required": false,
   "failure_reason": "",
-  "reuse_potential": "low",
-  "notes": []
+  "reuse_potential": "medium",
+  "notes": [
+    "Scoped package name should avoid unscoped npm publish permission issues.",
+    "Bin command remains ai-execution-template for installed usage."
+  ]
 }

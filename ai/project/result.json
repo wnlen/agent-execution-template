@@ -1,30 +1,92 @@
 {
-  "protocol_version": "0.5",
-  "status": "blocked",
-  "task_id": "",
-  "task_summary": "No task has been executed yet.",
+  "protocol_version": "0.7",
+  "status": "success",
+  "task_id": "scope-npm-package-for-publish",
+  "task_summary": "Changed the npm package to the scoped name @wnlen/ai-execution-template and updated user-facing npx commands.",
   "scope_followed": true,
-  "files_read": [],
+  "files_read": [
+    "package.json",
+    "README.md",
+    "docs/SPEC.md",
+    "bin/ai-execution-template.js"
+  ],
   "refs_read": [],
-  "files_changed": [],
-  "commands_run": [],
+  "files_changed": [
+    {
+      "file": "package.json",
+      "change_type": "modified",
+      "reason": "Use scoped npm package name @wnlen/ai-execution-template."
+    },
+    {
+      "file": "README.md",
+      "change_type": "modified",
+      "reason": "Update npx commands to use the scoped package."
+    },
+    {
+      "file": "docs/SPEC.md",
+      "change_type": "modified",
+      "reason": "Update package and install examples to the scoped package."
+    },
+    {
+      "file": "bin/ai-execution-template.js",
+      "change_type": "modified",
+      "reason": "Update CLI guidance messages to the scoped npx command."
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "npm test",
+      "result": "passed",
+      "notes": "Selftest passed after package scope change."
+    },
+    {
+      "command": "node bin/ai-execution-template.js doctor",
+      "result": "passed",
+      "notes": "Doctor still reports ready."
+    },
+    {
+      "command": "node -e \"for (const f of process.argv.slice(1)) JSON.parse(require('fs').readFileSync(f, 'utf8'));\" ...",
+      "result": "passed",
+      "notes": "Parsed package.json, result/metrics JSON, schemas, and example results."
+    },
+    {
+      "command": "npm_config_cache=/tmp/npm-cache-ai-execution-template npm pack --dry-run",
+      "result": "passed",
+      "notes": "Dry-run package now reports @wnlen/ai-execution-template@0.7.0."
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed",
+      "notes": "No whitespace errors detected."
+    }
+  ],
   "verification": {
-    "level": "none",
-    "passed": false,
-    "evidence": []
+    "level": "command",
+    "passed": true,
+    "evidence": [
+      "README and SPEC use npx @wnlen/ai-execution-template.",
+      "No stale unscoped npx commands remain.",
+      "npm test, doctor, JSON parse, npm pack dry-run, and git diff --check passed."
+    ]
   },
   "evidence": {
-    "git_diff_summary": "",
+    "git_diff_summary": "Scoped npm package name and updated documentation/CLI guidance.",
     "changed_files_from_git": [],
-    "command_outputs": [],
+    "command_outputs": [
+      "selftest ok",
+      "AI Execution Template Doctor: [OK] Ready to run",
+      "npm pack dry-run package name: @wnlen/ai-execution-template"
+    ],
     "unverified_claims": []
   },
-  "assumptions": [],
-  "issues": [
-    "No current task executed."
+  "assumptions": [
+    "The npm scope @wnlen is controlled by the publishing account.",
+    "The executable command remains ai-execution-template because the bin field is unchanged."
   ],
+  "issues": [],
   "next": [
-    "Fill ai/project/task.md and run ai/template/prompt.md."
+    "Publish with npm publish --access public.",
+    "Commit and push from an environment where .git is writable."
   ],
   "runtime_update": {
     "required": false,

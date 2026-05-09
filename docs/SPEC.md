@@ -22,8 +22,8 @@ npx 安装协议 -> 人类填写少量项目和任务信息 -> AI 按协议执�
 
 ```text
 Protocol: v0.7
-Package: ai-execution-template@0.7.0
-Install: npx ai-execution-template init
+Package: @wnlen/ai-execution-template@0.7.0
+Install: npx @wnlen/ai-execution-template init
 ```
 
 当前 v0.7 已经具备：
@@ -78,7 +78,7 @@ AI Coding Agent 在项目里工作的文件协议和安全边界。
 在任意项目根目录执行：
 
 ```bash
-npx ai-execution-template init
+npx @wnlen/ai-execution-template init
 ```
 
 然后普通用户只需要编辑：
@@ -105,13 +105,13 @@ ai/project/metrics.json
 检查安装状态：
 
 ```bash
-npx ai-execution-template doctor
+npx @wnlen/ai-execution-template doctor
 ```
 
 升级模板协议：
 
 ```bash
-npx ai-execution-template update
+npx @wnlen/ai-execution-template update
 ```
 
 ## 7. 安装后的目录结构
@@ -211,7 +211,7 @@ ai/project/archive/
 ### 9.1 `init`
 
 ```bash
-npx ai-execution-template init
+npx @wnlen/ai-execution-template init
 ```
 
 作用：
@@ -231,7 +231,7 @@ init 可以安装模板协议，但不能覆盖用户现场。
 ### 9.2 `update`
 
 ```bash
-npx ai-execution-template update
+npx @wnlen/ai-execution-template update
 ```
 
 作用：
@@ -249,7 +249,7 @@ update 只升级协议，不碰现场。
 ### 9.3 `doctor`
 
 ```bash
-npx ai-execution-template doctor
+npx @wnlen/ai-execution-template doctor
 ```
 
 作用：
