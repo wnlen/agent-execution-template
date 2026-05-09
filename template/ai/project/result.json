@@ -1,5 +1,5 @@
 {
-  "protocol_version": "0.7",
+  "protocol_version": "0.8",
   "status": "blocked",
   "task_id": "",
   "task_summary": "No task has been executed yet.",
@@ -24,7 +24,7 @@
     "No current task executed."
   ],
   "next": [
-    "Fill ai/project/task.md and run ai/template/prompt.md."
+    "Ask the agent to read ai/template/bootstrap.md, confirm project context, then draft and confirm ai/project/task.md before running ai/template/prompt.md."
   ],
   "runtime_update": {
     "required": false,

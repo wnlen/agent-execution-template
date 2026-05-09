@@ -9,6 +9,7 @@ const TARGET_AI = path.join(process.cwd(), "ai");
 
 const REQUIRED_FILES = [
   "ai/template/VERSION",
+  "ai/template/bootstrap.md",
   "ai/template/prompt.md",
   "ai/template/protocol.md",
   "ai/template/rules/core.md",
@@ -103,10 +104,12 @@ function init() {
   printChanges("AI Execution Template init", changes);
   console.log(`
 Next:
-1. Edit ai/project/project.md
-2. Edit ai/project/task.md
-3. Run your AI agent with: Read ai/template/prompt.md
-4. Check installation with: npx @wnlen/ai-execution-template doctor
+1. Ask your AI agent: Read ai/template/bootstrap.md
+2. Review and confirm ai/project/project.md and ai/project/refs/*
+3. Describe the current task as a short goal
+4. Let the agent draft ai/project/task.md for confirmation
+5. Confirm the task, then run: Read ai/template/prompt.md
+6. Check installation with: npx @wnlen/ai-execution-template doctor
 `);
 }
 

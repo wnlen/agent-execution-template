@@ -1,6 +1,6 @@
 # AI Execution Template Specification
 
-Current protocol: v0.7
+Current protocol: v0.8
 
 ## 1. 项目名称
 
@@ -13,7 +13,7 @@ Current protocol: v0.7
 它把 AI 编程从“聊天式执行”变成：
 
 ```text
-npx 安装协议 -> 人类填写少量项目和任务信息 -> AI 按协议执行 -> 结果落盘 -> 可验证可复盘
+npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务契约 -> 人类确认 -> AI 按协议执行 -> 结果落盘
 ```
 
 当前版本的核心不是做一个新的 Agent，也不是做复杂调度系统，而是给 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 提供同一套项目内执行协议。
@@ -21,24 +21,25 @@ npx 安装协议 -> 人类填写少量项目和任务信息 -> AI 按协议执�
 ## 3. 当前版本
 
 ```text
-Protocol: v0.7
-Package: @wnlen/ai-execution-template@0.7.0
+Protocol: v0.8
+Package: @wnlen/ai-execution-template@0.8.0
 Install: npx @wnlen/ai-execution-template init
 ```
 
-当前 v0.7 已经具备：
+当前 v0.8 已经具备：
 
 - npm `bin` 入口；
 - `init` / `update` / `doctor` 三个命令；
 - `template/project` 双区结构；
 - 保护 `ai/project/**` 不被升级覆盖；
 - 模板版本文件 `ai/template/VERSION`；
+- Bootstrap Mode：通过 `ai/template/bootstrap.md` 从受控范围内的项目文档、manifest 和必要代码生成 `project.md` / refs 草稿；
 - 自测脚本 `npm test`；
 - `result.json` / `result.md` / `metrics.json` 执行结果记录。
 
 ## 4. 解决的问题
 
-AI Execution Template 主要解决八类问题：
+AI Execution Template 主要解决九类问题：
 
 1. 每次都要重复向 AI 解释项目背景。
 2. 任务边界容易漂移，AI 做多、改多、跑多。
@@ -48,6 +49,7 @@ AI Execution Template 主要解决八类问题：
 6. 模板升级容易覆盖用户项目上下文。
 7. 用户不知道模板是否安装完整。
 8. 便宜模型和强模型没有明确分工规则。
+9. 直接影响执行精度的 `project.md` / `task.md` 仍然依赖人手写。
 
 最终目标是：
 
@@ -81,14 +83,26 @@ AI Coding Agent 在项目里工作的文件协议和安全边界。
 npx @wnlen/ai-execution-template init
 ```
 
-然后普通用户只需要编辑：
+然后让 AI Agent 先整理项目上下文：
+
+```text
+Read ai/template/bootstrap.md
+```
+
+人类检查并确认生成的项目上下文：
 
 ```text
 ai/project/project.md
+ai/project/refs/*
+```
+
+之后用一句话描述当前任务，AI 生成并等待确认：
+
+```text
 ai/project/task.md
 ```
 
-启动 AI Agent 时输入：
+确认后启动 AI Agent 执行：
 
 ```text
 Read ai/template/prompt.md
@@ -122,6 +136,7 @@ ai/
 
   template/
     VERSION
+    bootstrap.md
     prompt.md
     protocol.md
     rules/
@@ -174,6 +189,7 @@ project 是现场。
 
 ```text
 ai/template/VERSION
+ai/template/bootstrap.md
 ai/template/prompt.md
 ai/template/protocol.md
 ai/template/rules/core.md
@@ -264,9 +280,10 @@ npx @wnlen/ai-execution-template doctor
 ```text
 AI Execution Template Doctor
 
-Template version: 0.7.0
+Template version: 0.8.0
 
 [OK] ai/template/VERSION
+[OK] ai/template/bootstrap.md
 [OK] ai/template/prompt.md
 [OK] ai/template/protocol.md
 [OK] ai/template/rules/core.md
@@ -283,13 +300,19 @@ Template version: 0.7.0
 
 ## 10. 启动入口
 
-统一启动入口是：
+项目上下文启动入口是：
+
+```text
+ai/template/bootstrap.md
+```
+
+任务执行启动入口是：
 
 ```text
 ai/template/prompt.md
 ```
 
-其中固定要求 AI Agent 先读：
+执行入口固定要求 AI Agent 先读：
 
 ```text
 1. ai/template/protocol.md
@@ -312,13 +335,20 @@ ai/project/metrics.json
 当前协议的执行闭环是：
 
 ```text
-Task -> Plan -> Execute -> Review -> Result
+Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
 ```
 
 更具体地说：
 
 ```text
 读取模板协议
+→ 如项目上下文不完整，读取 bootstrap.md 进入 Bootstrap Mode
+→ 按受控范围读取项目文档和 manifest
+→ 文档不足时从业务代码做有边界推断
+→ 生成 project.md / refs 草稿
+→ 人类确认
+→ 基于一句话任务生成 task.md 草稿
+→ 人类确认任务契约
 → 读取项目背景
 → 读取当前任务
 → 检查任务是否可执行
@@ -331,28 +361,56 @@ Task -> Plan -> Execute -> Review -> Result
 → 必要时建议 runtime 更新
 ```
 
-## 12. 人类参与边界
+## 12. Bootstrap 与人类参与边界
 
-普通用户只需要编辑两个文件：
+普通用户通常只需要提供意图并确认两个文件：
 
 ```text
 ai/project/project.md
 ai/project/task.md
 ```
 
+AI 在 Bootstrap Mode 中负责先生成项目上下文草稿。默认读取范围包括：
+
+- 根目录文档：`README*`、`AGENTS.md`、`CLAUDE.md`、`CONTRIBUTING*`、`CHANGELOG*`；
+- package/build manifest：`package.json`、`pyproject.toml`、`Cargo.toml`、`go.mod`、`pom.xml`、`build.gradle*`、`Makefile`；
+- 项目文档：`docs/**`，优先 overview、architecture、setup、testing、deployment、API、ADR、decision；
+- 已有 AI refs：`ai/project/refs/*.md`；
+- source / test / config / docs 的浅层目录结构。
+
+如果文档和 manifest 不足，允许从业务代码做有边界推断：
+
+- 先看顶层目录和文件名；
+- 再看 `src/`、`app/`、`lib/`、`packages/`、`services/`、`cmd/`、`internal/`、`server/`、`client/`、`test/`、`tests/` 等入口；
+- 只读取足够识别项目用途、模块边界、命令和约束的代码；
+- 未经人类授权不全量扫描代码库。
+
+默认不读取：
+
+- `node_modules`、`vendor`、`.venv` 等依赖目录；
+- `dist`、`build`、`target`、`coverage` 等生成目录；
+- 除判断包管理器外的 lockfile；
+- `.env*` 等 secrets / environment 文件；
+- 未被用户明确引用的 archive/history 目录。
+
 人类负责：
 
-- 项目稳定背景；
 - 当前目标；
 - 范围边界；
 - 权限授权；
 - 验收标准；
 - 高风险决策；
+- 确认 `project.md` / refs 草稿；
+- 确认 `task.md` 草稿；
 - 最终验收。
 
 AI 负责：
 
 - 读取协议；
+- 从受控范围内读取项目文档和 manifest；
+- 文档不足时从业务代码做有边界推断；
+- 生成 `project.md` / refs 草稿；
+- 基于当前目标生成 `task.md` 草稿；
 - 补全可推断细节；
 - 判断任务是否可执行；
 - 判断是否需要阻断或升级；
@@ -363,7 +421,7 @@ AI 负责：
 核心目标是：
 
 ```text
-人类少输入，AI 多推断；但 scope、risk、permission、acceptance 不乱猜。
+人类少输入，AI 多整理；但 scope、risk、permission、acceptance 不乱猜。
 ```
 
 ## 13. 任务文件 `task.md`
@@ -656,7 +714,7 @@ git diff --check
 
 ## 24. 最终判断
 
-AI Execution Template v0.7 已经从一个 prompt/template 原型，升级为：
+AI Execution Template v0.8 已经从一个 prompt/template 原型，升级为：
 
 ```text
 低摩擦、可安装、可升级、保护用户现场的 AI 执行协议 npm 包雏形。

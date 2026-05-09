@@ -41,13 +41,17 @@ permission:
 
 # Task
 
-Normal users only need to edit `ai/project/project.md` and this file. Prefer
-safe assumptions over extra questions, but do not guess scope, risk,
+This file is the current execution contract. Prefer generating it in Bootstrap
+Mode from a short human goal plus repository context, then have a human review
+it before execution.
+
+Prefer safe assumptions over extra questions, but do not guess scope, risk,
 permissions, or acceptance.
 
 ## Goal
 
-Describe the exact goal of this task.
+Describe the exact goal of this task. If generated from a short human request,
+preserve the user's intent and make assumptions explicit.
 
 ## Scope
 

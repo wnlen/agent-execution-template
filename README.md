@@ -4,11 +4,11 @@ English | [简体中文](README.zh-CN.md)
 
 [![npm](https://img.shields.io/npm/v/@wnlen/ai-execution-template?color=cb3837)](https://www.npmjs.com/package/@wnlen/ai-execution-template)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![protocol](https://img.shields.io/badge/protocol-v0.7-blue.svg)](docs/SPEC.md)
+[![protocol](https://img.shields.io/badge/protocol-v0.8-blue.svg)](docs/SPEC.md)
 [![agent agnostic](https://img.shields.io/badge/agent-agnostic-111111.svg)](#works-with)
 
 > A 30-second execution protocol for AI coding agents.
-> Install it into any repository, describe the work once, let the agent execute inside a repeatable contract, and keep the result auditable.
+> Install it into any repository, let the agent bootstrap project context from existing docs, confirm the task contract, and keep execution auditable.
 
 ```bash
 npx @wnlen/ai-execution-template init
@@ -17,7 +17,7 @@ npx @wnlen/ai-execution-template init
 Then tell your coding agent:
 
 ```text
-Read ai/template/prompt.md
+Read ai/template/bootstrap.md
 ```
 
 AI Execution Template is not another agent framework. It is the missing execution layer between your repository and tools like Codex, Claude Code, Cursor, Aider, or any other AI coding agent.
@@ -31,7 +31,7 @@ chat prompt -> ad hoc edits -> unclear verification -> lost context
 into:
 
 ```text
-project contract -> bounded task -> protocol execution -> recorded result
+bootstrap project -> confirm context -> draft task -> confirm contract -> execute -> recorded result
 ```
 
 ## Why It Exists
@@ -45,6 +45,7 @@ AI coding agents are powerful, but most teams still run them through loose chat 
 - Useful execution history disappears into chat logs.
 - Template upgrades accidentally overwrite project-specific context.
 - Cheap and strong models are used without a clear division of labor.
+- The two files that define execution precision are often written by hand.
 
 AI Execution Template fixes this with a small, installable file protocol:
 
@@ -63,14 +64,26 @@ Install the protocol into the current repository:
 npx @wnlen/ai-execution-template init
 ```
 
-Fill in the project context and current task:
+Ask your agent to bootstrap project context from existing docs and manifests:
+
+```text
+Read ai/template/bootstrap.md
+```
+
+Review and confirm the generated project context:
 
 ```text
 ai/project/project.md
+ai/project/refs/*
+```
+
+Describe the current task as a short goal. The agent drafts:
+
+```text
 ai/project/task.md
 ```
 
-Start your agent with:
+Confirm the task, then run execution:
 
 ```text
 Read ai/template/prompt.md
@@ -102,6 +115,7 @@ npx @wnlen/ai-execution-template update
 | --- | --- |
 | Installable protocol | Add an AI execution contract to any repository in seconds. |
 | Agent agnostic | Works with Codex, Claude Code, Cursor, Aider, and other coding agents. |
+| Bootstrap mode | Reads approved docs/manifests, falls back to bounded code inference, drafts `project.md` and refs, then stops for confirmation. |
 | Protected project context | `update` refreshes `ai/template/**` without overwriting `ai/project/**`. |
 | Bounded task execution | Goals, scope, permissions, risk, and acceptance criteria live in one task file. |
 | Auditable results | Every run can leave human-readable output, machine-readable facts, and metrics. |
@@ -117,6 +131,7 @@ ai/
 
   template/
     VERSION
+    bootstrap.md
     prompt.md
     protocol.md
     rules/
@@ -185,13 +200,14 @@ It reports:
 AI Execution Template defines a simple loop:
 
 ```text
-Task -> Plan -> Execute -> Review -> Result
+Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
 ```
 
 The point is not to build a complex orchestrator. The point is to make one AI-assisted coding run clear enough to execute, verify, rerun, and audit.
 
 The protocol records:
 
+- approved bootstrap sources,
 - the task contract,
 - assumptions and risk,
 - verification attempts,
@@ -231,6 +247,7 @@ Common pairings:
 - Projects where task boundaries, verification, and audit trails matter.
 - Workflows that use cheap models by default and escalate only for judgment.
 - Repositories that need AI context to live in files, not only in chat history.
+- Users who want AI to draft the critical context files while humans confirm the final boundary.
 
 ## Not This
 
@@ -254,7 +271,7 @@ Current package:
 
 ```text
 Package:  @wnlen/ai-execution-template
-Protocol: v0.7
+Protocol: v0.8
 License:  MIT
 ```
 

@@ -24,7 +24,7 @@
   ],
   "properties": {
     "protocol_version": {
-      "const": "0.7"
+      "const": "0.8"
     },
     "task_id": {
       "type": "string"

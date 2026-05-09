@@ -49,9 +49,12 @@ function testInitUpdateDoctor() {
 
   run(["init"], cwd);
   assert(exists(cwd, "ai/template/VERSION"), "init should create template VERSION");
+  assert(exists(cwd, "ai/template/bootstrap.md"), "init should create template bootstrap prompt");
   assert(exists(cwd, "ai/template/prompt.md"), "init should create template prompt");
   assert(exists(cwd, "ai/project/project.md"), "init should create project.md");
   assert(exists(cwd, "ai/project/task.md"), "init should create task.md");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Confirmation Dimensions"), "init should install bootstrap prompt");
+  assert(read(cwd, "ai/template/protocol.md").includes("Bootstrap Read Scope"), "init should install bootstrap protocol");
 
   write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
   run(["update"], cwd);

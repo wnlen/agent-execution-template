@@ -4,11 +4,11 @@
 
 [![npm](https://img.shields.io/npm/v/@wnlen/ai-execution-template?color=cb3837)](https://www.npmjs.com/package/@wnlen/ai-execution-template)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![protocol](https://img.shields.io/badge/protocol-v0.7-blue.svg)](docs/SPEC.md)
+[![protocol](https://img.shields.io/badge/protocol-v0.8-blue.svg)](docs/SPEC.md)
 [![agent agnostic](https://img.shields.io/badge/agent-agnostic-111111.svg)](#适配工具)
 
 > 一个 30 秒可安装的 AI Coding Agent 执行协议。
-> 把它装进任意代码仓库，描述一次项目和任务，让 AI 在可复用、可验证、可复盘的协议里执行。
+> 把它装进任意代码仓库，让 AI 从现有文档整理项目上下文，人类确认任务契约，然后在可复用、可验证、可复盘的协议里执行。
 
 ```bash
 npx @wnlen/ai-execution-template init
@@ -17,7 +17,7 @@ npx @wnlen/ai-execution-template init
 然后告诉你的 AI 编程工具：
 
 ```text
-Read ai/template/prompt.md
+Read ai/template/bootstrap.md
 ```
 
 AI Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
@@ -31,7 +31,7 @@ AI Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、
 变成：
 
 ```text
-项目契约 -> 有边界的任务 -> 按协议执行 -> 结果落盘
+整理项目 -> 确认上下文 -> 生成任务 -> 确认契约 -> 执行 -> 结果落盘
 ```
 
 ## 为什么需要它
@@ -45,6 +45,7 @@ AI Coding Agent 已经很强，但大多数项目仍然在用松散聊天上下�
 - 有价值的执行历史散落在聊天记录中。
 - 模板升级容易误伤项目自己的上下文。
 - 便宜模型和强模型没有清晰分工。
+- 直接影响执行精度的两个文件经常还需要人手写。
 
 AI Execution Template 用一个很小的项目内文件协议解决这些问题：
 
@@ -63,14 +64,26 @@ ai/project/   当前项目现场
 npx @wnlen/ai-execution-template init
 ```
 
-填写项目上下文和当前任务：
+让 Agent 从现有文档和 manifest 里整理项目上下文：
+
+```text
+Read ai/template/bootstrap.md
+```
+
+检查并确认生成的项目上下文：
 
 ```text
 ai/project/project.md
+ai/project/refs/*
+```
+
+用一句话描述当前任务，Agent 会生成：
+
+```text
 ai/project/task.md
 ```
 
-启动 AI Agent 时输入：
+确认任务后执行：
 
 ```text
 Read ai/template/prompt.md
@@ -102,6 +115,7 @@ npx @wnlen/ai-execution-template update
 | --- | --- |
 | 可安装执行协议 | 几秒钟给任意仓库加入 AI 执行契约。 |
 | Agent 无关 | 可用于 Codex、Claude Code、Cursor、Aider 和其他编程 Agent。 |
+| Bootstrap 模式 | 读取受控范围内的文档和 manifest，必要时从代码做有边界推断，生成 `project.md` 和 refs 草稿后停下来等人确认。 |
 | 保护项目现场 | `update` 刷新 `ai/template/**`，不会覆盖 `ai/project/**`。 |
 | 有边界的任务执行 | 目标、范围、权限、风险和验收标准集中在任务文件里。 |
 | 可审计结果 | 每次执行都可以留下人类可读结果、机器可读事实和 metrics。 |
@@ -117,6 +131,7 @@ ai/
 
   template/
     VERSION
+    bootstrap.md
     prompt.md
     protocol.md
     rules/
@@ -185,13 +200,14 @@ npx @wnlen/ai-execution-template doctor
 AI Execution Template 定义了一个简单循环：
 
 ```text
-Task -> Plan -> Execute -> Review -> Result
+Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
 ```
 
 重点不是构建复杂调度器，而是让一次 AI 辅助编码任务足够清晰，可以执行、验证、重跑和审计。
 
 协议会记录：
 
+- 允许读取的 bootstrap 来源；
 - 任务契约；
 - 假设和风险；
 - 验证尝试；
@@ -231,6 +247,7 @@ AI Execution Template 有意保持工具无关。只要一个 Agent 能读取项
 - 任务边界、验证和审计记录很重要的项目。
 - 默认使用便宜模型，只在关键判断点升级模型的工作流。
 - 希望 AI 上下文存在于文件里，而不是只存在于聊天记录里的仓库。
+- 希望 AI 生成关键上下文文件、人类只确认边界和验收标准的用户。
 
 ## 它不是什么
 
@@ -254,7 +271,7 @@ AI Execution Template 不是：
 
 ```text
 Package:  @wnlen/ai-execution-template
-Protocol: v0.7
+Protocol: v0.8
 License:  MIT
 ```
 

@@ -41,9 +41,10 @@ permission:
 
 # Task
 
-Normal users only need to edit `ai/project/project.md` and this file. Prefer
-safe assumptions over extra questions, but do not guess scope, risk,
-permissions, or acceptance.
+Prefer generating this file in Bootstrap Mode from a short human goal plus
+repository context, then have a human review it before execution. Prefer safe
+assumptions over extra questions, but do not guess scope, risk, permissions, or
+acceptance.
 
 ## Goal
 

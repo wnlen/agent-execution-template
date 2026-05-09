@@ -10,9 +10,10 @@ project is the field workspace
 ## Files
 
 - `template/prompt.md`: AI startup prompt.
+- `template/bootstrap.md`: project discovery and context bootstrap prompt.
 - `template/VERSION`: installed template version.
-- `template/protocol.md`: execution flow, human-minimal task input, model division, sync rules.
-- `template/rules/core.md`: readiness, risk, refs, permissions, runtime governance.
+- `template/protocol.md`: bootstrap flow, execution flow, model division, sync rules.
+- `template/rules/core.md`: bootstrap scope, readiness, risk, refs, permissions, runtime governance.
 - `template/rules/output.md`: result and metrics output rules.
 - `template/schemas/`: optional result and metrics validation.
 - `project/project.md`: stable project identity.
@@ -26,11 +27,13 @@ project is the field workspace
 
 ## Normal Use
 
-1. Update `project/project.md` and `project/runtime.md` for the project.
-2. Fill `project/task.md` with the current task.
-3. Start the AI tool with `template/prompt.md`.
-4. Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
-5. Archive old task/result files if needed.
+1. Ask the AI tool to read `template/bootstrap.md`.
+2. Review and confirm `project/project.md` and relevant `project/refs/*`.
+3. Give the current task as a short goal.
+4. Review and confirm the generated `project/task.md`.
+5. Run execution with `template/prompt.md`.
+6. Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
+7. Archive old task/result files if needed.
 
 ## Sync Rules
 
@@ -44,11 +47,14 @@ From a real project back into the template repo:
 - Return only `ai/template/**`.
 - Never return `ai/project/**`.
 
-## Human-Minimal Rule
+## Bootstrap Rule
 
-- The human edits only `project/project.md` and `project/task.md` for normal use.
 - The human provides intent, hard constraints, and final acceptance.
-- The agent derives routine task detail from `project/project.md`, `project/runtime.md`, refs, and project files.
+- The agent drafts `project/project.md` and relevant `project/refs/*` from existing docs, manifests, refs, and project files.
+- The agent drafts `project/task.md` after the human provides the current task goal.
+- The human reviews and confirms project and task drafts before execution.
+- Bootstrap may write only project context files, plus `project/task.md` when a current task is provided.
+- Bootstrap must not edit source code, tests, configuration, dependency files, generated files, runtime files, result files, or metrics files.
 - Ask at most 3 clarification questions.
 - Ask only when the answer changes scope, risk, permission, or acceptance.
 - Repeated assumptions should become `project/runtime.md` update proposals.
