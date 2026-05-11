@@ -12,10 +12,18 @@
 
 然后选择模式：
 
-- 如果用户要求整理项目上下文，或 `ai/project/project.md` 为空、只有占位内容、
+- 如果用户说“整合 ai/project/inbox/ 里的新资料”，要求整合/合并/吸收/
+  更新上下文/处理新资料，提到 `reconcile` 或 `ai/project/inbox/`，
+  或 `ai/project/inbox/` 里存在待吸收资料，执行 `ai/template/reconcile.md`，
+  并按它的两阶段流程停止或更新。
+- 如果用户说“开始初始化这个项目”、要求初始化/整理/生成项目上下文，
+  或 `ai/project/project.md` 为空、只有占位内容、
   或不完整，执行 `ai/template/bootstrap.md`，并在项目上下文确认后停止。
 - 如果 `ai/project/task.md` 为空、只有占位内容、或不完整，根据用户当前目标和
   已确认的项目上下文起草它，然后停止等待人类确认。
+- 如果用户说“继续推进这个项目”，且没有更具体目标，先全局判断当前最值得做的
+  下一步：优先处理待确认上下文、待确认任务、失败结果、未完成任务或明显风险；
+  然后给出建议或起草 `ai/project/task.md`，不要让人类自己去文件管理器里找问题。
 - 只有当 `ai/project/project.md` 和 `ai/project/task.md` 已经足够定义身份、
   目标、范围、权限和验收时，才进入执行模式。
 

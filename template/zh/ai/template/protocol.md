@@ -12,18 +12,20 @@ ai/project/  = 当前项目执行工作区
 ## 执行流程
 
 ```text
-项目引导 -> 项目确认 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
+项目引导 / 上下文整合 -> 项目确认 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
 ```
 
 1. 项目发现时，执行 `ai/template/bootstrap.md`；不要总结它。
 2. 引导结束时使用“引导后交接”，在聊天里给出可确认摘要和推荐下一步，
    不要只要求人类打开文件检查。
 3. 任务执行时，执行 `ai/template/prompt.md`；不要总结它。
-4. 如果 `ai/project/task.md` 缺失或不完整，根据当前目标和已确认的项目上下文起草它，
+4. 当出现新的权威资料时，放入 `ai/project/inbox/`，执行 `ai/template/reconcile.md`；
+   不要总结它。整合必须先出计划，等确认后再更新上下文。
+5. 如果 `ai/project/task.md` 缺失或不完整，根据当前目标和已确认的项目上下文起草它，
    然后用“任务草稿交接”停止。
-5. 任务确认后，检查就绪度、风险、模型策略、引用、权限和验收。
-6. 只在项目任务边界内执行。
-7. 写入 `ai/project/result.json`、`ai/project/result.md` 和 `ai/project/metrics.json`。
+6. 任务确认后，检查就绪度、风险、模型策略、引用、权限和验收。
+7. 只在项目任务边界内执行。
+8. 写入 `ai/project/result.json`、`ai/project/result.md` 和 `ai/project/metrics.json`。
 
 ## 引导模式
 
@@ -128,6 +130,27 @@ ai/project/  = 当前项目执行工作区
 - 只为范围、风险、权限或验收阻塞项最多问 3 个问题；
 - 写完任务草稿后，使用 `ai/template/prompt.md` 中的“任务草稿交接”停止；
 - 永远不要编辑源码或业务文件。
+
+## 上下文整合模式
+
+上下文整合模式吸收新的权威资料，并修正现有长期上下文。
+
+新资料优先放入：
+
+- `ai/project/inbox/*.md`
+- `docs/**`
+
+用户可以直接说“整合 ai/project/inbox/ 里的新资料”。使用上下文整合模式时，
+执行 `ai/template/reconcile.md`。
+
+上下文整合模式必须：
+
+- 读取现有 `ai/project/project.md`、`ai/project/runtime.md` 和 `ai/project/refs/*.md`；
+- 读取人类指定的新资料；未指定时读取 `ai/project/inbox/*.md`；
+- 先输出整合计划，不修改文件；
+- 等人类确认后，才更新 `ai/project/project.md`、`ai/project/runtime.md` 和 `ai/project/refs/*.md`；
+- 不要默认修改 `task.md`、`result.*`、`metrics.json`、源码、测试、配置或依赖文件；
+- 不要把新资料整段塞进 refs，而是吸收长期有效、结构化、可复用的事实。
 
 ## 最少人类输入
 

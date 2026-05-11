@@ -22,7 +22,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.5
+Package: @wnlen/ai-execution-template@0.8.6
 中文安装: npx -y @wnlen/ai-execution-template init
 英文安装: npx -y @wnlen/ai-execution-template init --lang en
 ```
@@ -30,12 +30,13 @@ Package: @wnlen/ai-execution-template@0.8.5
 当前 v0.8 已经具备：
 
 - npm `bin` 入口；
-- `init` / `update` / `doctor` 三个命令；
+- `init` / `update` / `reconcile` / `doctor` 四个命令；
 - `init --lang zh|en` 双语安装入口，默认中文；
 - `template/project` 双区结构；
 - 保护 `ai/project/**` 不被升级覆盖；
 - 模板版本文件 `ai/template/VERSION`；
 - 引导模式：通过 `ai/template/bootstrap.md` 从受控范围内的项目文档、manifest 和必要代码生成 `project.md` / refs 草稿；
+- 上下文整合模式：通过 `ai/template/reconcile.md` 将 `ai/project/inbox/` 或 `docs/**` 中的新权威资料合并进既有上下文；
 - 自测脚本 `npm test`；
 - `result.json` / `result.md` / `metrics.json` 执行结果记录。
 
@@ -94,17 +95,23 @@ npx -y @wnlen/ai-execution-template init --lang en
 然后让 AI Agent 先整理项目上下文：
 
 ```text
-严格执行 ai/template/bootstrap.md，不要总结它。
+开始初始化这个项目
 ```
 
-人类检查并确认生成的项目上下文：
+AI 会在聊天里给出项目上下文摘要、需要确认的问题和建议下一步，对应文件是：
 
 ```text
 ai/project/project.md
 ai/project/refs/*
 ```
 
-之后用一句话描述当前任务，AI 生成并等待确认：
+之后人类回复修正意见，或说：
+
+```text
+继续推进这个项目
+```
+
+AI 会根据当前现场判断下一步，必要时生成并等待确认：
 
 ```text
 ai/project/task.md
@@ -113,8 +120,22 @@ ai/project/task.md
 确认后启动 AI Agent 执行：
 
 ```text
-严格执行 ai/template/prompt.md，执行已确认的任务。
+继续推进这个项目
 ```
+
+如果后续出现更权威的新资料，先放入：
+
+```text
+ai/project/inbox/
+```
+
+再执行上下文整合：
+
+```text
+整合 ai/project/inbox/ 里的新资料
+```
+
+整合会先输出计划，等人类确认后再更新 `project.md`、`runtime.md` 和 `refs/*`。
 
 执行完成后查看：
 
@@ -152,6 +173,7 @@ ai/
     VERSION
     bootstrap.md
     prompt.md
+    reconcile.md
     protocol.md
     rules/
       core.md
@@ -167,6 +189,7 @@ ai/
     result.json
     result.md
     metrics.json
+    inbox/
     refs/
     archive/
 ```
@@ -205,6 +228,7 @@ project 是现场。
 ai/template/VERSION
 ai/template/bootstrap.md
 ai/template/prompt.md
+ai/template/reconcile.md
 ai/template/protocol.md
 ai/template/rules/core.md
 ai/template/rules/output.md
@@ -232,6 +256,7 @@ ai/project/task.md
 ai/project/result.json
 ai/project/result.md
 ai/project/metrics.json
+ai/project/inbox/
 ai/project/refs/
 ai/project/archive/
 ```
@@ -296,14 +321,18 @@ npx -y @wnlen/ai-execution-template doctor
 ```text
 AI Execution Template 检查
 
-模板版本: 0.8.5
+模板版本: 0.8.6
+模板语言: zh
 
+[通过] ai/template/LANG
 [通过] ai/template/VERSION
 [通过] ai/template/bootstrap.md
 [通过] ai/template/prompt.md
+[通过] ai/template/reconcile.md
 [通过] ai/template/protocol.md
 [通过] ai/template/rules/core.md
 [通过] ai/template/rules/output.md
+[通过] ai/project/inbox/.gitkeep
 [通过] ai/project/project.md
 [通过] ai/project/runtime.md
 [通过] ai/project/task.md
@@ -316,17 +345,26 @@ AI Execution Template 检查
 
 ## 10. 启动入口
 
-项目上下文启动入口是：
+面向用户的项目上下文启动入口是：
 
 ```text
-ai/template/bootstrap.md
+开始初始化这个项目
 ```
 
-任务执行启动入口是：
+面向用户的任务执行入口是：
 
 ```text
-ai/template/prompt.md
+继续推进这个项目
 ```
+
+面向用户的上下文整合入口是：
+
+```text
+整合 ai/project/inbox/ 里的新资料
+```
+
+内部协议入口分别由 `ai/template/bootstrap.md`、`ai/template/prompt.md` 和
+`ai/template/reconcile.md` 承载，用户不需要记忆这些文件名。
 
 执行入口固定要求 AI Agent 先读：
 
@@ -526,6 +564,26 @@ Default cheap. Escalate for judgment. Record why.
 ```
 
 每次读取 ref 都必须在 `result.json.refs_read` 中记录原因。
+
+## 16.1 inbox 待吸收资料
+
+`ai/project/inbox/` 存放尚未整合进项目上下文的新资料。
+
+典型内容：
+
+```text
+ai/project/inbox/business-context.md
+ai/project/inbox/product-workflows.md
+ai/project/inbox/domain-model.md
+```
+
+当 inbox 中的资料需要吸收时，执行：
+
+```text
+整合 ai/project/inbox/ 里的新资料
+```
+
+AI 必须先输出整合计划，等人类确认后，才更新 `project.md`、`runtime.md` 和 `refs/*`。
 
 ## 17. 输出结果
 

@@ -1,0 +1,115 @@
+# AI Context Reconcile
+
+Do not summarize this file.
+Execute the context reconciliation workflow below.
+
+You are absorbing new authoritative material into an existing AI Execution Template project context.
+This is not a fresh bootstrap and not a full overwrite.
+
+Goal: merge long-lived facts from the new material, correct outdated or inaccurate context, and preserve existing context that is still correct.
+
+## When To Use
+
+Use this workflow when a project has been using the template for a while and a more complete or more authoritative business, product, architecture, or process document appears.
+
+New material should usually live in:
+
+- `ai/project/inbox/*.md`
+- `docs/**`
+
+`ai/project/inbox/` is the intake area for material that has not yet been absorbed. After reconciliation is confirmed, the material may stay for traceability or move into project docs or archives.
+
+## First Read
+
+1. `ai/template/protocol.md`
+2. `ai/template/rules/core.md`
+3. `ai/project/project.md`
+4. `ai/project/runtime.md`
+5. `ai/project/refs/*.md`
+6. The new material named by the human; if none is named, read `ai/project/inbox/*.md`
+
+Do not read `ai/project/archive/**`, source, tests, config, or dependency files by default unless the human explicitly asks you to use them for fact checking.
+
+## Reconciliation Principles
+
+- Do not overwrite the whole context set.
+- Preserve existing context that is still correct.
+- Split new material into the right places:
+  - Project identity, users, and stable conventions -> `ai/project/project.md`
+  - Current valid execution context -> `ai/project/runtime.md`
+  - Architecture / API / module boundaries -> `ai/project/refs/architecture.md`
+  - Commands -> `ai/project/refs/commands.md`
+  - Constraints -> `ai/project/refs/constraints.md`
+  - Durable decisions -> `ai/project/refs/decisions.md`
+- Do not dump raw source text into `refs/*`; absorb structured, long-lived, reusable context.
+- `task.md`, `result.json`, `result.md`, and `metrics.json` usually do not participate in business-context reconciliation unless the human explicitly asks you to extract long-lived facts from them.
+
+## Two-Phase Workflow
+
+### Phase 1: Reconciliation Plan
+
+First produce a reconciliation plan. Do not modify files.
+
+The plan must include:
+
+1. Content to add
+2. Content to correct
+3. Conflicts with existing context
+4. Content to remove or downgrade
+5. Questions requiring human confirmation, at most 3
+6. Files expected to change
+
+If there are no questions requiring confirmation, explicitly write "no extra confirmation needed".
+
+Stop at the end of Phase 1 and wait for human confirmation.
+
+### Phase 2: Apply Reconciliation
+
+Only update files after the human explicitly confirms the reconciliation plan.
+
+Allowed targets:
+
+- `ai/project/project.md`
+- `ai/project/runtime.md`
+- `ai/project/refs/*.md`
+
+Do not modify these unless the human explicitly asks:
+
+- Source, tests, config, dependency files
+- `ai/project/task.md`
+- `ai/project/result.json`
+- `ai/project/result.md`
+- `ai/project/metrics.json`
+- `ai/project/archive/**`
+
+## Final Handoff
+
+After applying reconciliation, the final response must include:
+
+```text
+Context reconciliation is complete.
+
+Updated:
+- file
+
+Key changes:
+- Added:
+- Corrected:
+- Deprecated:
+
+Still uncertain:
+- Up to 3 items; write "none" if there are none
+
+Recommended next step:
+1. Priority task:
+   Reason:
+2. Alternative task:
+   Reason:
+
+Reply with:
+- Confirm, draft task 1
+- Confirm, but do: <one-sentence task>
+- Correction: <what to change>
+```
+
+Do not make the human hunt through files to find changes; file paths are only for traceability.

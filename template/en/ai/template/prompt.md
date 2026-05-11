@@ -12,12 +12,23 @@ First read:
 
 Then choose the mode:
 
-- If the user asks to bootstrap project context, or if `ai/project/project.md`
-  is empty, placeholder-only, or incomplete, follow `ai/template/bootstrap.md`
+- If the user says "Reconcile the new material in ai/project/inbox/", asks to
+  reconcile, merge, absorb, update context, handle new material, mentions
+  `reconcile` or `ai/project/inbox/`, or if `ai/project/inbox/` contains
+  material waiting to be absorbed, follow `ai/template/reconcile.md` and stop
+  or update according to its two-phase workflow.
+- If the user says "Start initializing this project", asks to initialize,
+  organize, or generate project context, or if `ai/project/project.md` is
+  empty, placeholder-only, or incomplete, follow `ai/template/bootstrap.md`
   and stop after project-context confirmation.
 - If `ai/project/task.md` is empty, placeholder-only, or incomplete, draft it
   from the user's current goal and confirmed project context, then stop for
   human confirmation.
+- If the user says "Continue this project" without a more specific goal, first
+  judge the best next step globally: prioritize pending context confirmation,
+  pending task confirmation, failed results, unfinished tasks, or obvious
+  risks; then recommend a next step or draft `ai/project/task.md`. Do not make
+  the human hunt through files for gaps.
 - Use Execution Mode only after `ai/project/project.md` and
   `ai/project/task.md` are ready enough to define identity, goal, scope,
   permission, and acceptance.

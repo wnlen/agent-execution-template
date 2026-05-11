@@ -11,6 +11,7 @@ project is the field workspace
 
 - `template/prompt.md`: AI startup prompt.
 - `template/bootstrap.md`: project discovery and context bootstrap prompt.
+- `template/reconcile.md`: merge new authoritative material into existing project context.
 - `template/VERSION`: installed template version.
 - `template/protocol.md`: bootstrap flow, execution flow, model division, sync rules.
 - `template/rules/core.md`: bootstrap scope, readiness, risk, refs, permissions, runtime governance.
@@ -23,17 +24,33 @@ project is the field workspace
 - `project/result.md`: latest human-readable execution summary.
 - `project/metrics.json`: latest model, token, time, success, and reuse signals.
 - `project/refs/`: detailed references loaded only when needed.
+- `project/inbox/`: new material waiting to be absorbed, such as authoritative business docs.
 - `project/archive/`: historical tasks/results, not read by default.
 
 ## Normal Use
 
-1. Ask the AI tool: `Execute ai/template/bootstrap.md exactly. Do not summarize.`
-2. Review and confirm `project/project.md` and relevant `project/refs/*`.
-3. Reply with corrections or confirmation, plus the current task as a short goal.
-4. Review and confirm the generated `project/task.md`.
-5. Run execution with: `Follow ai/template/prompt.md and execute the confirmed task.`
-6. Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
-7. Archive old task/result files if needed.
+1. During initialization, tell the AI tool: `Start initializing this project`.
+2. The AI summarizes project context, confirmation points, and the recommended next step in chat.
+3. Reply with corrections, or say: `Continue this project`.
+4. To absorb new material, put it in `project/inbox/`, then say: `Reconcile the new material in ai/project/inbox/`.
+5. Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
+6. Archive old task/result files if needed.
+
+## Context Reconcile
+
+When more complete or more authoritative material appears, put it in:
+
+```text
+ai/project/inbox/
+```
+
+Then ask the AI tool:
+
+```text
+Reconcile the new material in ai/project/inbox/
+```
+
+The workflow produces a reconciliation plan first and updates `project.md`, `runtime.md`, and `refs/*` only after confirmation.
 
 ## Sync Rules
 

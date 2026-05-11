@@ -17,7 +17,7 @@ npx -y @wnlen/ai-execution-template init --lang en
 Then tell your coding agent:
 
 ```text
-Execute ai/template/bootstrap.md exactly. Do not summarize.
+Start initializing this project
 ```
 
 AI Execution Template is not another agent framework. It is the missing execution layer between your repository and tools like Codex, Claude Code, Cursor, Aider, or any other AI coding agent.
@@ -67,27 +67,33 @@ npx -y @wnlen/ai-execution-template init --lang en
 Ask your agent to bootstrap project context from existing docs and manifests:
 
 ```text
-Execute ai/template/bootstrap.md exactly. Do not summarize.
+Start initializing this project
 ```
 
-Review and confirm the generated project context:
+The agent will generate project context and summarize what needs confirmation,
+risks, and the recommended next step in chat:
 
 ```text
 ai/project/project.md
 ai/project/refs/*
 ```
 
-Reply with corrections or confirmation, plus the next task in one sentence.
-The agent drafts:
+Reply with corrections, or confirm and continue:
+
+```text
+Continue this project
+```
+
+The agent will draft or execute from current context:
 
 ```text
 ai/project/task.md
 ```
 
-Confirm the task draft, then run execution:
+After the task draft is confirmed, you can also say:
 
 ```text
-Follow ai/template/prompt.md and execute the confirmed task.
+Continue this project
 ```
 
 Review the execution output:
@@ -134,6 +140,7 @@ ai/
     VERSION
     bootstrap.md
     prompt.md
+    reconcile.md
     protocol.md
     rules/
       core.md
@@ -149,6 +156,7 @@ ai/
     result.json
     result.md
     metrics.json
+    inbox/
     refs/
     archive/
 ```
@@ -198,6 +206,14 @@ It reports:
 - `[WARN]` for empty required project context files.
 - `[MISSING]` for missing required files.
 
+### `reconcile`
+
+```bash
+npx -y @wnlen/ai-execution-template reconcile --lang en
+```
+
+Prints the shortest context-reconcile instructions.
+
 ## Execution Model
 
 AI Execution Template defines a simple loop:
@@ -217,6 +233,22 @@ The protocol records:
 - human-readable results,
 - machine-readable execution facts,
 - model tier and cost signals.
+
+## Context Reconcile
+
+When a more complete or more authoritative document appears after the project has been using the template, put it in:
+
+```text
+ai/project/inbox/
+```
+
+Then ask your agent:
+
+```text
+Reconcile the new material in ai/project/inbox/
+```
+
+The agent must produce a reconciliation plan first, wait for confirmation, then merge long-lived facts into `project.md`, `runtime.md`, and `refs/*`.
 
 ## Token-Efficient by Design
 

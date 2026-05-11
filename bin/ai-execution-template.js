@@ -14,9 +14,11 @@ const REQUIRED_FILES = [
   "ai/template/VERSION",
   "ai/template/bootstrap.md",
   "ai/template/prompt.md",
+  "ai/template/reconcile.md",
   "ai/template/protocol.md",
   "ai/template/rules/core.md",
   "ai/template/rules/output.md",
+  "ai/project/inbox/.gitkeep",
   "ai/project/project.md",
   "ai/project/runtime.md",
   "ai/project/task.md",
@@ -32,18 +34,19 @@ const TEXT = {
 用法:
   ai-execution-template init [--lang zh|en] [--verbose]
   ai-execution-template update [--lang zh|en]
+  ai-execution-template reconcile [--lang zh|en]
   ai-execution-template doctor
 `,
     unknown: "未知",
     sourceMissing: "找不到模板来源",
     ready: "AI Execution Template 已就绪。",
     start: "开始:",
-    startPrompt: "严格执行 ai/template/bootstrap.md，不要总结它。",
+    startPrompt: "开始初始化这个项目",
     then: "然后:",
-    reviewProject: "检查 ai/project/project.md 和 ai/project/refs/*",
-    giveTask: "给出修正意见，或提供一个任务目标",
-    confirmTask: "确认 ai/project/task.md 后，运行:",
-    executePrompt: "严格执行 ai/template/prompt.md，执行已确认的任务。",
+    reviewProject: "按 AI 输出确认或修正项目上下文",
+    giveTask: "需要执行任务时，说：继续推进这个项目",
+    confirmTask: "需要吸收新资料时，先放入 ai/project/inbox/，然后说:",
+    executePrompt: "整合 ai/project/inbox/ 里的新资料",
     files: "文件",
     check: "检查",
     details: "详情:",
@@ -62,6 +65,10 @@ const TEXT = {
     readyWithWarnings: "已就绪，但存在警告",
     readyToRun: "已就绪",
     invalidLang: "不支持的语言，请使用 zh 或 en",
+    reconcileTitle: "AI Execution Template 上下文整合",
+    reconcilePut: "把新的业务、产品、架构或流程资料放到:",
+    reconcileAsk: "然后对 AI 说:",
+    reconcilePrompt: "整合 ai/project/inbox/ 里的新资料",
     changeLabels: {
       created: "已创建",
       updated: "已更新",
@@ -75,18 +82,19 @@ const TEXT = {
 Usage:
   ai-execution-template init [--lang zh|en] [--verbose]
   ai-execution-template update [--lang zh|en]
+  ai-execution-template reconcile [--lang zh|en]
   ai-execution-template doctor
 `,
     unknown: "unknown",
     sourceMissing: "Template source not found",
     ready: "AI Execution Template ready.",
     start: "Start:",
-    startPrompt: "Execute ai/template/bootstrap.md exactly. Do not summarize.",
+    startPrompt: "Start initializing this project",
     then: "Then:",
-    reviewProject: "Review ai/project/project.md and ai/project/refs/*",
-    giveTask: "Give corrections or a task goal",
-    confirmTask: "Confirm ai/project/task.md, then run:",
-    executePrompt: "Follow ai/template/prompt.md and execute the confirmed task.",
+    reviewProject: "Confirm or correct the project context from the agent output",
+    giveTask: "When you want to execute work, say: Continue this project",
+    confirmTask: "When you need to absorb new material, put it in ai/project/inbox/, then say:",
+    executePrompt: "Reconcile the new material in ai/project/inbox/",
     files: "Files",
     check: "Check",
     details: "Details:",
@@ -105,6 +113,10 @@ Usage:
     readyWithWarnings: "Ready to run with warnings",
     readyToRun: "Ready to run",
     invalidLang: "Unsupported language. Use zh or en",
+    reconcileTitle: "AI Execution Template Context Reconcile",
+    reconcilePut: "Put new business, product, architecture, or process material in:",
+    reconcileAsk: "Then tell your agent:",
+    reconcilePrompt: "Reconcile the new material in ai/project/inbox/",
     changeLabels: {
       created: "CREATED",
       updated: "UPDATED",
@@ -279,6 +291,24 @@ function update({ lang = readInstalledLang() } = {}) {
   console.log(`[${text.pass}] ${text.updated} ${readVersion(sourceTemplate) || text.unknown}. ${text.projectNotModified}`);
 }
 
+function reconcile({ lang = readInstalledLang() } = {}) {
+  const text = getText(lang);
+  if (!SUPPORTED_LANGS.has(lang)) {
+    console.error(`[${text.fail}] ${text.invalidLang}: ${lang}`);
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log(`${text.reconcileTitle}
+
+${text.reconcilePut}
+  ai/project/inbox/
+
+${text.reconcileAsk}
+  ${text.reconcilePrompt}
+`);
+}
+
 function doctor() {
   const lang = readInstalledLang();
   const text = getText(lang);
@@ -321,12 +351,17 @@ function doctor() {
 const args = process.argv.slice(2);
 const command = args[0] || "help";
 const verbose = args.includes("--verbose");
-const requestedLang = parseLang(args, command === "update" || command === "doctor" ? readInstalledLang() : DEFAULT_LANG);
+const requestedLang = parseLang(
+  args,
+  command === "update" || command === "doctor" || command === "reconcile" ? readInstalledLang() : DEFAULT_LANG
+);
 
 if (command === "init") {
   init({ lang: requestedLang, verbose });
 } else if (command === "update") {
   update({ lang: requestedLang });
+} else if (command === "reconcile") {
+  reconcile({ lang: requestedLang });
 } else if (command === "doctor") {
   doctor();
 } else {

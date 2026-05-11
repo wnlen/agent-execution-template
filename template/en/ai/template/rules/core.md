@@ -76,6 +76,31 @@ Task Draft Mode may write only:
 Task Draft Mode must end with the Task Draft Handoff from
 `ai/template/prompt.md`.
 
+## Context Reconcile Gate
+
+If the user provides new authoritative business, product, architecture, or
+process material and wants it merged into existing context, or says
+"Reconcile the new material in ai/project/inbox/", follow
+`ai/template/reconcile.md`. Do not re-bootstrap and do not overwrite the whole
+context set.
+
+New material should usually live in:
+
+- `ai/project/inbox/*.md`
+- `docs/**`
+
+Context reconciliation must produce a plan first and wait for human
+confirmation before updating files.
+
+By default, context reconciliation may update only:
+
+- `ai/project/project.md`
+- `ai/project/runtime.md`
+- `ai/project/refs/*.md`
+
+Do not modify current task, results, metrics, archives, source, tests, config,
+or dependency files unless the human explicitly authorizes it.
+
 ## Risk Gate
 
 Before editing code or running commands, check whether the task involves:

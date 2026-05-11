@@ -23,7 +23,7 @@ npx -y @wnlen/ai-execution-template init --lang zh
 然后告诉你的 AI 编程工具：
 
 ```text
-严格执行 ai/template/bootstrap.md，不要总结它。
+开始初始化这个项目
 ```
 
 AI Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
@@ -79,26 +79,32 @@ npx -y @wnlen/ai-execution-template init --lang en
 让 Agent 从现有文档和 manifest 里整理项目上下文：
 
 ```text
-严格执行 ai/template/bootstrap.md，不要总结它。
+开始初始化这个项目
 ```
 
-检查并确认生成的项目上下文：
+Agent 会生成项目上下文，并在聊天里给出需要确认的摘要、风险和建议下一步：
 
 ```text
 ai/project/project.md
 ai/project/refs/*
 ```
 
-回复修正意见或确认，并用一句话描述下一个任务。Agent 会生成：
+回复修正意见，或确认后继续：
+
+```text
+继续推进这个项目
+```
+
+Agent 会根据当前上下文起草或执行：
 
 ```text
 ai/project/task.md
 ```
 
-确认任务草稿后执行：
+当任务草稿已确认后，也可以直接说：
 
 ```text
-严格执行 ai/template/prompt.md，执行已确认的任务。
+继续推进这个项目
 ```
 
 查看执行结果：
@@ -145,6 +151,7 @@ ai/
     VERSION
     bootstrap.md
     prompt.md
+    reconcile.md
     protocol.md
     rules/
       core.md
@@ -160,6 +167,7 @@ ai/
     result.json
     result.md
     metrics.json
+    inbox/
     refs/
     archive/
 ```
@@ -209,6 +217,14 @@ npx -y @wnlen/ai-execution-template doctor
 - `[警告]` 必要的项目上下文文件为空。
 - `[缺失]` 必要文件缺失。
 
+### `reconcile`
+
+```bash
+npx -y @wnlen/ai-execution-template reconcile
+```
+
+打印上下文整合的最短操作说明。
+
 ## 执行模型
 
 AI Execution Template 定义了一个简单循环：
@@ -228,6 +244,22 @@ AI Execution Template 定义了一个简单循环：
 - 人类可读结果；
 - 机器可读执行事实；
 - 模型档位和成本信号。
+
+## 上下文整合
+
+当项目使用一段时间后，出现更完整、更权威的业务、产品、架构或流程资料时，先放到：
+
+```text
+ai/project/inbox/
+```
+
+然后告诉 AI：
+
+```text
+整合 ai/project/inbox/ 里的新资料
+```
+
+AI 必须先输出整合计划，等待确认后，再把长期有效事实合并进 `project.md`、`runtime.md` 和 `refs/*`。
 
 ## Token-Efficient 设计
 

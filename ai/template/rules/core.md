@@ -66,6 +66,27 @@
 
 任务草稿模式必须以 `ai/template/prompt.md` 中的“任务草稿交接”结束。
 
+## 上下文整合门
+
+如果用户提供新的权威业务、产品、架构或流程资料，并希望合并到既有上下文，
+或说“整合 ai/project/inbox/ 里的新资料”，执行 `ai/template/reconcile.md`，
+不要重新 bootstrap，也不要全量覆盖。
+
+新资料优先放在：
+
+- `ai/project/inbox/*.md`
+- `docs/**`
+
+上下文整合必须先输出整合计划，等待人类确认后才更新文件。
+
+上下文整合默认只能更新：
+
+- `ai/project/project.md`
+- `ai/project/runtime.md`
+- `ai/project/refs/*.md`
+
+除非人类明确授权，不要修改当前任务、结果、指标、归档、源码、测试、配置或依赖文件。
+
 ## 风险门
 
 编辑代码或运行命令前，检查任务是否涉及：

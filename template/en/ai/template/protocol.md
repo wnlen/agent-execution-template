@@ -13,7 +13,7 @@ Template is protocol. Project is the field workspace.
 ## Execution Flow
 
 ```text
-Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
+Project Bootstrap / Context Reconcile -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
 ```
 
 1. For project discovery, follow `ai/template/bootstrap.md`; do not summarize it.
@@ -21,12 +21,15 @@ Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Ex
    in-chat summary and recommended next step. Do not only ask the human to open
    files and inspect them.
 3. For task execution, follow `ai/template/prompt.md`; do not summarize it.
-4. If `ai/project/task.md` is missing or incomplete, draft it from the current
+4. When new authoritative material appears, put it in `ai/project/inbox/` and
+   follow `ai/template/reconcile.md`; do not summarize it. Reconciliation must
+   produce a plan first and update context only after confirmation.
+5. If `ai/project/task.md` is missing or incomplete, draft it from the current
    goal and confirmed project context, then stop with the Task Draft Handoff.
-5. After task confirmation, check readiness, risk, model policy, refs,
+6. After task confirmation, check readiness, risk, model policy, refs,
    permission, and acceptance.
-6. Execute only within the project task boundary.
-7. Write `ai/project/result.json`, `ai/project/result.md`, and `ai/project/metrics.json`.
+7. Execute only within the project task boundary.
+8. Write `ai/project/result.json`, `ai/project/result.md`, and `ai/project/metrics.json`.
 
 ## Bootstrap Mode
 
@@ -143,6 +146,28 @@ Task Draft Mode should:
 - stop after writing the task draft with the Task Draft Handoff from
   `ai/template/prompt.md`;
 - never edit source or business files.
+
+## Context Reconcile Mode
+
+Context Reconcile Mode absorbs new authoritative material and corrects existing
+long-lived context.
+
+New material should usually live in:
+
+- `ai/project/inbox/*.md`
+- `docs/**`
+
+The user can simply say "Reconcile the new material in ai/project/inbox/".
+Use Context Reconcile Mode by following `ai/template/reconcile.md`.
+
+Context Reconcile Mode must:
+
+- read existing `ai/project/project.md`, `ai/project/runtime.md`, and `ai/project/refs/*.md`;
+- read the new material named by the human; if none is named, read `ai/project/inbox/*.md`;
+- produce a reconciliation plan first without modifying files;
+- update `ai/project/project.md`, `ai/project/runtime.md`, and `ai/project/refs/*.md` only after human confirmation;
+- not modify `task.md`, `result.*`, `metrics.json`, source, tests, config, or dependency files by default;
+- not dump raw new material into refs; absorb long-lived, structured, reusable facts.
 
 ## Human-Minimal Task
 
