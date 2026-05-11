@@ -14,10 +14,16 @@
 npx @wnlen/ai-execution-template init
 ```
 
+默认安装中文模板；也可以显式指定：
+
+```bash
+npx @wnlen/ai-execution-template init --lang zh
+```
+
 然后告诉你的 AI 编程工具：
 
 ```text
-Execute ai/template/bootstrap.md exactly. Do not summarize.
+严格执行 ai/template/bootstrap.md，不要总结它。
 ```
 
 AI Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
@@ -64,10 +70,16 @@ ai/project/   当前项目现场
 npx @wnlen/ai-execution-template init
 ```
 
+英文项目可使用：
+
+```bash
+npx @wnlen/ai-execution-template init --lang en
+```
+
 让 Agent 从现有文档和 manifest 里整理项目上下文：
 
 ```text
-Execute ai/template/bootstrap.md exactly. Do not summarize.
+严格执行 ai/template/bootstrap.md，不要总结它。
 ```
 
 检查并确认生成的项目上下文：
@@ -86,7 +98,7 @@ ai/project/task.md
 确认任务草稿后执行：
 
 ```text
-Follow ai/template/prompt.md and execute the confirmed task.
+严格执行 ai/template/prompt.md，执行已确认的任务。
 ```
 
 查看执行结果：
@@ -170,6 +182,7 @@ npx @wnlen/ai-execution-template init
 - 更新或创建 `ai/template/**`。
 - 创建缺失的 `ai/project/**` 文件。
 - 保留已有的 `ai/project/**` 文件。
+- 默认安装中文模板；英文模板使用 `--lang en`。
 
 ### `update`
 
@@ -180,6 +193,7 @@ npx @wnlen/ai-execution-template update
 只更新 `ai/template/**`。
 
 当协议升级，但项目上下文不应该被覆盖时使用它。
+默认沿用 `ai/template/LANG` 中记录的已安装语言。
 
 ### `doctor`
 
@@ -191,16 +205,16 @@ npx @wnlen/ai-execution-template doctor
 
 输出状态包括：
 
-- `[OK]` 文件存在且可用。
-- `[WARN]` 必要的项目上下文文件为空。
-- `[MISSING]` 必要文件缺失。
+- `[通过]` 文件存在且可用。
+- `[警告]` 必要的项目上下文文件为空。
+- `[缺失]` 必要文件缺失。
 
 ## 执行模型
 
 AI Execution Template 定义了一个简单循环：
 
 ```text
-Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
+项目引导 -> 项目确认 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
 ```
 
 重点不是构建复杂调度器，而是让一次 AI 辅助编码任务足够清晰，可以执行、验证、重跑和审计。
