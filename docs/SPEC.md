@@ -86,9 +86,7 @@ npx @wnlen/ai-execution-template init
 然后让 AI Agent 先整理项目上下文：
 
 ```text
-Follow ai/template/bootstrap.md.
-Do not summarize it.
-Bootstrap this project now.
+Execute ai/template/bootstrap.md exactly. Do not summarize.
 ```
 
 人类检查并确认生成的项目上下文：

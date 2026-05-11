@@ -32,7 +32,7 @@ function usage() {
   console.log(`AI Execution Template
 
 Usage:
-  ai-execution-template init
+  ai-execution-template init [--verbose]
   ai-execution-template update
   ai-execution-template doctor
 `);
@@ -82,7 +82,18 @@ function printChanges(title, changes) {
   }
 }
 
-function init() {
+function summarizeChanges(changes) {
+  const counts = changes.reduce((acc, change) => {
+    acc[change.action] = (acc[change.action] || 0) + 1;
+    return acc;
+  }, {});
+  return ["created", "updated", "kept"]
+    .filter((action) => counts[action])
+    .map((action) => `${counts[action]} ${action}`)
+    .join(", ");
+}
+
+function init({ verbose = false } = {}) {
   if (!fs.existsSync(SOURCE_AI)) {
     console.error(`[FAIL] Template source not found: ${SOURCE_AI}`);
     process.exitCode = 1;
@@ -101,20 +112,24 @@ function init() {
   changes.push(...copyTree(path.join(SOURCE_AI, "project"), path.join(TARGET_AI, "project"), false)
     .map((change) => ({ ...change, path: path.join("ai/project", change.path) })));
 
-  printChanges("AI Execution Template init", changes);
-  console.log(`
-Next:
-1. Send this to your AI agent:
-   Follow ai/template/bootstrap.md.
-   Do not summarize it.
-   Bootstrap this project now.
-2. Review and confirm ai/project/project.md and ai/project/refs/*
-3. Reply with corrections or confirmation, plus the current task as a short goal
-4. Let the agent draft ai/project/task.md for confirmation
-5. Confirm the task, then send:
-   Follow ai/template/prompt.md and execute the confirmed task.
-6. Check installation with: npx @wnlen/ai-execution-template doctor
+  console.log(`AI Execution Template ready.
+
+Start:
+  Execute ai/template/bootstrap.md exactly. Do not summarize.
+
+Then:
+  Review ai/project/project.md and ai/project/refs/*
+  Give corrections or a task goal
+  Confirm ai/project/task.md, then run:
+    Follow ai/template/prompt.md and execute the confirmed task.
+
+Files: ${summarizeChanges(changes)}
+Check: npx @wnlen/ai-execution-template doctor
 `);
+
+  if (verbose) {
+    printChanges("Details:", changes);
+  }
 }
 
 function update() {
@@ -168,10 +183,12 @@ function doctor() {
   }
 }
 
-const command = process.argv[2] || "help";
+const args = process.argv.slice(2);
+const command = args[0] || "help";
+const verbose = args.includes("--verbose");
 
 if (command === "init") {
-  init();
+  init({ verbose });
 } else if (command === "update") {
   update();
 } else if (command === "doctor") {

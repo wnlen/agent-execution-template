@@ -17,9 +17,7 @@ npx @wnlen/ai-execution-template init
 Then tell your coding agent:
 
 ```text
-Follow ai/template/bootstrap.md.
-Do not summarize it.
-Bootstrap this project now.
+Execute ai/template/bootstrap.md exactly. Do not summarize.
 ```
 
 AI Execution Template is not another agent framework. It is the missing execution layer between your repository and tools like Codex, Claude Code, Cursor, Aider, or any other AI coding agent.
@@ -69,9 +67,7 @@ npx @wnlen/ai-execution-template init
 Ask your agent to bootstrap project context from existing docs and manifests:
 
 ```text
-Follow ai/template/bootstrap.md.
-Do not summarize it.
-Bootstrap this project now.
+Execute ai/template/bootstrap.md exactly. Do not summarize.
 ```
 
 Review and confirm the generated project context:

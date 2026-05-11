@@ -58,7 +58,12 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/template/bootstrap.md").includes("Post-Bootstrap Handoff"), "bootstrap prompt should include handoff");
   assert(read(cwd, "ai/template/prompt.md").includes("Task Draft Handoff"), "execution prompt should include task handoff");
   assert(read(cwd, "ai/template/protocol.md").includes("Bootstrap Read Scope"), "init should install bootstrap protocol");
-  assert(!run(["init"], cwd).includes("Read ai/template/bootstrap.md"), "init output should not use weak Read bootstrap command");
+  const initOutput = run(["init"], cwd);
+  assert(initOutput.includes("Execute ai/template/bootstrap.md exactly. Do not summarize."), "init output should provide compact bootstrap prompt");
+  assert(initOutput.includes("Files:"), "init output should summarize file changes");
+  assert(!initOutput.includes("[UPDATED]"), "init output should hide detailed file changes by default");
+  assert(!initOutput.includes("Read ai/template/bootstrap.md"), "init output should not use weak Read bootstrap command");
+  assert(run(["init", "--verbose"], cwd).includes("[UPDATED] ai/template/VERSION"), "init --verbose should show detailed file changes");
 
   write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
   run(["update"], cwd);

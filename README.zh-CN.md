@@ -17,9 +17,7 @@ npx @wnlen/ai-execution-template init
 然后告诉你的 AI 编程工具：
 
 ```text
-Follow ai/template/bootstrap.md.
-Do not summarize it.
-Bootstrap this project now.
+Execute ai/template/bootstrap.md exactly. Do not summarize.
 ```
 
 AI Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
@@ -69,9 +67,7 @@ npx @wnlen/ai-execution-template init
 让 Agent 从现有文档和 manifest 里整理项目上下文：
 
 ```text
-Follow ai/template/bootstrap.md.
-Do not summarize it.
-Bootstrap this project now.
+Execute ai/template/bootstrap.md exactly. Do not summarize.
 ```
 
 检查并确认生成的项目上下文：
