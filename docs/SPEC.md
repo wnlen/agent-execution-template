@@ -86,7 +86,9 @@ npx @wnlen/ai-execution-template init
 然后让 AI Agent 先整理项目上下文：
 
 ```text
-Read ai/template/bootstrap.md
+Follow ai/template/bootstrap.md.
+Do not summarize it.
+Bootstrap this project now.
 ```
 
 人类检查并确认生成的项目上下文：
@@ -105,7 +107,7 @@ ai/project/task.md
 确认后启动 AI Agent 执行：
 
 ```text
-Read ai/template/prompt.md
+Follow ai/template/prompt.md and execute the confirmed task.
 ```
 
 执行完成后查看：

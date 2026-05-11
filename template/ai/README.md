@@ -27,11 +27,11 @@ project is the field workspace
 
 ## Normal Use
 
-1. Ask the AI tool to read `template/bootstrap.md`.
+1. Ask the AI tool: `Follow ai/template/bootstrap.md. Do not summarize it. Bootstrap this project now.`
 2. Review and confirm `project/project.md` and relevant `project/refs/*`.
-3. Give the current task as a short goal.
+3. Reply with corrections or confirmation, plus the current task as a short goal.
 4. Review and confirm the generated `project/task.md`.
-5. Run execution with `template/prompt.md`.
+5. Run execution with: `Follow ai/template/prompt.md and execute the confirmed task.`
 6. Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
 7. Archive old task/result files if needed.
 

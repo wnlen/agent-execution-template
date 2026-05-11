@@ -1,5 +1,8 @@
 # AI Execution Prompt
 
+Do not summarize this file.
+Execute the workflow below.
+
 You are operating inside an AI Execution Template workspace.
 
 First read:
@@ -19,6 +22,8 @@ Then choose the mode:
   `ai/project/task.md` are ready enough to define identity, goal, scope,
   permission, and acceptance.
 
+## Task Draft Handoff
+
 In Task Draft Mode:
 
 1. Read confirmed `ai/project/project.md` and relevant `ai/project/refs/*.md`.
@@ -26,6 +31,24 @@ In Task Draft Mode:
 3. Ask at most 3 questions only for scope, risk, permission, or acceptance
    blockers.
 4. Stop for human confirmation. Do not modify source or business files.
+
+End Task Draft Mode with:
+
+```text
+Task draft is ready.
+
+Please review:
+- ai/project/task.md
+
+Confirm or correct:
+1. Goal and acceptance
+2. Allowed and denied scope
+3. Permissions, commands, and risk level
+
+Reply with:
+- Confirmed, execute
+- Or corrections
+```
 
 In Execution Mode, read:
 

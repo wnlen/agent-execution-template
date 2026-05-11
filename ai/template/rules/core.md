@@ -35,9 +35,10 @@ a current task goal.
 Bootstrap Mode must not edit source code, tests, configuration, dependency
 files, generated files, runtime files, result files, or metrics files.
 
-After writing bootstrap drafts, stop for human confirmation. Do not continue
-into implementation in the same run unless the human explicitly confirms the
-drafts and asks to execute.
+After writing bootstrap drafts, stop with the Post-Bootstrap Handoff from
+`ai/template/bootstrap.md`. Do not continue into task drafting or
+implementation in the same run unless the human explicitly confirms the
+project context and provides a task.
 
 ## Bootstrap Read Scope
 
@@ -68,6 +69,9 @@ confirmation before implementation.
 Task Draft Mode may write only:
 
 - `ai/project/task.md`
+
+Task Draft Mode must end with the Task Draft Handoff from
+`ai/template/prompt.md`.
 
 ## Risk Gate
 

@@ -16,11 +16,12 @@ Template is protocol. Project is the field workspace.
 Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
 ```
 
-1. For project discovery, read `ai/template/bootstrap.md`.
-2. Confirm generated `ai/project/project.md` and relevant `ai/project/refs/*.md`.
-3. For task execution, read `ai/template/prompt.md`.
+1. For project discovery, follow `ai/template/bootstrap.md`; do not summarize it.
+2. End bootstrap with the Post-Bootstrap Handoff and confirm generated
+   `ai/project/project.md` and relevant `ai/project/refs/*.md`.
+3. For task execution, follow `ai/template/prompt.md`; do not summarize it.
 4. If `ai/project/task.md` is missing or incomplete, draft it from the current
-   goal and confirmed project context, then stop for confirmation.
+   goal and confirmed project context, then stop with the Task Draft Handoff.
 5. After task confirmation, check readiness, risk, model policy, refs,
    permission, and acceptance.
 6. Execute only within the project task boundary.
@@ -113,8 +114,9 @@ before expanding the read scope.
 - security, compatibility, performance, data, and deployment constraints;
 - documented decisions only when evidence exists.
 
-After writing drafts, stop and ask the human to review and confirm before task
-drafting or Execution Mode begins.
+After writing drafts, stop with the Post-Bootstrap Handoff from
+`ai/template/bootstrap.md`. Do not enter task drafting or Execution Mode until
+the human confirms project context.
 
 ## Task Draft Mode
 
@@ -133,7 +135,8 @@ Task Draft Mode should:
   permissions, command policy, model policy, and acceptance criteria;
 - ask at most 3 questions only for scope, risk, permission, or acceptance
   blockers;
-- stop after writing the task draft and ask for confirmation;
+- stop after writing the task draft with the Task Draft Handoff from
+  `ai/template/prompt.md`;
 - never edit source or business files.
 
 ## Human-Minimal Task

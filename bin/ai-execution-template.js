@@ -104,11 +104,15 @@ function init() {
   printChanges("AI Execution Template init", changes);
   console.log(`
 Next:
-1. Ask your AI agent: Read ai/template/bootstrap.md
+1. Send this to your AI agent:
+   Follow ai/template/bootstrap.md.
+   Do not summarize it.
+   Bootstrap this project now.
 2. Review and confirm ai/project/project.md and ai/project/refs/*
-3. Describe the current task as a short goal
+3. Reply with corrections or confirmation, plus the current task as a short goal
 4. Let the agent draft ai/project/task.md for confirmation
-5. Confirm the task, then run: Read ai/template/prompt.md
+5. Confirm the task, then send:
+   Follow ai/template/prompt.md and execute the confirmed task.
 6. Check installation with: npx @wnlen/ai-execution-template doctor
 `);
 }
