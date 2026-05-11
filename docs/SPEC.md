@@ -22,7 +22,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.0
+Package: @wnlen/ai-execution-template@0.8.1
 Install: npx @wnlen/ai-execution-template init
 ```
 
@@ -282,7 +282,7 @@ npx @wnlen/ai-execution-template doctor
 ```text
 AI Execution Template Doctor
 
-Template version: 0.8.0
+Template version: 0.8.1
 
 [OK] ai/template/VERSION
 [OK] ai/template/bootstrap.md

@@ -54,7 +54,11 @@ function testInitUpdateDoctor() {
   assert(exists(cwd, "ai/project/project.md"), "init should create project.md");
   assert(exists(cwd, "ai/project/task.md"), "init should create task.md");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Confirmation Dimensions"), "init should install bootstrap prompt");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Do not summarize this file"), "bootstrap prompt should prevent summary-only behavior");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Post-Bootstrap Handoff"), "bootstrap prompt should include handoff");
+  assert(read(cwd, "ai/template/prompt.md").includes("Task Draft Handoff"), "execution prompt should include task handoff");
   assert(read(cwd, "ai/template/protocol.md").includes("Bootstrap Read Scope"), "init should install bootstrap protocol");
+  assert(!run(["init"], cwd).includes("Read ai/template/bootstrap.md"), "init output should not use weak Read bootstrap command");
 
   write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
   run(["update"], cwd);
