@@ -22,9 +22,9 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.4
-中文安装: npx @wnlen/ai-execution-template init
-英文安装: npx @wnlen/ai-execution-template init --lang en
+Package: @wnlen/ai-execution-template@0.8.5
+中文安装: npx -y @wnlen/ai-execution-template init
+英文安装: npx -y @wnlen/ai-execution-template init --lang en
 ```
 
 当前 v0.8 已经具备：
@@ -82,13 +82,13 @@ AI Coding Agent 在项目里工作的文件协议和安全边界。
 在任意项目根目录执行：
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/ai-execution-template init
 ```
 
 默认安装中文模板。英文模板使用：
 
 ```bash
-npx @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/ai-execution-template init --lang en
 ```
 
 然后让 AI Agent 先整理项目上下文：
@@ -127,19 +127,19 @@ ai/project/metrics.json
 检查安装状态：
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/ai-execution-template doctor
 ```
 
 升级模板协议：
 
 ```bash
-npx @wnlen/ai-execution-template update
+npx -y @wnlen/ai-execution-template update
 ```
 
 `update` 默认沿用已安装语言，也可以显式指定：
 
 ```bash
-npx @wnlen/ai-execution-template update --lang en
+npx -y @wnlen/ai-execution-template update --lang en
 ```
 
 ## 7. 安装后的目录结构
@@ -241,7 +241,7 @@ ai/project/archive/
 ### 9.1 `init`
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/ai-execution-template init
 ```
 
 作用：
@@ -262,7 +262,7 @@ init 可以安装模板协议，但不能覆盖用户现场。
 ### 9.2 `update`
 
 ```bash
-npx @wnlen/ai-execution-template update
+npx -y @wnlen/ai-execution-template update
 ```
 
 作用：
@@ -281,7 +281,7 @@ update 只升级协议，不碰现场。
 ### 9.3 `doctor`
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/ai-execution-template doctor
 ```
 
 作用：
@@ -296,7 +296,7 @@ npx @wnlen/ai-execution-template doctor
 ```text
 AI Execution Template 检查
 
-模板版本: 0.8.4
+模板版本: 0.8.5
 
 [通过] ai/template/VERSION
 [通过] ai/template/bootstrap.md

@@ -11,7 +11,7 @@ English | [简体中文](README.zh-CN.md)
 > Install it into any repository, let the agent bootstrap project context from existing docs, confirm the task contract, and keep execution auditable.
 
 ```bash
-npx @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/ai-execution-template init --lang en
 ```
 
 Then tell your coding agent:
@@ -61,7 +61,7 @@ ai/project/   project-specific working context
 Install the protocol into the current repository:
 
 ```bash
-npx @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/ai-execution-template init --lang en
 ```
 
 Ask your agent to bootstrap project context from existing docs and manifests:
@@ -101,13 +101,13 @@ ai/project/metrics.json
 Check the installation:
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/ai-execution-template doctor
 ```
 
 Upgrade only the reusable protocol files:
 
 ```bash
-npx @wnlen/ai-execution-template update --lang en
+npx -y @wnlen/ai-execution-template update --lang en
 ```
 
 ## What You Get
@@ -163,7 +163,7 @@ The split is the core design:
 ### `init`
 
 ```bash
-npx @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/ai-execution-template init --lang en
 ```
 
 Creates `ai/` in the current project.
@@ -176,7 +176,7 @@ Creates `ai/` in the current project.
 ### `update`
 
 ```bash
-npx @wnlen/ai-execution-template update --lang en
+npx -y @wnlen/ai-execution-template update --lang en
 ```
 
 Updates only `ai/template/**`.
@@ -187,7 +187,7 @@ Without `--lang`, `update` follows the installed language in `ai/template/LANG`.
 ### `doctor`
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/ai-execution-template doctor
 ```
 
 Checks the installed template version and required files.

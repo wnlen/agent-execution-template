@@ -11,13 +11,13 @@
 > 把它装进任意代码仓库，让 AI 从现有文档整理项目上下文，人类确认任务契约，然后在可复用、可验证、可复盘的协议里执行。
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/ai-execution-template init
 ```
 
 默认安装中文模板；也可以显式指定：
 
 ```bash
-npx @wnlen/ai-execution-template init --lang zh
+npx -y @wnlen/ai-execution-template init --lang zh
 ```
 
 然后告诉你的 AI 编程工具：
@@ -67,13 +67,13 @@ ai/project/   当前项目现场
 在当前仓库安装协议：
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/ai-execution-template init
 ```
 
 英文项目可使用：
 
 ```bash
-npx @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/ai-execution-template init --lang en
 ```
 
 让 Agent 从现有文档和 manifest 里整理项目上下文：
@@ -112,13 +112,13 @@ ai/project/metrics.json
 检查安装状态：
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/ai-execution-template doctor
 ```
 
 只升级可复用协议文件：
 
 ```bash
-npx @wnlen/ai-execution-template update
+npx -y @wnlen/ai-execution-template update
 ```
 
 ## 你会得到什么
@@ -174,7 +174,7 @@ ai/
 ### `init`
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/ai-execution-template init
 ```
 
 在当前项目创建 `ai/`。
@@ -187,7 +187,7 @@ npx @wnlen/ai-execution-template init
 ### `update`
 
 ```bash
-npx @wnlen/ai-execution-template update
+npx -y @wnlen/ai-execution-template update
 ```
 
 只更新 `ai/template/**`。
@@ -198,7 +198,7 @@ npx @wnlen/ai-execution-template update
 ### `doctor`
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/ai-execution-template doctor
 ```
 
 检查已安装模板版本和必要文件。

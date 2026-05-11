@@ -58,7 +58,7 @@ const TEXT = {
     pass: "通过",
     fail: "失败",
     empty: "为空",
-    runInit: "请运行 npx @wnlen/ai-execution-template init",
+    runInit: "请运行 npx -y @wnlen/ai-execution-template init",
     readyWithWarnings: "已就绪，但存在警告",
     readyToRun: "已就绪",
     invalidLang: "不支持的语言，请使用 zh 或 en",
@@ -101,7 +101,7 @@ Usage:
     pass: "OK",
     fail: "FAIL",
     empty: "is empty",
-    runInit: "Run npx @wnlen/ai-execution-template init",
+    runInit: "Run npx -y @wnlen/ai-execution-template init",
     readyWithWarnings: "Ready to run with warnings",
     readyToRun: "Ready to run",
     invalidLang: "Unsupported language. Use zh or en",
@@ -249,7 +249,7 @@ ${text.then}
     ${text.executePrompt}
 
 ${text.files}: ${summarizeChanges(changes, lang)}
-${text.check}: npx @wnlen/ai-execution-template doctor
+${text.check}: npx -y @wnlen/ai-execution-template doctor
 `);
 
   if (verbose) {
