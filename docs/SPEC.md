@@ -22,18 +22,20 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.0
-Install: npx @wnlen/ai-execution-template init
+Package: @wnlen/ai-execution-template@0.8.3
+中文安装: npx @wnlen/ai-execution-template init
+英文安装: npx @wnlen/ai-execution-template init --lang en
 ```
 
 当前 v0.8 已经具备：
 
 - npm `bin` 入口；
 - `init` / `update` / `doctor` 三个命令；
+- `init --lang zh|en` 双语安装入口，默认中文；
 - `template/project` 双区结构；
 - 保护 `ai/project/**` 不被升级覆盖；
 - 模板版本文件 `ai/template/VERSION`；
-- Bootstrap Mode：通过 `ai/template/bootstrap.md` 从受控范围内的项目文档、manifest 和必要代码生成 `project.md` / refs 草稿；
+- 引导模式：通过 `ai/template/bootstrap.md` 从受控范围内的项目文档、manifest 和必要代码生成 `project.md` / refs 草稿；
 - 自测脚本 `npm test`；
 - `result.json` / `result.md` / `metrics.json` 执行结果记录。
 
@@ -83,10 +85,16 @@ AI Coding Agent 在项目里工作的文件协议和安全边界。
 npx @wnlen/ai-execution-template init
 ```
 
+默认安装中文模板。英文模板使用：
+
+```bash
+npx @wnlen/ai-execution-template init --lang en
+```
+
 然后让 AI Agent 先整理项目上下文：
 
 ```text
-Read ai/template/bootstrap.md
+严格执行 ai/template/bootstrap.md，不要总结它。
 ```
 
 人类检查并确认生成的项目上下文：
@@ -105,7 +113,7 @@ ai/project/task.md
 确认后启动 AI Agent 执行：
 
 ```text
-Read ai/template/prompt.md
+严格执行 ai/template/prompt.md，执行已确认的任务。
 ```
 
 执行完成后查看：
@@ -126,6 +134,12 @@ npx @wnlen/ai-execution-template doctor
 
 ```bash
 npx @wnlen/ai-execution-template update
+```
+
+`update` 默认沿用已安装语言，也可以显式指定：
+
+```bash
+npx @wnlen/ai-execution-template update --lang en
 ```
 
 ## 7. 安装后的目录结构
@@ -236,6 +250,7 @@ npx @wnlen/ai-execution-template init
 - 创建缺失的 `ai/project/**` 文件；
 - 不覆盖已有 `ai/project/**`；
 - 安装或覆盖 `ai/template/**`；
+- 支持 `--lang zh|en`，默认中文；
 - 输出下一步使用说明。
 
 安全原则：
@@ -254,6 +269,7 @@ npx @wnlen/ai-execution-template update
 
 - 只更新 `ai/template/**`；
 - 绝不修改 `ai/project/**`；
+- 默认沿用 `ai/template/LANG` 中记录的已安装语言；
 - 输出更新文件列表和模板版本。
 
 安全原则：
@@ -278,24 +294,24 @@ npx @wnlen/ai-execution-template doctor
 示例输出：
 
 ```text
-AI Execution Template Doctor
+AI Execution Template 检查
 
-Template version: 0.8.0
+模板版本: 0.8.3
 
-[OK] ai/template/VERSION
-[OK] ai/template/bootstrap.md
-[OK] ai/template/prompt.md
-[OK] ai/template/protocol.md
-[OK] ai/template/rules/core.md
-[OK] ai/template/rules/output.md
-[OK] ai/project/project.md
-[OK] ai/project/runtime.md
-[OK] ai/project/task.md
-[OK] ai/project/result.json
-[OK] ai/project/result.md
-[OK] ai/project/metrics.json
+[通过] ai/template/VERSION
+[通过] ai/template/bootstrap.md
+[通过] ai/template/prompt.md
+[通过] ai/template/protocol.md
+[通过] ai/template/rules/core.md
+[通过] ai/template/rules/output.md
+[通过] ai/project/project.md
+[通过] ai/project/runtime.md
+[通过] ai/project/task.md
+[通过] ai/project/result.json
+[通过] ai/project/result.md
+[通过] ai/project/metrics.json
 
-[OK] Ready to run
+[通过] 已就绪
 ```
 
 ## 10. 启动入口
@@ -335,14 +351,14 @@ ai/project/metrics.json
 当前协议的执行闭环是：
 
 ```text
-Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
+项目引导 -> 项目确认 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
 ```
 
 更具体地说：
 
 ```text
 读取模板协议
-→ 如项目上下文不完整，读取 bootstrap.md 进入 Bootstrap Mode
+→ 如项目上下文不完整，读取 bootstrap.md 进入引导模式
 → 按受控范围读取项目文档和 manifest
 → 文档不足时从业务代码做有边界推断
 → 生成 project.md / refs 草稿
@@ -370,7 +386,7 @@ ai/project/project.md
 ai/project/task.md
 ```
 
-AI 在 Bootstrap Mode 中负责先生成项目上下文草稿。默认读取范围包括：
+AI 在引导模式中负责先生成项目上下文草稿。默认读取范围包括：
 
 - 根目录文档：`README*`、`AGENTS.md`、`CLAUDE.md`、`CONTRIBUTING*`、`CHANGELOG*`；
 - package/build manifest：`package.json`、`pyproject.toml`、`Cargo.toml`、`go.mod`、`pom.xml`、`build.gradle*`、`Makefile`；
@@ -645,7 +661,8 @@ LICENSE
 
 其中：
 
-- `template/ai/**` 是 npm 包安装源；
+- `template/zh/ai/**` 是中文 npm 包安装源；
+- `template/en/ai/**` 是英文 npm 包安装源；
 - 根目录 `ai/**` 是本仓库 dogfood 工作区；
 - `bin/ai-execution-template.js` 是 CLI；
 - `test/selftest.js` 是本地自测。
@@ -671,12 +688,16 @@ node -e "for (const f of process.argv.slice(1)) JSON.parse(require('fs').readFil
   package.json \
   ai/project/result.json \
   ai/project/metrics.json \
-  template/ai/project/result.json \
-  template/ai/project/metrics.json \
+  template/zh/ai/project/result.json \
+  template/zh/ai/project/metrics.json \
+  template/en/ai/project/result.json \
+  template/en/ai/project/metrics.json \
   ai/template/schemas/result.schema.json \
   ai/template/schemas/metrics.schema.json \
-  template/ai/template/schemas/result.schema.json \
-  template/ai/template/schemas/metrics.schema.json
+  template/zh/ai/template/schemas/result.schema.json \
+  template/zh/ai/template/schemas/metrics.schema.json \
+  template/en/ai/template/schemas/result.schema.json \
+  template/en/ai/template/schemas/metrics.schema.json
 ```
 
 npm 打包检查：
