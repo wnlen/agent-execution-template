@@ -30,15 +30,18 @@ Bootstrap Mode may write only project context files:
 - `ai/project/refs/decisions.md`
 
 Bootstrap Mode may write `ai/project/task.md` only if the human also provides
-a current task goal.
+a current task goal. In that case, draft only the task contract and do not
+enter implementation.
 
 Bootstrap Mode must not edit source code, tests, configuration, dependency
 files, generated files, runtime files, result files, or metrics files.
 
 After writing bootstrap drafts, stop with the Post-Bootstrap Handoff from
-`ai/template/bootstrap.md`. Do not continue into task drafting or
-implementation in the same run unless the human explicitly confirms the
-project context and provides a task.
+`ai/template/bootstrap.md`. The handoff must include a confirmable in-chat
+summary and recommended next step, not only file paths to inspect. If the human
+already provided a current task goal, bootstrap may also draft
+`ai/project/task.md` in the same run, but it must still stop for confirmation
+and must not enter implementation.
 
 ## Bootstrap Read Scope
 

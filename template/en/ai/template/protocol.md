@@ -17,8 +17,9 @@ Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Ex
 ```
 
 1. For project discovery, follow `ai/template/bootstrap.md`; do not summarize it.
-2. End bootstrap with the Post-Bootstrap Handoff and confirm generated
-   `ai/project/project.md` and relevant `ai/project/refs/*.md`.
+2. End bootstrap with the Post-Bootstrap Handoff, including a confirmable
+   in-chat summary and recommended next step. Do not only ask the human to open
+   files and inspect them.
 3. For task execution, follow `ai/template/prompt.md`; do not summarize it.
 4. If `ai/project/task.md` is missing or incomplete, draft it from the current
    goal and confirmed project context, then stop with the Task Draft Handoff.
@@ -43,11 +44,13 @@ Bootstrap Mode must:
 - summarize stable project facts into `ai/project/project.md`;
 - update focused refs when durable architecture, command, constraint, or
   decision facts can be inferred;
-- create `ai/project/task.md` only if the human also provides a current task;
+- create `ai/project/task.md` only if the human also provides a current task,
+  and only draft the task contract;
 - mark unknown facts as `Unknown` instead of guessing;
 - ask at most 3 questions only when answers change scope, risk, permission, or
   acceptance;
-- stop after writing draft project context files;
+- stop after writing draft project context files; if a current task was
+  provided, it may also write a task draft before stopping;
 - never edit source, business, config, dependency, or generated files.
 
 ### Bootstrap Read Scope
@@ -115,8 +118,9 @@ before expanding the read scope.
 - documented decisions only when evidence exists.
 
 After writing drafts, stop with the Post-Bootstrap Handoff from
-`ai/template/bootstrap.md`. Do not enter task drafting or Execution Mode until
-the human confirms project context.
+`ai/template/bootstrap.md`. If the human did not provide a current task,
+recommend the next best task. If the human already provided a current task,
+you may also draft `ai/project/task.md`, but do not execute.
 
 ## Task Draft Mode
 
@@ -125,7 +129,8 @@ Task Draft Mode prepares the current execution contract:
 - `ai/project/task.md`
 
 Use Task Draft Mode when project context is confirmed but `ai/project/task.md`
-is empty, placeholder-only, incomplete, or the human provides a new task goal.
+is empty, placeholder-only, incomplete, or the human provides a new task goal
+that was not already drafted during bootstrap.
 
 Task Draft Mode should:
 

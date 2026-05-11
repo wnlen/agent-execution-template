@@ -57,8 +57,12 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/template/bootstrap.md").includes("确认维度"), "init should install bootstrap prompt");
   assert(read(cwd, "ai/template/bootstrap.md").includes("不要总结这个文件"), "bootstrap prompt should prevent summary-only behavior");
   assert(read(cwd, "ai/template/bootstrap.md").includes("引导后交接"), "bootstrap prompt should include handoff");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("我建议下一步做"), "bootstrap prompt should recommend next steps");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("不要让人类主动去文件管理器里寻找问题"), "bootstrap prompt should not offload file inspection to humans");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("任务草稿摘要"), "bootstrap prompt should support task draft summary when a goal is provided");
   assert(read(cwd, "ai/template/prompt.md").includes("任务草稿交接"), "execution prompt should include task handoff");
   assert(read(cwd, "ai/template/protocol.md").includes("引导读取范围"), "init should install bootstrap protocol");
+  assert(read(cwd, "ai/template/protocol.md").includes("推荐下一步最值得做的任务"), "protocol should require recommended next steps");
   const initOutput = run(["init"], cwd);
   assert(initOutput.includes("严格执行 ai/template/bootstrap.md，不要总结它。"), "init output should provide compact bootstrap prompt");
   assert(initOutput.includes("文件:"), "init output should summarize file changes");
@@ -80,6 +84,8 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/LANG") === "en\n", "init --lang en should install English template");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Confirmation Dimensions"), "English init should install English bootstrap prompt");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Do not summarize this file"), "English bootstrap prompt should prevent summary-only behavior");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Recommended next step"), "English bootstrap prompt should recommend next steps");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Do not make the human hunt through files"), "English bootstrap prompt should not offload file inspection to humans");
   assert(initOutput.includes("Execute ai/template/bootstrap.md exactly. Do not summarize."), "English init output should provide English bootstrap prompt");
   assert(initOutput.includes("Files:"), "English init output should summarize file changes");
   assert(!initOutput.includes("[UPDATED]"), "English init output should hide detailed file changes by default");

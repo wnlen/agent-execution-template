@@ -29,6 +29,7 @@ Create or update:
 - `ai/project/refs/decisions.md` only when durable decisions are documented
 
 Create `ai/project/task.md` only if the human also provides a current task.
+If you create `ai/project/task.md`, draft only the task contract. Do not enter execution.
 
 Do not edit source code, tests, app config, dependency files, generated files,
 runtime files, result files, or metrics files during bootstrap.
@@ -87,33 +88,85 @@ or acceptance.
 
 ## Post-Bootstrap Handoff
 
-After writing project context drafts, end with a `Next` section that tells the
-human exactly what to do next.
+After writing project context drafts, do not only ask the human to open files
+and inspect them. The final response must include a confirmable summary so the
+human can confirm or correct directly in chat.
 
-The final message must include this shape:
+If the human already provided a current task goal in the bootstrap request, you
+must also draft `ai/project/task.md`, then ask the human to confirm both the
+project understanding and the task draft.
+
+If the human did not provide a current task goal, recommend the next best task
+based on the project state.
+
+The final response must use one of these shapes.
+
+When there is no current task goal:
 
 ```text
-Bootstrap draft is ready.
+Bootstrap is complete. I wrote the project context.
 
-Please review:
+My understanding of the project:
+- Project:
+- Tech stack:
+- Main modules:
+- Common commands:
+- Important constraints:
+- Still uncertain: up to 3 items; write "none" if there are none
+
+Recommended next step:
+1. Priority task:
+   Reason:
+2. Alternative task:
+   Reason:
+
+Written:
 - ai/project/project.md
 - ai/project/refs/architecture.md
 - ai/project/refs/commands.md
 - ai/project/refs/constraints.md
 - ai/project/refs/decisions.md
 
-Confirm or correct:
-1. Project identity and users
-2. Tech stack and commands
-3. Module boundaries and constraints
-
-Next:
-Then reply with:
-- Confirmed, or corrections
-- Your next task in one sentence
+Reply with:
+- Confirm, draft task 1
+- Confirm, but do: <one-sentence task>
+- Correction: <what to change>
 ```
 
-If important unknowns remain, list at most 3 questions before the `Next` /
-`Then reply
-with` block. Ask only questions whose answers change project identity,
-commands, boundaries, constraints, risk, permission, or acceptance.
+When there is already a current task goal:
+
+```text
+Bootstrap is complete. I wrote the project context and task draft.
+
+My understanding of the project:
+- Project:
+- Tech stack:
+- Main modules:
+- Common commands:
+- Important constraints:
+- Still uncertain: up to 3 items; write "none" if there are none
+
+Task draft summary:
+- Goal:
+- Scope:
+- Out of scope:
+- Acceptance:
+- Risk:
+- Permissions needed:
+
+Written:
+- ai/project/project.md
+- ai/project/refs/architecture.md
+- ai/project/refs/commands.md
+- ai/project/refs/constraints.md
+- ai/project/refs/decisions.md
+- ai/project/task.md
+
+Reply with:
+- Confirm, execute
+- Correction: <what to change>
+```
+
+If important unknowns remain, list at most 3 of them under "Still uncertain".
+Do not make the human hunt through files to find issues; file paths are only
+for traceability.
