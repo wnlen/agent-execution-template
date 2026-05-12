@@ -73,6 +73,7 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/template/bootstrap.md").includes("任务草稿摘要"), "bootstrap prompt should support task draft summary when a goal is provided");
   assert(read(cwd, "ai/template/prompt.md").includes("任务草稿交接"), "execution prompt should include task handoff");
   assert(read(cwd, "ai/template/prompt.md").includes("开始初始化这个项目"), "execution prompt should route natural bootstrap entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料"), "execution prompt should route bootstrap with inbox material");
   assert(read(cwd, "ai/template/prompt.md").includes("整合 ai/project/inbox/ 里的新资料"), "execution prompt should route natural reconcile entry");
   assert(read(cwd, "ai/template/prompt.md").includes("继续推进这个项目"), "execution prompt should route natural continue entry");
   assert(read(cwd, "ai/template/prompt.md").includes("strategy_update"), "execution prompt should route strategy updates");
@@ -87,6 +88,8 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/project/proposals/final-shape-updates/_template.md").includes("`accepted`"), "proposal template should describe accepted status");
   const initOutput = run(["init"], cwd);
   assert(initOutput.includes("开始初始化这个项目"), "init output should provide compact natural bootstrap prompt");
+  assert(initOutput.includes("初始化前:"), "init output should distinguish pre-bootstrap guidance");
+  assert(initOutput.includes("开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料"), "init output should explain bootstrap with existing material");
   assert(initOutput.includes("整合 ai/project/inbox/ 里的新资料"), "init output should provide compact natural reconcile prompt");
   assert(initOutput.includes("重新总结和优化项目上下文"), "init output should expose project context refresh in user language");
   assert(initOutput.includes("把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案"), "init output should provide natural strategy prompt");
@@ -126,6 +129,7 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/bootstrap.md").includes("Recommended next step"), "English bootstrap prompt should recommend next steps");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Do not make the human hunt through files"), "English bootstrap prompt should not offload file inspection to humans");
   assert(read(cwd, "ai/template/prompt.md").includes("Start initializing this project"), "English execution prompt should route natural bootstrap entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("Start initializing this project and absorb the material in ai/project/inbox/"), "English execution prompt should route bootstrap with inbox material");
   assert(read(cwd, "ai/template/prompt.md").includes("Reconcile the new material in ai/project/inbox/"), "English execution prompt should route natural reconcile entry");
   assert(read(cwd, "ai/template/prompt.md").includes("Continue this project"), "English execution prompt should route natural continue entry");
   assert(read(cwd, "ai/template/prompt.md").includes("strategy_update"), "English execution prompt should route strategy updates");
@@ -138,6 +142,8 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/reconcile.md").includes("Context Reconcile"), "English init should install English reconcile prompt");
   assert(read(cwd, "ai/template/reconcile.md").includes("reconciliation plan"), "English reconcile prompt should require a plan first");
   assert(initOutput.includes("Start initializing this project"), "English init output should provide English bootstrap prompt");
+  assert(initOutput.includes("Before initialization:"), "English init output should distinguish pre-bootstrap guidance");
+  assert(initOutput.includes("Start initializing this project and absorb the material in ai/project/inbox/"), "English init output should explain bootstrap with existing material");
   assert(initOutput.includes("Reconcile the new material in ai/project/inbox/"), "English init output should provide English reconcile prompt");
   assert(initOutput.includes("Resummarize and improve project context"), "English init output should expose context refresh in user language");
   assert(initOutput.includes("Generate a direction amendment proposal from ai/project/inbox/ideas/"), "English init output should provide natural strategy prompt");

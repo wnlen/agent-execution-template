@@ -19,6 +19,10 @@
   `ai/project/proposals/final-shape-updates/*.md` 可以合并，按
   `apply_strategy_update` 起草或执行应用任务；如果 proposal 仍为
   `proposed`，先根据这次明确确认更新为 `accepted`。
+- 如果用户说“开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料”，
+  或要求初始化时一并吸收 `ai/project/inbox/` 里的资料，执行
+  `ai/template/bootstrap.md`，并把 `ai/project/inbox/*.md` 与
+  `ai/project/inbox/raw/*.md` 视为本次引导输入的一部分；在项目上下文确认后停止。
 - 如果用户说“整合 ai/project/inbox/ 里的新资料”，要求整合/合并/吸收/
   更新上下文/处理新资料，提到 `reconcile` 或 `ai/project/inbox/`，
   或 `ai/project/inbox/` 里存在 `.gitkeep` 之外的待吸收资料，执行 `ai/template/reconcile.md`，

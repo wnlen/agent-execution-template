@@ -69,10 +69,15 @@ const TEXT = {
     unknown: "未知",
     sourceMissing: "找不到模板来源",
     ready: "AI Execution Template 已就绪。",
-    initGuide: `下一步:
-  对 AI 说: 开始初始化这个项目
+    initGuide: `初始化前:
+  如果你手头还没有额外资料
+    对 AI 说: 开始初始化这个项目
 
-常见需求:
+  如果你已经有项目简介、架构文档、模块设计等资料
+    先放到: ai/project/inbox/
+    再对 AI 说: 开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料
+
+初始化完成后常见需求:
   继续让 AI 往下做
     对 AI 说: 继续推进这个项目
 
@@ -173,10 +178,15 @@ Usage:
     unknown: "unknown",
     sourceMissing: "Template source not found",
     ready: "AI Execution Template ready.",
-    initGuide: `Next:
-  Tell the AI: Start initializing this project
+    initGuide: `Before initialization:
+  If you do not have extra material yet
+    Tell the AI: Start initializing this project
 
-Common needs:
+  If you already have a project brief, architecture docs, or module designs
+    Put them in: ai/project/inbox/
+    Then tell the AI: Start initializing this project and absorb the material in ai/project/inbox/
+
+Common needs after initialization:
   Continue letting the AI work
     Tell the AI: Continue this project
 

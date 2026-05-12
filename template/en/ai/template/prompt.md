@@ -21,6 +21,11 @@ Then choose the mode:
   `ai/project/proposals/final-shape-updates/*.md` may be merged, draft or
   execute an `apply_strategy_update` task. If the proposal is still
   `proposed`, update it to `accepted` based on that explicit confirmation.
+- If the user says "Start initializing this project and absorb the material in ai/project/inbox/",
+  or asks to initialize while also absorbing material from
+  `ai/project/inbox/`, follow `ai/template/bootstrap.md` and treat
+  `ai/project/inbox/*.md` and `ai/project/inbox/raw/*.md` as part of the
+  bootstrap input for this run; stop after project-context confirmation.
 - If the user says "Reconcile the new material in ai/project/inbox/", asks to
   reconcile, merge, absorb, update context, handle new material, mentions
   `reconcile` or `ai/project/inbox/`, or if `ai/project/inbox/` contains
