@@ -88,10 +88,10 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/project/proposals/final-shape-updates/_template.md").includes("`accepted`"), "proposal template should describe accepted status");
   const initOutput = run(["init"], cwd);
   assert(initOutput.includes("开始初始化这个项目"), "init output should provide compact natural bootstrap prompt");
-  assert(initOutput.includes("初始化前:"), "init output should distinguish pre-bootstrap guidance");
+  assert(initOutput.includes("[初始化]"), "init output should distinguish pre-bootstrap guidance");
   assert(initOutput.includes("开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料"), "init output should explain bootstrap with existing material");
   assert(initOutput.includes("整合 ai/project/inbox/ 里的新资料"), "init output should provide compact natural reconcile prompt");
-  assert(initOutput.includes("重新总结和优化项目上下文"), "init output should expose project context refresh in user language");
+  assert(initOutput.includes("优化上下文"), "init output should expose project context refresh in user language");
   assert(initOutput.includes("把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案"), "init output should provide natural strategy prompt");
   assert(initOutput.includes("ai-execution-template next"), "init output should tell users how to recover the next step");
   assert(initOutput.includes("文件:"), "init output should summarize file changes");
@@ -142,10 +142,10 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/reconcile.md").includes("Context Reconcile"), "English init should install English reconcile prompt");
   assert(read(cwd, "ai/template/reconcile.md").includes("reconciliation plan"), "English reconcile prompt should require a plan first");
   assert(initOutput.includes("Start initializing this project"), "English init output should provide English bootstrap prompt");
-  assert(initOutput.includes("Before initialization:"), "English init output should distinguish pre-bootstrap guidance");
+  assert(initOutput.includes("[Initialize]"), "English init output should distinguish pre-bootstrap guidance");
   assert(initOutput.includes("Start initializing this project and absorb the material in ai/project/inbox/"), "English init output should explain bootstrap with existing material");
   assert(initOutput.includes("Reconcile the new material in ai/project/inbox/"), "English init output should provide English reconcile prompt");
-  assert(initOutput.includes("Resummarize and improve project context"), "English init output should expose context refresh in user language");
+  assert(initOutput.includes("Improve context"), "English init output should expose context refresh in user language");
   assert(initOutput.includes("Generate a direction amendment proposal from ai/project/inbox/ideas/"), "English init output should provide natural strategy prompt");
   assert(initOutput.includes("ai-execution-template next"), "English init output should tell users how to recover the next step");
   assert(initOutput.includes("Files:"), "English init output should summarize file changes");

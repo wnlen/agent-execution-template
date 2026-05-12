@@ -69,33 +69,28 @@ const TEXT = {
     unknown: "未知",
     sourceMissing: "找不到模板来源",
     ready: "AI Execution Template 已就绪。",
-    initGuide: `初始化前:
-  如果你手头还没有额外资料
-    对 AI 说: 开始初始化这个项目
+    initGuide: `[初始化]
+1. 直接初始化
+   对 AI 说: 开始初始化这个项目
+2. 带资料初始化
+   先放到: ai/project/inbox/
+   对 AI 说: 开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料
 
-  如果你已经有项目简介、架构文档、模块设计等资料
-    先放到: ai/project/inbox/
-    再对 AI 说: 开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料
+[后续]
+1. 继续推进
+   对 AI 说: 继续推进这个项目
+2. 吸收新资料
+   先放到: ai/project/inbox/
+   对 AI 说: 整合 ai/project/inbox/ 里的新资料
+3. 优化上下文
+   运行命令: npx -y @wnlen/ai-execution-template refresh
+4. 评估方向
+   先放到: ai/project/inbox/ideas/
+   对 AI 说: 把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
+5. 查看下一步
+   运行命令: npx -y @wnlen/ai-execution-template next
 
-初始化完成后常见需求:
-  继续让 AI 往下做
-    对 AI 说: 继续推进这个项目
-
-  吸收新的资料
-    先放到: ai/project/inbox/
-    再对 AI 说: 整合 ai/project/inbox/ 里的新资料
-
-  重新总结和优化项目上下文
-    运行命令: npx -y @wnlen/ai-execution-template refresh
-
-  评估新的方向或想法
-    先放到: ai/project/inbox/ideas/
-    再对 AI 说: 把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
-
-  不确定下一步该做什么
-    运行命令: npx -y @wnlen/ai-execution-template next
-
-区分标准:
+[区分标准]
   资料 = 已确定的事实、文档、流程、接口、业务规则
   方向 = 还没决定的新想法、产品策略、架构调整、路线变化`,
     start: "开始:",
@@ -178,33 +173,28 @@ Usage:
     unknown: "unknown",
     sourceMissing: "Template source not found",
     ready: "AI Execution Template ready.",
-    initGuide: `Before initialization:
-  If you do not have extra material yet
-    Tell the AI: Start initializing this project
+    initGuide: `[Initialize]
+1. Initialize directly
+   Tell the AI: Start initializing this project
+2. Initialize with material
+   Put it in: ai/project/inbox/
+   Tell the AI: Start initializing this project and absorb the material in ai/project/inbox/
 
-  If you already have a project brief, architecture docs, or module designs
-    Put them in: ai/project/inbox/
-    Then tell the AI: Start initializing this project and absorb the material in ai/project/inbox/
+[Follow-up]
+1. Continue work
+   Tell the AI: Continue this project
+2. Absorb new material
+   Put it in: ai/project/inbox/
+   Tell the AI: Reconcile the new material in ai/project/inbox/
+3. Improve context
+   Run: npx -y @wnlen/ai-execution-template refresh
+4. Evaluate direction
+   Put it in: ai/project/inbox/ideas/
+   Tell the AI: Generate a direction amendment proposal from ai/project/inbox/ideas/
+5. Show next step
+   Run: npx -y @wnlen/ai-execution-template next
 
-Common needs after initialization:
-  Continue letting the AI work
-    Tell the AI: Continue this project
-
-  Absorb new material
-    Put it in: ai/project/inbox/
-    Then tell the AI: Reconcile the new material in ai/project/inbox/
-
-  Resummarize and improve project context
-    Run: npx -y @wnlen/ai-execution-template refresh
-
-  Evaluate a new direction or idea
-    Put it in: ai/project/inbox/ideas/
-    Then tell the AI: Generate a direction amendment proposal from ai/project/inbox/ideas/
-
-  Not sure what to do next
-    Run: npx -y @wnlen/ai-execution-template next
-
-Rule of thumb:
+[Rule of thumb]
   Material = confirmed facts, docs, workflows, APIs, or business rules
   Direction = undecided ideas, product strategy, architecture changes, or roadmap changes`,
     start: "Start:",
