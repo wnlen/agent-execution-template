@@ -22,7 +22,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.8
+Package: @wnlen/ai-execution-template@0.8.10
 中文安装: npx -y @wnlen/ai-execution-template init
 英文安装: npx -y @wnlen/ai-execution-template init --lang en
 ```
@@ -326,7 +326,26 @@ npx -y @wnlen/ai-execution-template update
 update 只升级协议，不碰现场。
 ```
 
-### 9.3 `doctor`
+### 9.3 `refresh`
+
+```bash
+npx -y @wnlen/ai-execution-template refresh
+```
+
+作用：
+
+- 将旧 `ai/project/**` 改名备份为 `ai/project.backup.<timestamp>`；
+- 生成新的 `ai/project/**`；
+- 将旧上下文复制到 `ai/project/inbox/raw/old-project/`；
+- 输出下一句要交给 AI 的整理指令。
+
+安全原则：
+
+```text
+refresh 可以重建项目上下文，但必须先备份旧现场。
+```
+
+### 9.4 `doctor`
 
 ```bash
 npx -y @wnlen/ai-execution-template doctor
@@ -344,7 +363,7 @@ npx -y @wnlen/ai-execution-template doctor
 ```text
 AI Execution Template 检查
 
-模板版本: 0.8.8
+模板版本: 0.8.10
 模板语言: zh
 
 [通过] ai/template/LANG
@@ -366,7 +385,7 @@ AI Execution Template 检查
 [通过] 已就绪
 ```
 
-### 9.4 `strategy`
+### 9.5 `strategy`
 
 ```bash
 npx -y @wnlen/ai-execution-template strategy
@@ -379,7 +398,7 @@ npx -y @wnlen/ai-execution-template strategy
 - 指示 AI 生成 `strategy_update` 提案；
 - 提醒人类确认后再执行 `apply_strategy_update`。
 
-### 9.5 `reconcile`
+### 9.6 `reconcile`
 
 ```bash
 npx -y @wnlen/ai-execution-template reconcile

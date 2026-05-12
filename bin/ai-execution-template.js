@@ -58,6 +58,7 @@ const TEXT = {
 
 用法:
   ai-execution-template init [--lang zh|en] [--verbose]
+  ai-execution-template refresh [--lang zh|en]
   ai-execution-template update [--lang zh|en]
   ai-execution-template reconcile [--lang zh|en]
   ai-execution-template strategy [--lang zh|en]
@@ -77,6 +78,12 @@ const TEXT = {
     files: "文件",
     check: "检查",
     details: "详情:",
+    refreshTitle: "AI Execution Template 项目上下文重整",
+    refreshBackedUp: "已备份旧项目上下文",
+    refreshImported: "已将旧项目上下文放入",
+    refreshReady: "新的 ai/project/** 已生成。",
+    refreshPrompt: "整合 ai/project/inbox/ 里的新资料，基于旧上下文重新生成更精良的 ai/project/",
+    refreshNoProject: "未发现旧 ai/project/**，已执行普通初始化。",
     updateTitle: "AI Execution Template 更新",
     updated: "已将 ai/template/** 更新到",
     projectNotModified: "ai/project/** 未修改。",
@@ -106,6 +113,11 @@ const TEXT = {
     strategyReview: "人类确认提案后，再说:",
     strategyApplyPrompt: "确认，合并这个提案",
     repairHint: "缺失的 project 推荐文件可通过重新运行 init 安全补齐；已有 ai/project/** 不会被覆盖。",
+    permissionDenied: "无法写入目标路径",
+    permissionHint: `请检查 ai/** 的归属和权限。常见修复:
+  sudo chown -R "$(id -un):$(id -gn)" ai
+  find ai -type d -exec chmod u+rwx {} +
+  find ai -type f -exec chmod u+rw {} +`,
     changeLabels: {
       created: "已创建",
       updated: "已更新",
@@ -118,6 +130,7 @@ const TEXT = {
 
 Usage:
   ai-execution-template init [--lang zh|en] [--verbose]
+  ai-execution-template refresh [--lang zh|en]
   ai-execution-template update [--lang zh|en]
   ai-execution-template reconcile [--lang zh|en]
   ai-execution-template strategy [--lang zh|en]
@@ -137,6 +150,12 @@ Usage:
     files: "Files",
     check: "Check",
     details: "Details:",
+    refreshTitle: "AI Execution Template project context refresh",
+    refreshBackedUp: "Backed up old project context",
+    refreshImported: "Imported old project context into",
+    refreshReady: "Generated a fresh ai/project/**.",
+    refreshPrompt: "Reconcile the new material in ai/project/inbox/ and regenerate a stronger ai/project/ from the old context",
+    refreshNoProject: "No old ai/project/** found; ran normal init.",
     updateTitle: "AI Execution Template update",
     updated: "Updated ai/template/** to",
     projectNotModified: "ai/project/** was not modified.",
@@ -166,6 +185,11 @@ Usage:
     strategyReview: "After human confirmation, say:",
     strategyApplyPrompt: "Confirmed, merge this proposal",
     repairHint: "Missing recommended project files can be safely added by running init again; existing ai/project/** files are not overwritten.",
+    permissionDenied: "Cannot write target path",
+    permissionHint: `Check ownership and permissions under ai/**. Common fix:
+  sudo chown -R "$(id -un):$(id -gn)" ai
+  find ai -type d -exec chmod u+rwx {} +
+  find ai -type f -exec chmod u+rw {} +`,
     changeLabels: {
       created: "CREATED",
       updated: "UPDATED",
@@ -262,6 +286,28 @@ function copyTree(sourceRoot, targetRoot, overwrite) {
   );
 }
 
+function formatTimestamp(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate())
+  ].join("") + "-" + [
+    pad(date.getHours()),
+    pad(date.getMinutes()),
+    pad(date.getSeconds())
+  ].join("");
+}
+
+function uniqueBackupPath(basePath) {
+  if (!fs.existsSync(basePath)) return basePath;
+  for (let index = 1; index < 1000; index += 1) {
+    const candidate = `${basePath}-${index}`;
+    if (!fs.existsSync(candidate)) return candidate;
+  }
+  throw new Error(`Could not allocate backup path: ${basePath}`);
+}
+
 function printChanges(title, changes, lang) {
   const text = getText(lang);
   console.log(title);
@@ -282,7 +328,7 @@ function summarizeChanges(changes, lang) {
     .join(", ");
 }
 
-function init({ lang = DEFAULT_LANG, verbose = false } = {}) {
+function init({ lang = DEFAULT_LANG, verbose = false, quiet = false } = {}) {
   const text = getText(lang);
   if (!SUPPORTED_LANGS.has(lang)) {
     console.error(`[${text.fail}] ${text.invalidLang}: ${lang}`);
@@ -309,7 +355,8 @@ function init({ lang = DEFAULT_LANG, verbose = false } = {}) {
   changes.push(...copyTree(path.join(sourceAi, "project"), path.join(TARGET_AI, "project"), false)
     .map((change) => ({ ...change, path: path.join("ai/project", change.path) })));
 
-  console.log(`${text.ready}
+  if (!quiet) {
+    console.log(`${text.ready}
 
 ${text.start}
   ${text.startPrompt}
@@ -325,9 +372,46 @@ ${text.files}: ${summarizeChanges(changes, lang)}
 ${text.check}: npx -y @wnlen/ai-execution-template doctor
 `);
 
-  if (verbose) {
-    printChanges(text.details, changes, lang);
+    if (verbose) {
+      printChanges(text.details, changes, lang);
+    }
   }
+}
+
+function refresh({ lang = DEFAULT_LANG } = {}) {
+  const text = getText(lang);
+  if (!SUPPORTED_LANGS.has(lang)) {
+    console.error(`[${text.fail}] ${text.invalidLang}: ${lang}`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const projectPath = path.join(TARGET_AI, "project");
+
+  if (!fs.existsSync(projectPath)) {
+    init({ lang, verbose: false, quiet: false });
+    console.log(`[${text.pass}] ${text.refreshNoProject}`);
+    return;
+  }
+
+  ensureDir(TARGET_AI);
+  const backupPath = uniqueBackupPath(path.join(TARGET_AI, `project.backup.${formatTimestamp()}`));
+  fs.renameSync(projectPath, backupPath);
+
+  init({ lang, verbose: false, quiet: true });
+
+  const importPath = path.join(TARGET_AI, "project", "inbox", "raw", "old-project");
+  ensureDir(importPath);
+  copyTree(backupPath, importPath, false);
+
+  console.log(`${text.refreshTitle}
+[${text.pass}] ${text.refreshBackedUp}: ${path.relative(process.cwd(), backupPath)}
+[${text.pass}] ${text.refreshImported}: ${path.relative(process.cwd(), importPath)}
+[${text.pass}] ${text.refreshReady}
+
+${text.then}
+  ${text.refreshPrompt}
+`);
 }
 
 function update({ lang = readInstalledLang() } = {}) {
@@ -389,6 +473,23 @@ ${text.strategyAsk}
 ${text.strategyReview}
   ${text.strategyApplyPrompt}
 `);
+}
+
+function isPermissionError(error) {
+  return error && (error.code === "EACCES" || error.code === "EPERM");
+}
+
+function printFatal(error, lang) {
+  const text = getText(lang);
+  if (isPermissionError(error)) {
+    const target = error.dest || error.path || process.cwd();
+    console.error(`[${text.fail}] ${text.permissionDenied}: ${target}`);
+    console.error(text.permissionHint);
+    process.exitCode = 1;
+    return;
+  }
+  console.error(error && error.stack ? error.stack : String(error));
+  process.exitCode = 1;
 }
 
 function doctor() {
@@ -480,24 +581,30 @@ const command = args[0] || "help";
 const verbose = args.includes("--verbose");
 const requestedLang = parseLang(
   args,
-  command === "update" || command === "doctor" || command === "reconcile" || command === "strategy"
+  command === "update" || command === "doctor" || command === "reconcile" || command === "strategy" || command === "refresh"
     ? readInstalledLang()
     : DEFAULT_LANG
 );
 
-if (command === "init") {
-  init({ lang: requestedLang, verbose });
-} else if (command === "update") {
-  update({ lang: requestedLang });
-} else if (command === "reconcile") {
-  reconcile({ lang: requestedLang });
-} else if (command === "strategy") {
-  strategy({ lang: requestedLang });
-} else if (command === "doctor") {
-  doctor();
-} else {
-  usage(requestedLang);
-  if (command !== "help" && command !== "--help" && command !== "-h") {
-    process.exitCode = 1;
+try {
+  if (command === "init") {
+    init({ lang: requestedLang, verbose });
+  } else if (command === "refresh") {
+    refresh({ lang: requestedLang });
+  } else if (command === "update") {
+    update({ lang: requestedLang });
+  } else if (command === "reconcile") {
+    reconcile({ lang: requestedLang });
+  } else if (command === "strategy") {
+    strategy({ lang: requestedLang });
+  } else if (command === "doctor") {
+    doctor();
+  } else {
+    usage(requestedLang);
+    if (command !== "help" && command !== "--help" && command !== "-h") {
+      process.exitCode = 1;
+    }
   }
+} catch (error) {
+  printFatal(error, requestedLang);
 }

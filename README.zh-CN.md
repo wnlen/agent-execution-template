@@ -144,6 +144,7 @@ npx -y @wnlen/ai-execution-template strategy
 | 项目北极星 | 在 `ai/project/refs/final-shape.md` 保存最终形态、价值判断和跑偏标准。 |
 | 策略修订门禁 | 新方向先进入 `inbox/ideas/`，生成 proposal，人类确认后才合并进北极星、模块地图或路线图。 |
 | 保护项目现场 | `update` 刷新 `ai/template/**`，不会覆盖 `ai/project/**`。 |
+| 项目上下文重整 | `refresh` 备份旧 `ai/project/**`，生成新项目上下文，并把旧上下文放入 inbox 供 AI 整理。 |
 | 有边界的任务执行 | 目标、范围、权限、风险和验收标准集中在任务文件里。 |
 | 可审计结果 | 每次执行都可以留下人类可读结果、机器可读事实和 metrics。 |
 | Token-efficient 模型策略 | 便宜模型处理边界清楚的工作，强模型只用于关键判断点。 |
@@ -218,6 +219,19 @@ npx -y @wnlen/ai-execution-template update
 
 当协议升级，但项目上下文不应该被覆盖时使用它。
 默认沿用 `ai/template/LANG` 中记录的已安装语言。
+
+### `refresh`
+
+```bash
+npx -y @wnlen/ai-execution-template refresh
+```
+
+重整项目上下文。
+
+- 将旧 `ai/project/**` 改名备份为 `ai/project.backup.<timestamp>`。
+- 生成新的 `ai/project/**`。
+- 将旧上下文复制到 `ai/project/inbox/raw/old-project/`。
+- 输出下一句要交给 AI 的整理指令。
 
 ### `doctor`
 

@@ -134,6 +134,7 @@ npx -y @wnlen/ai-execution-template strategy --lang en
 | Project North Star | Stores final shape, task-worthiness criteria, and drift criteria in `ai/project/refs/final-shape.md`. |
 | Strategy amendment gate | New direction goes through `inbox/ideas/`, a proposal, human confirmation, then an explicit apply task. |
 | Protected project context | `update` refreshes `ai/template/**` without overwriting `ai/project/**`. |
+| Project context refresh | `refresh` backs up old `ai/project/**`, creates a fresh project context, and imports the old context into the inbox for reconciliation. |
 | Bounded task execution | Goals, scope, permissions, risk, and acceptance criteria live in one task file. |
 | Auditable results | Every run can leave human-readable output, machine-readable facts, and metrics. |
 | Token-efficient model policy | Cheap models handle bounded work; strong models are reserved for judgment points. |
@@ -208,6 +209,19 @@ Updates only `ai/template/**`.
 
 Use this when the protocol improves but your project context should remain untouched.
 Without `--lang`, `update` follows the installed language in `ai/template/LANG`.
+
+### `refresh`
+
+```bash
+npx -y @wnlen/ai-execution-template refresh --lang en
+```
+
+Refreshes project context.
+
+- Renames old `ai/project/**` to `ai/project.backup.<timestamp>`.
+- Generates a fresh `ai/project/**`.
+- Copies the old context into `ai/project/inbox/raw/old-project/`.
+- Prints the next prompt to give your agent.
 
 ### `doctor`
 

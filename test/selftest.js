@@ -187,10 +187,46 @@ function testDoctorFailureAndWarning() {
   assert(taskWarnOutput.includes("任务 front matter 缺少关键字段"), "doctor should warn incomplete task front matter");
 }
 
+function testRefreshBacksUpAndImportsOldProject() {
+  const cwd = createTempProject("ai-execution-template-refresh");
+  run(["init"], cwd);
+  write(cwd, "ai/project/project.md", "OLD PROJECT CONTEXT\n");
+
+  const output = run(["refresh"], cwd);
+  const backups = fs.readdirSync(path.join(cwd, "ai"))
+    .filter((entry) => entry.startsWith("project.backup."));
+
+  assert(backups.length === 1, "refresh should back up the old project directory");
+  assert(read(cwd, "ai/project/project.md") !== "OLD PROJECT CONTEXT\n", "refresh should create a fresh project directory");
+  assert(
+    read(cwd, "ai/project/inbox/raw/old-project/project.md") === "OLD PROJECT CONTEXT\n",
+    "refresh should import old project context into the new inbox"
+  );
+  assert(output.includes("AI Execution Template 项目上下文重整"), "refresh should print a refresh summary");
+  assert(output.includes("基于旧上下文重新生成更精良的 ai/project/"), "refresh should print the next agent prompt");
+}
+
+function testPermissionErrorIsActionable() {
+  const cwd = createTempProject("ai-execution-template-permission");
+  const inbox = path.join(cwd, "ai/project/inbox");
+  fs.mkdirSync(inbox, { recursive: true });
+  fs.chmodSync(inbox, 0o555);
+  try {
+    const output = run(["init"], cwd, 1);
+    assert(output.includes("无法写入目标路径"), "permission failures should explain the blocked target");
+    assert(output.includes("sudo chown -R"), "permission failures should include an ownership repair command");
+    assert(!output.includes("node:fs"), "permission failures should not expose the raw Node stack");
+  } finally {
+    fs.chmodSync(inbox, 0o755);
+  }
+}
+
 function main() {
   testInitUpdateDoctor();
   testEnglishInitUpdateDoctor();
   testDoctorFailureAndWarning();
+  testRefreshBacksUpAndImportsOldProject();
+  testPermissionErrorIsActionable();
   console.log("selftest ok");
 }
 
