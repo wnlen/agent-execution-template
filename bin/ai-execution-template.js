@@ -37,6 +37,21 @@ const RECOMMENDED_FILES = [
   "ai/project/refs/roadmap.md"
 ];
 
+const JSON_HEALTH_FILES = [
+  "ai/project/result.json",
+  "ai/project/metrics.json"
+];
+
+const TASK_HEALTH_PATTERNS = [
+  /^task_id:\s*/m,
+  /^type:\s*/m,
+  /^priority:\s*/m,
+  /^risk_level:\s*/m,
+  /^model_policy:/m,
+  /^refs:/m,
+  /^permission:/m
+];
+
 const TEXT = {
   zh: {
     usage: `AI Execution Template
@@ -73,6 +88,9 @@ const TEXT = {
     pass: "通过",
     fail: "失败",
     empty: "为空",
+    invalidJson: "JSON 无效",
+    taskFrontMatterIncomplete: "任务 front matter 缺少关键字段",
+    versionMismatch: "模板版本与包版本不一致",
     runInit: "请运行 npx -y @wnlen/ai-execution-template init",
     readyWithWarnings: "已就绪，但存在警告",
     readyToRun: "已就绪",
@@ -130,6 +148,9 @@ Usage:
     pass: "OK",
     fail: "FAIL",
     empty: "is empty",
+    invalidJson: "contains invalid JSON",
+    taskFrontMatterIncomplete: "task front matter is missing required fields",
+    versionMismatch: "template version does not match package version",
     runInit: "Run npx -y @wnlen/ai-execution-template init",
     readyWithWarnings: "Ready to run with warnings",
     readyToRun: "Ready to run",
@@ -158,6 +179,17 @@ function readVersion(root) {
   const versionFile = path.join(root, "VERSION");
   if (!fs.existsSync(versionFile)) return null;
   return fs.readFileSync(versionFile, "utf8").trim() || null;
+}
+
+function readPackageVersion() {
+  const packageFile = path.join(PACKAGE_ROOT, "package.json");
+  if (!fs.existsSync(packageFile)) return null;
+  try {
+    const pkg = JSON.parse(fs.readFileSync(packageFile, "utf8"));
+    return pkg.version || null;
+  } catch {
+    return null;
+  }
 }
 
 function readInstalledLang() {
@@ -368,6 +400,8 @@ function doctor() {
 
   let missing = 0;
   let warnings = 0;
+  const installedVersion = readVersion(path.join(TARGET_AI, "template"));
+  const packageVersion = readPackageVersion();
 
   for (const file of REQUIRED_FILES) {
     const fullPath = path.join(process.cwd(), file);
@@ -396,6 +430,38 @@ function doctor() {
       continue;
     }
     console.log(`[${text.pass}] ${file}`);
+  }
+
+  for (const file of JSON_HEALTH_FILES) {
+    const fullPath = path.join(process.cwd(), file);
+    if (!fs.existsSync(fullPath)) {
+      continue;
+    }
+    try {
+      JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      console.log(`[${text.pass}] ${file} JSON`);
+    } catch {
+      console.log(`[${text.fail}] ${file} ${text.invalidJson}`);
+      missing += 1;
+    }
+  }
+
+  const taskPath = path.join(process.cwd(), "ai/project/task.md");
+  if (fs.existsSync(taskPath)) {
+    const taskContent = fs.readFileSync(taskPath, "utf8");
+    const hasFrontMatter = taskContent.startsWith("---\n");
+    const hasRequiredTaskFields = TASK_HEALTH_PATTERNS.every((pattern) => pattern.test(taskContent));
+    if (hasFrontMatter && hasRequiredTaskFields) {
+      console.log(`[${text.pass}] ai/project/task.md front matter`);
+    } else {
+      console.log(`[${text.warn}] ai/project/task.md ${text.taskFrontMatterIncomplete}`);
+      warnings += 1;
+    }
+  }
+
+  if (installedVersion && packageVersion && installedVersion !== packageVersion) {
+    console.log(`[${text.warn}] ai/template/VERSION ${text.versionMismatch}: ${installedVersion} != ${packageVersion}`);
+    warnings += 1;
   }
 
   if (missing > 0) {

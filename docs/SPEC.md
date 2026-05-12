@@ -22,7 +22,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.7
+Package: @wnlen/ai-execution-template@0.8.8
 中文安装: npx -y @wnlen/ai-execution-template init
 英文安装: npx -y @wnlen/ai-execution-template init --lang en
 ```
@@ -344,7 +344,7 @@ npx -y @wnlen/ai-execution-template doctor
 ```text
 AI Execution Template 检查
 
-模板版本: 0.8.7
+模板版本: 0.8.8
 模板语言: zh
 
 [通过] ai/template/LANG

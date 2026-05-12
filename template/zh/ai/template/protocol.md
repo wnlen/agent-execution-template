@@ -237,6 +237,8 @@ ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
 必须满足：
 
 - 人类明确确认某个 proposal 可以合并；
+- proposal 状态已经是 `accepted`，或在执行前根据人类明确确认从
+  `proposed` 更新为 `accepted`；
 - `task.md.permission.modify.allowed` 包含将被修改的正式方向文件；
 - 只应用提案中已确认的内容，不顺手扩写新方向。
 
@@ -247,7 +249,14 @@ ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
 - `ai/project/refs/roadmap.md`
 - 必要时更新 `ai/project/refs/decisions.md` 或 `constraints.md`
 
-应用后必须在 `result.md` 中列出已合并的 proposal、修改文件和未合并事项。
+应用后必须：
+
+- 将 proposal 状态更新为 `applied`；
+- 填写 `applied_at`；
+- 在 `result.md` 中列出已合并的 proposal、修改文件和未合并事项。
+
+如果人类拒绝提案，应保留 proposal 文件，将 `status` 更新为 `rejected`，
+不要删除历史提案。
 
 ## 最少人类输入
 

@@ -82,6 +82,9 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/template/protocol.md").includes("推荐下一步最值得做的任务"), "protocol should require recommended next steps");
   assert(read(cwd, "ai/template/protocol.md").includes("上下文整合模式"), "protocol should include context reconcile mode");
   assert(read(cwd, "ai/template/protocol.md").includes("策略修订模式"), "protocol should include strategy update mode");
+  assert(read(cwd, "ai/template/rules/core.md").includes("策略修订门"), "core rules should include strategy update gate");
+  assert(read(cwd, "ai/template/rules/core.md").includes("ai/project/refs/final-shape.md"), "core rules should route direction refs");
+  assert(read(cwd, "ai/project/proposals/final-shape-updates/_template.md").includes("`accepted`"), "proposal template should describe accepted status");
   const initOutput = run(["init"], cwd);
   assert(initOutput.includes("开始初始化这个项目"), "init output should provide compact natural bootstrap prompt");
   assert(initOutput.includes("整合 ai/project/inbox/ 里的新资料"), "init output should provide compact natural reconcile prompt");
@@ -102,7 +105,10 @@ function testInitUpdateDoctor() {
   run(["update"], cwd);
   assert(read(cwd, "ai/project/project.md") === "USER PROJECT MARKER\n", "update must not overwrite project.md");
 
-  run(["doctor"], cwd);
+  const doctorOutput = run(["doctor"], cwd);
+  assert(doctorOutput.includes("ai/project/result.json JSON"), "doctor should validate result JSON");
+  assert(doctorOutput.includes("ai/project/metrics.json JSON"), "doctor should validate metrics JSON");
+  assert(doctorOutput.includes("ai/project/task.md front matter"), "doctor should validate task front matter");
 }
 
 function testEnglishInitUpdateDoctor() {
@@ -125,6 +131,8 @@ function testEnglishInitUpdateDoctor() {
   assert(exists(cwd, "ai/project/refs/module-map.md"), "English init should create module map");
   assert(exists(cwd, "ai/project/refs/roadmap.md"), "English init should create roadmap");
   assert(exists(cwd, "ai/project/proposals/final-shape-updates/_template.md"), "English init should create strategy proposal template");
+  assert(read(cwd, "ai/template/rules/core.md").includes("Strategy Update Gate"), "English core rules should include strategy update gate");
+  assert(read(cwd, "ai/project/proposals/final-shape-updates/_template.md").includes("`accepted`"), "English proposal template should describe accepted status");
   assert(read(cwd, "ai/template/reconcile.md").includes("Context Reconcile"), "English init should install English reconcile prompt");
   assert(read(cwd, "ai/template/reconcile.md").includes("reconciliation plan"), "English reconcile prompt should require a plan first");
   assert(initOutput.includes("Start initializing this project"), "English init output should provide English bootstrap prompt");
@@ -141,6 +149,8 @@ function testEnglishInitUpdateDoctor() {
 
   const doctorOutput = run(["doctor"], cwd);
   assert(doctorOutput.includes("Template language: en"), "doctor should show installed English language");
+  assert(doctorOutput.includes("ai/project/result.json JSON"), "English doctor should validate result JSON");
+  assert(doctorOutput.includes("ai/project/task.md front matter"), "English doctor should validate task front matter");
   assert(doctorOutput.includes("[OK] Ready to run"), "doctor should use installed English language");
   const reconcileOutput = run(["reconcile"], cwd);
   assert(reconcileOutput.includes("AI Execution Template Context Reconcile"), "reconcile should use installed English language");
@@ -163,6 +173,18 @@ function testDoctorFailureAndWarning() {
   run(["init"], warnCwd);
   write(warnCwd, "ai/project/runtime.md", "");
   run(["doctor"], warnCwd);
+
+  const invalidJsonCwd = createTempProject("ai-execution-template-invalid-json");
+  run(["init"], invalidJsonCwd);
+  write(invalidJsonCwd, "ai/project/result.json", "{invalid\n");
+  const invalidJsonOutput = run(["doctor"], invalidJsonCwd, 1);
+  assert(invalidJsonOutput.includes("JSON 无效"), "doctor should fail invalid result JSON");
+
+  const taskWarnCwd = createTempProject("ai-execution-template-task-frontmatter");
+  run(["init"], taskWarnCwd);
+  write(taskWarnCwd, "ai/project/task.md", "# Task only\n");
+  const taskWarnOutput = run(["doctor"], taskWarnCwd);
+  assert(taskWarnOutput.includes("任务 front matter 缺少关键字段"), "doctor should warn incomplete task front matter");
 }
 
 function main() {

@@ -2,8 +2,8 @@
 
 ## Current State
 
-- Phase: MVP template setup
-- Focus: Keep the AI execution layer minimal, auditable, and easy to copy into any software project.
+- Phase: Direction-layer and execution-layer consistency pass
+- Focus: Keep the file protocol installable, upgradeable, and auditable while keeping project-direction governance aligned with task execution constraints.
 - Blocker: None
 - Known Risks:
   - Over-expanding scope beyond the current task
@@ -12,6 +12,7 @@
   - Marking success without verification evidence
   - Running commands outside explicit permission
   - Optimizing for token savings instead of acceptable output per cost
+  - Direction-layer capabilities advancing while rules, runtime, or doctor checks stay on older semantics
 
 ## Hard Rules
 
@@ -38,6 +39,9 @@
 - Bootstrap read set starts from `ai/template/bootstrap.md`, `ai/template/protocol.md`, `ai/template/rules/core.md`, root docs, manifests, docs, refs, and bounded source-structure inspection when docs are insufficient.
 - Execution read set is `ai/template/prompt.md`, `ai/template/protocol.md`, `ai/template/rules/core.md`, `ai/project/project.md`, `ai/project/runtime.md`, and `ai/project/task.md`.
 - `ai/project/refs/` files are loaded only when required by task or triggered by task type.
+- `ai/project/refs/final-shape.md`, `module-map.md`, and `roadmap.md` are official direction-layer documents.
+- Official direction-layer documents must not be modified by routine reconcile flows or routine execution tasks.
+- Direction changes must go through a `strategy_update` proposal and `apply_strategy_update`.
 - `ai/project/archive/` is never read by default.
 - `ai/project/result.json` is the only authoritative latest result.
 - `ai/project/result.md` is the latest human-readable summary.
@@ -49,13 +53,15 @@
 ## Active Context
 
 This project is a protocol/template, not a complex agent framework.
-The MVP should remain file-based and tool-agnostic.
-Do not add CLI, UI, cloud sync, or multi-agent orchestration until the file protocol proves useful in real projects.
-The current product position is: minimal auditable execution protocol for AI Coding Agents.
-The current product goal is to reduce human interaction frequency and input size while making tasks more precise over time.
+The current product position is: project-direction governance plus auditable task execution for AI Coding Agents.
+The current product goal is to reduce human interaction frequency and input size while making tasks more precise over time and reducing long-term direction drift.
+Small CLI additions that improve protocol adoption and governance closure are allowed; do not introduce UI, cloud sync, or multi-agent orchestration.
 
 ## Ref Routing
 
+- Final shape / North Star / task-worthiness -> `ai/project/refs/final-shape.md`
+- Current module structure / boundaries / dependency direction -> `ai/project/refs/module-map.md`
+- Stage goals / near-term roadmap / deferred work -> `ai/project/refs/roadmap.md`
 - Architecture / API / module boundary -> `ai/project/refs/architecture.md`
 - Historical decision -> `ai/project/refs/decisions.md`
 - Security / compatibility / performance / data / deployment -> `ai/project/refs/constraints.md`

@@ -13,6 +13,13 @@ target_files:
 
 # 方向修订提案
 
+状态规则：
+
+- `proposed`：AI 已生成，等待人类审查。
+- `accepted`：人类明确确认，可以进入应用任务。
+- `rejected`：人类明确拒绝，保留提案用于追溯。
+- `applied`：已由 `apply_strategy_update` 合并，且填写 `applied_at`。
+
 ## 1. 新灵感摘要
 
 -

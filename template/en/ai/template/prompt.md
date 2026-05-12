@@ -19,7 +19,8 @@ Then choose the mode:
   then stop for human confirmation.
 - If the user explicitly confirms that a proposal under
   `ai/project/proposals/final-shape-updates/*.md` may be merged, draft or
-  execute an `apply_strategy_update` task.
+  execute an `apply_strategy_update` task. If the proposal is still
+  `proposed`, update it to `accepted` based on that explicit confirmation.
 - If the user says "Reconcile the new material in ai/project/inbox/", asks to
   reconcile, merge, absorb, update context, handle new material, mentions
   `reconcile` or `ai/project/inbox/`, or if `ai/project/inbox/` contains

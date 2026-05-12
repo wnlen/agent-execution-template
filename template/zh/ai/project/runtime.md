@@ -2,8 +2,8 @@
 
 ## 当前状态
 
-- 阶段：MVP 模板搭建
-- 重点：保持 AI 执行层最小、可审计，并且容易复制到任意软件项目。
+- 阶段：方向层与执行层一致性收口
+- 重点：保持文件协议可安装、可升级、可审计，并让项目方向治理与任务执行约束一致。
 - 阻塞：无
 - 已知风险：
   - 超出当前任务范围
@@ -12,6 +12,7 @@
   - 没有验证证据就标记成功
   - 在明确权限之外运行命令
   - 只优化 token 节省，而忽略成本可接受前提下的输出质量
+  - 方向层已升级但规则、runtime 或 doctor 仍停留在旧语义
 
 ## 硬规则
 
@@ -38,6 +39,9 @@
 - 引导读取集从 `ai/template/bootstrap.md`、`ai/template/protocol.md`、`ai/template/rules/core.md`、根目录文档、清单、文档、引用开始；当文档不足时，进行有限源码结构检查。
 - 执行读取集是 `ai/template/prompt.md`、`ai/template/protocol.md`、`ai/template/rules/core.md`、`ai/project/project.md`、`ai/project/runtime.md` 和 `ai/project/task.md`。
 - `ai/project/refs/` 文件只在任务要求或任务类型触发时加载。
+- `ai/project/refs/final-shape.md`、`module-map.md`、`roadmap.md` 属于方向层正式文档。
+- 方向层正式文档不能被普通 reconcile 或普通执行任务直接修改。
+- 方向修订必须经过 `strategy_update` proposal 和 `apply_strategy_update`。
 - 默认永远不读取 `ai/project/archive/`。
 - `ai/project/result.json` 是唯一权威的最新结果。
 - `ai/project/result.md` 是最新的人类可读摘要。
@@ -49,13 +53,15 @@
 ## 当前上下文
 
 这个项目是协议 / 模板，不是复杂 Agent 框架。
-MVP 应保持基于文件、工具无关。
-在文件协议被真实项目证明有用之前，不要增加 CLI、UI、云同步或多 Agent 编排。
-当前产品定位是：面向 AI Coding Agent 的最小可审计执行协议。
-当前产品目标是减少人类交互频率和输入量，同时让任务随时间变得更精确。
+当前产品定位是：面向 AI Coding Agent 的项目方向治理 + 可审计任务执行协议。
+当前产品目标是减少人类交互频率和输入量，同时让任务随时间变得更精确，并减少长期方向漂移。
+允许增加少量服务于协议采用和治理闭环的 CLI；不要引入 UI、云同步或多 Agent 编排。
 
 ## 引用路由
 
+- 最终形态 / 北极星 / 任务价值判断 -> `ai/project/refs/final-shape.md`
+- 当前模块结构 / 边界 / 依赖方向 -> `ai/project/refs/module-map.md`
+- 阶段目标 / 近期路线 / 暂缓事项 -> `ai/project/refs/roadmap.md`
 - 架构 / API / 模块边界 -> `ai/project/refs/architecture.md`
 - 历史决策 -> `ai/project/refs/decisions.md`
 - 安全 / 兼容性 / 性能 / 数据 / 部署 -> `ai/project/refs/constraints.md`

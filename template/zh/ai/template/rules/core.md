@@ -23,6 +23,9 @@
 引导模式只能写项目上下文文件：
 
 - `ai/project/project.md`
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
 - `ai/project/refs/architecture.md`
 - `ai/project/refs/commands.md`
 - `ai/project/refs/constraints.md`
@@ -75,6 +78,7 @@
 新资料优先放在：
 
 - `ai/project/inbox/*.md`
+- `ai/project/inbox/raw/*.md`
 - `docs/**`
 
 上下文整合必须先输出整合计划，等待人类确认后才更新文件。
@@ -85,7 +89,38 @@
 - `ai/project/runtime.md`
 - `ai/project/refs/*.md`
 
+如果新资料会改变北极星、模块地图或路线图的方向性内容，只能建议创建
+`strategy_update` 提案，不能在上下文整合中直接修改：
+
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
+
 除非人类明确授权，不要修改当前任务、结果、指标、归档、源码、测试、配置或依赖文件。
+
+## 策略修订门
+
+如果用户要求更新项目北极星、最终形态、产品宪法、模块地图、路线图或项目方向，
+或 `ai/project/inbox/ideas/` 中存在 `.gitkeep` 之外的新灵感，执行
+`strategy_update`。
+
+`strategy_update` 只能：
+
+- 读取正式方向文档、决策、约束和灵感输入；
+- 以 `ai/project/proposals/final-shape-updates/_template.md` 为结构模板；
+- 创建 `ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md`；
+- 将新提案状态写为 `proposed`；
+- 停止等待人类确认。
+
+它不能直接修改正式方向文档、源码、测试、配置或依赖文件。
+
+只有人类明确确认某个 proposal 后，才可以执行 `apply_strategy_update`。
+应用时：
+
+- 被确认的提案应从 `proposed` 更新为 `accepted`，或已经是 `accepted`；
+- 合并完成后，将提案更新为 `applied` 并填写 `applied_at`；
+- 如果人类拒绝提案，保留文件并将 `status` 更新为 `rejected`；
+- 只应用已确认内容，不顺手扩展新方向。
 
 ## 风险门
 
@@ -105,6 +140,9 @@
 
 只在需要时，或 `ai/project/task.md` 要求时读取引用文件：
 
+- 最终形态 / 北极星 / 任务价值判断 -> `ai/project/refs/final-shape.md`
+- 当前模块结构 / 边界 / 依赖方向 -> `ai/project/refs/module-map.md`
+- 阶段目标 / 近期路线 / 暂缓事项 -> `ai/project/refs/roadmap.md`
 - 架构 / API / 模块边界 -> `ai/project/refs/architecture.md`
 - 历史决策 -> `ai/project/refs/decisions.md`
 - 安全 / 兼容性 / 性能 / 数据 / 部署 -> `ai/project/refs/constraints.md`

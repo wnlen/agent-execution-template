@@ -24,6 +24,9 @@ execution.
 Bootstrap Mode may write only project context files:
 
 - `ai/project/project.md`
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
 - `ai/project/refs/architecture.md`
 - `ai/project/refs/commands.md`
 - `ai/project/refs/constraints.md`
@@ -87,6 +90,7 @@ context set.
 New material should usually live in:
 
 - `ai/project/inbox/*.md`
+- `ai/project/inbox/raw/*.md`
 - `docs/**`
 
 Context reconciliation must produce a plan first and wait for human
@@ -98,8 +102,45 @@ By default, context reconciliation may update only:
 - `ai/project/runtime.md`
 - `ai/project/refs/*.md`
 
+If new material would change directional content in the North Star, module map,
+or roadmap, Context Reconcile Mode may only recommend a `strategy_update`. It
+must not directly modify:
+
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
+
 Do not modify current task, results, metrics, archives, source, tests, config,
 or dependency files unless the human explicitly authorizes it.
+
+## Strategy Update Gate
+
+If the user asks to update the North Star, final shape, product constitution,
+module map, roadmap, or project direction, or if
+`ai/project/inbox/ideas/` contains non-`.gitkeep` new ideas, execute
+`strategy_update`.
+
+`strategy_update` may only:
+
+- read official direction docs, decisions, constraints, and idea inputs;
+- use `ai/project/proposals/final-shape-updates/_template.md` as its structural
+  template;
+- create `ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md`;
+- set the new proposal status to `proposed`;
+- stop for human confirmation.
+
+It must not directly modify official direction docs, source, tests, config, or
+dependency files.
+
+Only after the human explicitly confirms a proposal may
+`apply_strategy_update` run. During application:
+
+- the confirmed proposal should move from `proposed` to `accepted`, or already
+  be `accepted`;
+- after merge, update the proposal to `applied` and fill `applied_at`;
+- if the human rejects the proposal, keep the file and set `status` to
+  `rejected`;
+- apply only confirmed content, without opportunistic expansion.
 
 ## Risk Gate
 
@@ -120,6 +161,9 @@ write blocked results.
 
 Read refs only when needed or required by `ai/project/task.md`:
 
+- Final shape / North Star / task-worthiness -> `ai/project/refs/final-shape.md`
+- Current module structure / boundaries / dependency direction -> `ai/project/refs/module-map.md`
+- Stage goals / near-term roadmap / deferred work -> `ai/project/refs/roadmap.md`
 - Architecture / API / module boundary -> `ai/project/refs/architecture.md`
 - Historical decision -> `ai/project/refs/decisions.md`
 - Security / compatibility / performance / data / deployment -> `ai/project/refs/constraints.md`

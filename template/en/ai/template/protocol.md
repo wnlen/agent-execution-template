@@ -264,6 +264,8 @@ or dependency files.
 It requires:
 
 - explicit human confirmation that a proposal may be merged;
+- the proposal is already `accepted`, or is updated from `proposed` to
+  `accepted` immediately before execution based on explicit human confirmation;
 - `task.md.permission.modify.allowed` includes the official direction files
   that will be changed;
 - applying only the confirmed proposal content, without opportunistic expansion.
@@ -275,8 +277,15 @@ Allowed updates:
 - `ai/project/refs/roadmap.md`
 - `ai/project/refs/decisions.md` or `constraints.md` when necessary
 
-After applying, `result.md` must list the merged proposal, changed files, and
-items left unmerged.
+After applying:
+
+- update proposal status to `applied`;
+- fill `applied_at`;
+- make `result.md` list the merged proposal, changed files, and items left
+  unmerged.
+
+If the human rejects a proposal, keep the proposal file, update `status` to
+`rejected`, and do not delete that historical strategy record.
 
 ## Human-Minimal Task
 
