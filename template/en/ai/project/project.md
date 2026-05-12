@@ -23,6 +23,7 @@ manifests, then have a human review it. Mark unknown facts as `Unknown`.
 - Tests:
 - Configuration:
 - Documentation:
+- Direction docs: `ai/project/refs/final-shape.md`, `module-map.md`, `roadmap.md`
 
 ## Stable Constraints
 
@@ -35,4 +36,7 @@ manifests, then have a human review it. Mark unknown facts as `Unknown`.
 ## Notes
 
 Keep this file for stable project identity and long-lived conventions.
+Use `ai/project/refs/final-shape.md` for project direction and final shape.
+Use `ai/project/refs/module-map.md` for current module structure.
+Use `ai/project/refs/roadmap.md` for staged direction.
 Use `ai/project/runtime.md` for current execution context.

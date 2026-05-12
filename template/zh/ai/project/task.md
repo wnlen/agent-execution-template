@@ -1,6 +1,6 @@
 ---
 task_id: ""
-type: "bugfix | feature | refactor | docs | config | test | research"
+type: "bugfix | feature | refactor | docs | config | test | research | strategy_update | apply_strategy_update"
 priority: "P0 | P1 | P2 | P3"
 risk_level: "low | medium | high"
 depends_on_previous_result: false
@@ -50,6 +50,9 @@ permission:
 
 描述这个任务的准确目标。如果由简短人类请求生成，保留用户意图并明确写出假设。
 
+如果 `type = strategy_update`，目标是生成方向修订提案，不写代码。
+如果 `type = apply_strategy_update`，目标是把已确认提案合并进正式方向文档。
+
 ## 范围
 
 允许范围：
@@ -69,6 +72,8 @@ permission:
 - 不要重构无关模块。
 - 除非任务要求，不要修改公共 API。
 - 除非明确授权，不要编辑 `ai/project/runtime.md`。
+- 除非 `type = apply_strategy_update` 且已有确认过的提案，不要修改
+  `ai/project/refs/final-shape.md`、`module-map.md` 或 `roadmap.md`。
 
 ## 验收
 

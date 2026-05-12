@@ -22,7 +22,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.6
+Package: @wnlen/ai-execution-template@0.8.7
 中文安装: npx -y @wnlen/ai-execution-template init
 英文安装: npx -y @wnlen/ai-execution-template init --lang en
 ```
@@ -30,19 +30,21 @@ Package: @wnlen/ai-execution-template@0.8.6
 当前 v0.8 已经具备：
 
 - npm `bin` 入口；
-- `init` / `update` / `reconcile` / `doctor` 四个命令；
+- `init` / `update` / `reconcile` / `strategy` / `doctor` 五个命令；
 - `init --lang zh|en` 双语安装入口，默认中文；
 - `template/project` 双区结构；
 - 保护 `ai/project/**` 不被升级覆盖；
 - 模板版本文件 `ai/template/VERSION`；
 - 引导模式：通过 `ai/template/bootstrap.md` 从受控范围内的项目文档、manifest 和必要代码生成 `project.md` / refs 草稿；
 - 上下文整合模式：通过 `ai/template/reconcile.md` 将 `ai/project/inbox/` 或 `docs/**` 中的新权威资料合并进既有上下文；
+- 项目方向层：通过 `final-shape.md`、`module-map.md`、`roadmap.md` 保存北极星、模块地图和路线图；
+- 策略修订门禁：通过 `strategy_update` proposal 和 `apply_strategy_update` 防止普通执行任务直接改项目宪法；
 - 自测脚本 `npm test`；
 - `result.json` / `result.md` / `metrics.json` 执行结果记录。
 
 ## 4. 解决的问题
 
-AI Execution Template 主要解决九类问题：
+AI Execution Template 主要解决十类问题：
 
 1. 每次都要重复向 AI 解释项目背景。
 2. 任务边界容易漂移，AI 做多、改多、跑多。
@@ -53,6 +55,7 @@ AI Execution Template 主要解决九类问题：
 7. 用户不知道模板是否安装完整。
 8. 便宜模型和强模型没有明确分工规则。
 9. 直接影响执行精度的 `project.md` / `task.md` 仍然依赖人手写。
+10. AI 能稳定执行任务，但缺少判断任务为什么值得做、项目下一步往哪里生长的方向层。
 
 最终目标是：
 
@@ -163,6 +166,12 @@ npx -y @wnlen/ai-execution-template update
 npx -y @wnlen/ai-execution-template update --lang en
 ```
 
+查看方向修订入口：
+
+```bash
+npx -y @wnlen/ai-execution-template strategy
+```
+
 ## 7. 安装后的目录结构
 
 ```text
@@ -190,7 +199,14 @@ ai/
     result.md
     metrics.json
     inbox/
+      ideas/
+      raw/
+    proposals/
+      final-shape-updates/
     refs/
+      final-shape.md
+      module-map.md
+      roadmap.md
     archive/
 ```
 
@@ -257,7 +273,14 @@ ai/project/result.json
 ai/project/result.md
 ai/project/metrics.json
 ai/project/inbox/
+ai/project/inbox/ideas/
+ai/project/inbox/raw/
+ai/project/proposals/final-shape-updates/
+ai/project/proposals/final-shape-updates/_template.md
 ai/project/refs/
+ai/project/refs/final-shape.md
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
 ai/project/archive/
 ```
 
@@ -321,7 +344,7 @@ npx -y @wnlen/ai-execution-template doctor
 ```text
 AI Execution Template 检查
 
-模板版本: 0.8.6
+模板版本: 0.8.7
 模板语言: zh
 
 [通过] ai/template/LANG
@@ -343,6 +366,31 @@ AI Execution Template 检查
 [通过] 已就绪
 ```
 
+### 9.4 `strategy`
+
+```bash
+npx -y @wnlen/ai-execution-template strategy
+```
+
+作用：
+
+- 打印方向修订的最短操作说明；
+- 指示用户把新方向灵感放到 `ai/project/inbox/ideas/`；
+- 指示 AI 生成 `strategy_update` 提案；
+- 提醒人类确认后再执行 `apply_strategy_update`。
+
+### 9.5 `reconcile`
+
+```bash
+npx -y @wnlen/ai-execution-template reconcile
+```
+
+作用：
+
+- 打印上下文整合的最短操作说明；
+- 指示用户把新的业务、产品、架构或流程资料放到 `ai/project/inbox/`；
+- 指示 AI 先输出整合计划，等待确认后再更新长期上下文。
+
 ## 10. 启动入口
 
 面向用户的项目上下文启动入口是：
@@ -361,6 +409,12 @@ AI Execution Template 检查
 
 ```text
 整合 ai/project/inbox/ 里的新资料
+```
+
+面向用户的方向修订入口可以是：
+
+```text
+把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
 ```
 
 内部协议入口分别由 `ai/template/bootstrap.md`、`ai/template/prompt.md` 和
@@ -389,7 +443,7 @@ ai/project/metrics.json
 当前协议的执行闭环是：
 
 ```text
-项目引导 -> 项目确认 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
+项目引导 -> 项目确认 -> 方向修订提案可选 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
 ```
 
 更具体地说：
@@ -413,6 +467,17 @@ ai/project/metrics.json
 → 尽可能验证
 → 写回 result / metrics
 → 必要时建议 runtime 更新
+```
+
+如果当前目标会改变项目最终形态、模块边界或路线图，必须先进入策略修订：
+
+```text
+灵感进入 ai/project/inbox/ideas/
+→ strategy_update 读取 final-shape / module-map / roadmap / decisions / constraints
+→ 输出 ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
+→ 人类确认
+→ apply_strategy_update 合并进正式方向文件
+→ 再生成或执行具体 task.md
 ```
 
 ## 12. Bootstrap 与人类参与边界
@@ -478,6 +543,17 @@ AI 负责：
 人类少输入，AI 多整理；但 scope、risk、permission、acceptance 不乱猜。
 ```
 
+引导模式不仅要生成项目身份，也要在有证据时初始化方向层：
+
+```text
+ai/project/refs/final-shape.md
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
+```
+
+如果现有资料不足以判断最终形态、模块地图或路线图，必须写 `Unknown` 或保留占位，
+不能为了填满文档而编造愿景。
+
 ## 13. 任务文件 `task.md`
 
 `ai/project/task.md` 是当前任务契约。
@@ -497,6 +573,23 @@ AI 负责：
 - 约束；
 - 验收标准；
 - stop conditions。
+
+任务类型允许包含：
+
+```text
+bugfix
+feature
+refactor
+docs
+config
+test
+research
+strategy_update
+apply_strategy_update
+```
+
+其中 `strategy_update` 只生成方向修订提案，不写代码；`apply_strategy_update`
+只应用已确认提案，不顺手扩展新方向。
 
 原则：
 
@@ -557,6 +650,9 @@ Default cheap. Escalate for judgment. Record why.
 推荐路由：
 
 ```text
+最终形态 / 北极星 / 任务价值判断 -> ai/project/refs/final-shape.md
+当前模块结构 / 边界 / 依赖方向     -> ai/project/refs/module-map.md
+阶段目标 / 近期路线 / 暂缓事项     -> ai/project/refs/roadmap.md
 架构 / API / 模块边界       -> ai/project/refs/architecture.md
 历史决策                    -> ai/project/refs/decisions.md
 安全 / 兼容 / 性能 / 数据    -> ai/project/refs/constraints.md
@@ -575,6 +671,7 @@ Default cheap. Escalate for judgment. Record why.
 ai/project/inbox/business-context.md
 ai/project/inbox/product-workflows.md
 ai/project/inbox/domain-model.md
+ai/project/inbox/raw/interview-notes.md
 ```
 
 当 inbox 中的资料需要吸收时，执行：
@@ -584,6 +681,85 @@ ai/project/inbox/domain-model.md
 ```
 
 AI 必须先输出整合计划，等人类确认后，才更新 `project.md`、`runtime.md` 和 `refs/*`。
+
+如果新资料会改变 `final-shape.md`、`module-map.md` 或 `roadmap.md` 的方向性内容，
+上下文整合只能建议创建 `strategy_update` 提案，不能直接改这些文件。
+
+## 16.2 项目北极星与策略修订
+
+`ai/project/refs/final-shape.md` 是项目北极星说明书，也可以理解为
+Product Constitution / Final Shape Spec。它负责保存：
+
+- 项目一句话定位；
+- 解决的本质问题；
+- 目标用户和核心痛点；
+- 最终产品形态；
+- 当前阶段不做什么；
+- 核心模块边界；
+- 长期护城河；
+- 判断任务是否值得做的标准；
+- 判断项目是否跑偏的标准。
+
+配套文件：
+
+```text
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
+ai/project/inbox/ideas/
+ai/project/proposals/final-shape-updates/
+ai/project/proposals/final-shape-updates/_template.md
+```
+
+门禁规则：
+
+```text
+灵感不能直接改宪法。
+AI 不能在普通执行任务里顺手改宪法。
+普通执行任务不能直接改北极星、模块地图或路线图。
+```
+
+正确流程：
+
+```text
+idea -> proposal -> review -> human confirm -> update
+```
+
+`strategy_update` 必须输出到：
+
+```text
+ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
+```
+
+并以：
+
+```text
+ai/project/proposals/final-shape-updates/_template.md
+```
+
+作为结构模板。
+
+提案必须包含：
+
+1. 新灵感摘要
+2. 与当前 final-shape 的一致点
+3. 冲突点
+4. 应该吸收的部分
+5. 应该拒绝的部分
+6. 对模块地图的影响
+7. 对路线图的影响
+8. 建议修改 diff
+9. 风险
+10. 是否推荐合并
+
+只有人类确认后，`apply_strategy_update` 才能修改：
+
+```text
+ai/project/refs/final-shape.md
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
+ai/project/refs/decisions.md
+ai/project/refs/constraints.md
+```
 
 ## 17. 输出结果
 

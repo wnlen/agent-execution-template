@@ -10,10 +10,21 @@ ai/project/  = current project execution workspace
 
 Template is protocol. Project is the field workspace.
 
+The project workspace stores both execution state and direction. The direction
+layer answers "why is this worth doing and where should the project grow"; the
+execution layer answers "what is this task and how will it be accepted."
+
+```text
+ai/project/refs/final-shape.md = project North Star
+ai/project/refs/module-map.md  = current module map
+ai/project/refs/roadmap.md     = staged roadmap
+ai/project/task.md             = current execution contract
+```
+
 ## Execution Flow
 
 ```text
-Project Bootstrap / Context Reconcile -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
+Project Bootstrap / Context Reconcile / Strategy Update -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
 ```
 
 1. For project discovery, follow `ai/template/bootstrap.md`; do not summarize it.
@@ -24,12 +35,17 @@ Project Bootstrap / Context Reconcile -> Project Confirm -> Task Draft -> Task C
 4. When new authoritative material appears, put it in `ai/project/inbox/` and
    follow `ai/template/reconcile.md`; do not summarize it. Reconciliation must
    produce a plan first and update context only after confirmation.
-5. If `ai/project/task.md` is missing or incomplete, draft it from the current
+5. When a new idea would change the final product shape, module boundaries, or
+   roadmap, put it in `ai/project/inbox/ideas/`, then create a
+   `strategy_update` task to produce a proposal.
+6. Only after the human confirms the proposal may an `apply_strategy_update`
+   task modify `final-shape.md`, `module-map.md`, or `roadmap.md`.
+7. If `ai/project/task.md` is missing or incomplete, draft it from the current
    goal and confirmed project context, then stop with the Task Draft Handoff.
-6. After task confirmation, check readiness, risk, model policy, refs,
+8. After task confirmation, check readiness, risk, model policy, refs,
    permission, and acceptance.
-7. Execute only within the project task boundary.
-8. Write `ai/project/result.json`, `ai/project/result.md`, and `ai/project/metrics.json`.
+9. Execute only within the project task boundary.
+10. Write `ai/project/result.json`, `ai/project/result.md`, and `ai/project/metrics.json`.
 
 ## Bootstrap Mode
 
@@ -115,10 +131,24 @@ before expanding the read scope.
 
 `ai/project/refs/*.md` should contain focused durable context:
 
+- project North Star, final shape, and task-worthiness criteria;
+- current module map, staged roadmap, and direction constraints;
 - architecture and module boundaries;
 - run, build, test, and verification commands;
 - security, compatibility, performance, data, and deployment constraints;
 - documented decisions only when evidence exists.
+
+Recommended routing:
+
+```text
+final shape / North Star / task worthiness -> ai/project/refs/final-shape.md
+current module structure / boundaries      -> ai/project/refs/module-map.md
+stage goals / near-term roadmap            -> ai/project/refs/roadmap.md
+architecture / API / technical boundaries  -> ai/project/refs/architecture.md
+commands / verification                    -> ai/project/refs/commands.md
+non-negotiable constraints                 -> ai/project/refs/constraints.md
+confirmed key decisions                    -> ai/project/refs/decisions.md
+```
 
 After writing drafts, stop with the Post-Bootstrap Handoff from
 `ai/template/bootstrap.md`. If the human did not provide a current task,
@@ -168,6 +198,85 @@ Context Reconcile Mode must:
 - update `ai/project/project.md`, `ai/project/runtime.md`, and `ai/project/refs/*.md` only after human confirmation;
 - not modify `task.md`, `result.*`, `metrics.json`, source, tests, config, or dependency files by default;
 - not dump raw new material into refs; absorb long-lived, structured, reusable facts.
+
+If new material would change directional content in `final-shape.md`,
+`module-map.md`, or `roadmap.md`, Context Reconcile Mode may only recommend a
+`strategy_update`; it must not directly edit those files.
+
+## Strategy Update Mode
+
+Strategy Update Mode handles changes to project direction, final shape, module
+boundaries, or roadmap.
+
+Use it when:
+
+- `ai/project/inbox/ideas/` contains new product, business, architecture, or
+  direction ideas;
+- the user asks to update the North Star, final shape, product constitution,
+  module map, or roadmap;
+- a routine task discovers that the current execution goal may conflict with
+  project direction.
+
+### `strategy_update`
+
+`strategy_update` only produces a proposal. It does not write code and does not
+modify official direction files.
+
+It must read:
+
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
+- `ai/project/refs/decisions.md`
+- `ai/project/refs/constraints.md`
+- human-specified new material; if none is named, read `ai/project/inbox/ideas/*`
+
+Write the proposal to:
+
+```text
+ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
+```
+
+Use `ai/project/proposals/final-shape-updates/_template.md` as the structural
+template.
+
+The proposal must include:
+
+1. Summary of the new idea
+2. Alignment with current `final-shape.md`
+3. Conflicts
+4. Parts to absorb
+5. Parts to reject
+6. Impact on the module map
+7. Impact on the roadmap
+8. Suggested diff
+9. Risks
+10. Merge recommendation
+
+Stop after producing the proposal and wait for human confirmation. Do not
+modify `final-shape.md`, `module-map.md`, `roadmap.md`, source, tests, config,
+or dependency files.
+
+### `apply_strategy_update`
+
+`apply_strategy_update` only applies a confirmed proposal.
+
+It requires:
+
+- explicit human confirmation that a proposal may be merged;
+- `task.md.permission.modify.allowed` includes the official direction files
+  that will be changed;
+- applying only the confirmed proposal content, without opportunistic expansion.
+
+Allowed updates:
+
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
+- `ai/project/refs/decisions.md` or `constraints.md` when necessary
+
+After applying, `result.md` must list the merged proposal, changed files, and
+items left unmerged.
 
 ## Human-Minimal Task
 

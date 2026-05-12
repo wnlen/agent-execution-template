@@ -1,5 +1,5 @@
 {
-  "protocol_version": "0.7",
+  "protocol_version": "0.8",
   "status": "blocked",
   "task_id": "example-blocked",
   "task_summary": "Task lacks acceptance criteria and permission boundaries.",

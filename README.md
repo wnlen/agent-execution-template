@@ -46,12 +46,14 @@ AI coding agents are powerful, but most teams still run them through loose chat 
 - Template upgrades accidentally overwrite project-specific context.
 - Cheap and strong models are used without a clear division of labor.
 - The two files that define execution precision are often written by hand.
+- Execution can become stable while still lacking a direction layer for judging
+  whether a task is worth doing or whether the project is drifting.
 
 AI Execution Template fixes this with a small, installable file protocol:
 
 ```text
 ai/template/  reusable execution protocol
-ai/project/   project-specific working context
+ai/project/   project-specific working context and direction layer
 ```
 
 `update` can refresh the protocol, while your project workspace stays protected.
@@ -116,6 +118,12 @@ Upgrade only the reusable protocol files:
 npx -y @wnlen/ai-execution-template update --lang en
 ```
 
+Print the direction-amendment entrypoint:
+
+```bash
+npx -y @wnlen/ai-execution-template strategy --lang en
+```
+
 ## What You Get
 
 | Capability | What it means |
@@ -123,6 +131,8 @@ npx -y @wnlen/ai-execution-template update --lang en
 | Installable protocol | Add an AI execution contract to any repository in seconds. |
 | Agent agnostic | Works with Codex, Claude Code, Cursor, Aider, and other coding agents. |
 | Bootstrap mode | Reads approved docs/manifests, falls back to bounded code inference, drafts `project.md` and refs, then stops for confirmation. |
+| Project North Star | Stores final shape, task-worthiness criteria, and drift criteria in `ai/project/refs/final-shape.md`. |
+| Strategy amendment gate | New direction goes through `inbox/ideas/`, a proposal, human confirmation, then an explicit apply task. |
 | Protected project context | `update` refreshes `ai/template/**` without overwriting `ai/project/**`. |
 | Bounded task execution | Goals, scope, permissions, risk, and acceptance criteria live in one task file. |
 | Auditable results | Every run can leave human-readable output, machine-readable facts, and metrics. |
@@ -157,7 +167,14 @@ ai/
     result.md
     metrics.json
     inbox/
+      ideas/
+      raw/
+    proposals/
+      final-shape-updates/
     refs/
+      final-shape.md
+      module-map.md
+      roadmap.md
     archive/
 ```
 
@@ -214,6 +231,16 @@ npx -y @wnlen/ai-execution-template reconcile --lang en
 
 Prints the shortest context-reconcile instructions.
 
+### `strategy`
+
+```bash
+npx -y @wnlen/ai-execution-template strategy --lang en
+```
+
+Prints the shortest direction-amendment instructions. New ideas go to
+`ai/project/inbox/ideas/`, then the agent generates a `strategy_update`
+proposal. After human confirmation, `apply_strategy_update` merges it.
+
 ## Execution Model
 
 AI Execution Template defines a simple loop:
@@ -249,6 +276,30 @@ Reconcile the new material in ai/project/inbox/
 ```
 
 The agent must produce a reconciliation plan first, wait for confirmation, then merge long-lived facts into `project.md`, `runtime.md`, and `refs/*`.
+
+## Project North Star
+
+Long-term direction does not belong in the current task. AI Execution Template
+stores the direction layer inside protected `ai/project/**` files:
+
+```text
+ai/project/refs/final-shape.md       # project North Star / final shape
+ai/project/refs/module-map.md        # current module map
+ai/project/refs/roadmap.md           # staged roadmap
+ai/project/inbox/ideas/              # new idea intake
+ai/project/proposals/final-shape-updates/
+ai/project/proposals/final-shape-updates/_template.md
+```
+
+Routine execution tasks must not edit the North Star, module map, or roadmap
+directly. Direction changes should follow:
+
+```text
+idea -> strategy_update proposal -> human confirm -> apply_strategy_update
+```
+
+That keeps `task.md` as the current work order while `final-shape.md` explains
+why a task is worth doing and where the project should grow.
 
 ## Token-Efficient by Design
 

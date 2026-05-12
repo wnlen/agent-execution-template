@@ -12,10 +12,17 @@
 
 然后选择模式：
 
+- 如果用户要求更新北极星、最终形态、产品宪法、模块地图、路线图、项目方向，
+  或 `ai/project/inbox/ideas/` 里存在 `.gitkeep` 之外的待评估灵感，按 `strategy_update`
+  起草方向修订任务或直接生成提案，然后停止等待人类确认。
+- 如果用户明确确认某个
+  `ai/project/proposals/final-shape-updates/*.md` 可以合并，按
+  `apply_strategy_update` 起草或执行应用任务。
 - 如果用户说“整合 ai/project/inbox/ 里的新资料”，要求整合/合并/吸收/
   更新上下文/处理新资料，提到 `reconcile` 或 `ai/project/inbox/`，
-  或 `ai/project/inbox/` 里存在待吸收资料，执行 `ai/template/reconcile.md`，
-  并按它的两阶段流程停止或更新。
+  或 `ai/project/inbox/` 里存在 `.gitkeep` 之外的待吸收资料，执行 `ai/template/reconcile.md`，
+  并按它的两阶段流程停止或更新；但 `ai/project/inbox/ideas/` 应优先走
+  `strategy_update`。
 - 如果用户说“开始初始化这个项目”、要求初始化/整理/生成项目上下文，
   或 `ai/project/project.md` 为空、只有占位内容、
   或不完整，执行 `ai/template/bootstrap.md`，并在项目上下文确认后停止。
@@ -51,6 +58,29 @@
 
 请回复：
 - 已确认，执行
+- 或修正意见
+```
+
+## 策略修订交接
+
+在 `strategy_update` 中：
+
+1. 读取 `final-shape.md`、`module-map.md`、`roadmap.md`、`decisions.md`、
+   `constraints.md` 和相关 `inbox/ideas/*`。
+2. 以 `ai/project/proposals/final-shape-updates/_template.md` 为结构模板，
+   生成 `ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md`。
+3. 停止等待人类确认。不要修改正式方向文件或源码。
+
+结束时使用：
+
+```text
+方向修订提案已准备好。
+
+请检查：
+- ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
+
+请回复：
+- 确认，合并这个提案
 - 或修正意见
 ```
 

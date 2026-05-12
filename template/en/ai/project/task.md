@@ -1,6 +1,6 @@
 ---
 task_id: ""
-type: "bugfix | feature | refactor | docs | config | test | research"
+type: "bugfix | feature | refactor | docs | config | test | research | strategy_update | apply_strategy_update"
 priority: "P0 | P1 | P2 | P3"
 risk_level: "low | medium | high"
 depends_on_previous_result: false
@@ -53,6 +53,10 @@ permissions, or acceptance.
 Describe the exact goal of this task. If generated from a short human request,
 preserve the user's intent and make assumptions explicit.
 
+If `type = strategy_update`, the goal is to produce a direction amendment
+proposal, not code. If `type = apply_strategy_update`, the goal is to merge a
+confirmed proposal into the official direction documents.
+
 ## Scope
 
 Allowed scope:
@@ -72,6 +76,9 @@ Out of scope:
 - Do not refactor unrelated modules.
 - Do not modify public API unless required by the task.
 - Do not edit `ai/project/runtime.md` unless explicitly authorized.
+- Do not modify `ai/project/refs/final-shape.md`, `module-map.md`, or
+  `roadmap.md` unless `type = apply_strategy_update` and a confirmed proposal
+  exists.
 
 ## Acceptance
 

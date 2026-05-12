@@ -1,5 +1,5 @@
 {
-  "protocol_version": "0.7",
+  "protocol_version": "0.8",
   "status": "partial",
   "task_id": "example-partial-manual-verification",
   "task_summary": "Code change completed but manual UI verification is required.",

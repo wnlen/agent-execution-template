@@ -23,8 +23,15 @@ project is the field workspace
 - `project/result.json`: latest authoritative execution result.
 - `project/result.md`: latest human-readable execution summary.
 - `project/metrics.json`: latest model, token, time, success, and reuse signals.
+- `project/refs/final-shape.md`: project North Star / final shape.
+- `project/refs/module-map.md`: current module map.
+- `project/refs/roadmap.md`: staged roadmap.
 - `project/refs/`: detailed references loaded only when needed.
+- `project/inbox/ideas/`: product, business, architecture, or direction ideas waiting for evaluation.
+- `project/inbox/raw/`: raw long-form inputs, interviews, notes, or fragments.
 - `project/inbox/`: new material waiting to be absorbed, such as authoritative business docs.
+- `project/proposals/final-shape-updates/`: North Star and roadmap amendment proposals.
+- `project/proposals/final-shape-updates/_template.md`: direction amendment proposal template.
 - `project/archive/`: historical tasks/results, not read by default.
 
 ## Normal Use
@@ -33,8 +40,10 @@ project is the field workspace
 2. The AI summarizes project context, confirmation points, and the recommended next step in chat.
 3. Reply with corrections, or say: `Continue this project`.
 4. To absorb new material, put it in `project/inbox/`, then say: `Reconcile the new material in ai/project/inbox/`.
-5. Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
-6. Archive old task/result files if needed.
+5. For a new direction idea, put it in `project/inbox/ideas/` and have the AI produce a `strategy_update` proposal.
+6. After human confirmation, run `apply_strategy_update` to merge it into the official direction docs.
+7. Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
+8. Archive old task/result files if needed.
 
 ## Context Reconcile
 
@@ -51,6 +60,26 @@ Reconcile the new material in ai/project/inbox/
 ```
 
 The workflow produces a reconciliation plan first and updates `project.md`, `runtime.md`, and `refs/*` only after confirmation.
+
+## Direction Amendments
+
+The North Star, module map, and roadmap belong to the project direction layer:
+
+```text
+ai/project/refs/final-shape.md
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
+```
+
+Routine execution tasks must not edit these files directly. Put new ideas in:
+
+```text
+ai/project/inbox/ideas/
+```
+
+Then have the AI produce a `strategy_update` proposal. After human
+confirmation, use `apply_strategy_update` to merge it into the official
+direction documents.
 
 ## Sync Rules
 

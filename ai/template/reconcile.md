@@ -15,6 +15,7 @@
 新资料默认放在：
 
 - `ai/project/inbox/*.md`
+- `ai/project/inbox/raw/*.md`
 - `docs/**`
 
 `ai/project/inbox/` 是待吸收资料区。资料被整合确认后，可以保留用于追溯，也可以移动到项目文档或归档。
@@ -37,11 +38,16 @@
 - 将新资料拆分进合适位置：
   - 项目身份、用户、稳定约定 -> `ai/project/project.md`
   - 当前仍有效的执行上下文 -> `ai/project/runtime.md`
+  - 最终形态 / 北极星 / 任务价值判断 -> `ai/project/refs/final-shape.md`
+  - 当前模块结构 / 边界 / 依赖方向 -> `ai/project/refs/module-map.md`
+  - 阶段目标 / 近期路线 / 暂缓事项 -> `ai/project/refs/roadmap.md`
   - 架构 / API / 模块边界 -> `ai/project/refs/architecture.md`
   - 命令 -> `ai/project/refs/commands.md`
   - 约束 -> `ai/project/refs/constraints.md`
   - 持久决策 -> `ai/project/refs/decisions.md`
 - 不要把 `refs/*` 写成原文堆砌；只吸收结构化、长期有效、可复用的内容。
+- 如果新资料会改变北极星、模块地图或路线图的方向性内容，只能建议创建
+  `strategy_update` 提案，不要在上下文整合中直接修改这些方向文件。
 - `task.md`、`result.json`、`result.md`、`metrics.json` 通常不参与业务上下文整合，除非人类明确要求吸收其中仍长期有效的事实。
 
 ## 两阶段流程
@@ -76,6 +82,9 @@
 除非人类明确要求，否则不要修改：
 
 - 源码、测试、配置、依赖文件
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
 - `ai/project/task.md`
 - `ai/project/result.json`
 - `ai/project/result.md`

@@ -23,8 +23,15 @@ project 是现场工作区
 - `project/result.json`：最新权威执行结果。
 - `project/result.md`：最新人类可读执行摘要。
 - `project/metrics.json`：最新模型、token、耗时、成功和复用信号。
+- `project/refs/final-shape.md`：项目北极星说明书 / 最终形态。
+- `project/refs/module-map.md`：当前模块地图。
+- `project/refs/roadmap.md`：阶段路线图。
 - `project/refs/`：只在需要时加载的详细引用。
+- `project/inbox/ideas/`：待评估的产品、业务、架构或方向灵感。
+- `project/inbox/raw/`：长文本、访谈、碎片材料等原始输入。
 - `project/inbox/`：待吸收的新资料，例如更权威的业务文档。
+- `project/proposals/final-shape-updates/`：北极星和路线图修订提案。
+- `project/proposals/final-shape-updates/_template.md`：方向修订提案模板。
 - `project/archive/`：历史任务和结果，默认不读取。
 
 ## 常规用法
@@ -33,8 +40,10 @@ project 是现场工作区
 2. AI 会在聊天里给出项目上下文摘要、需要确认的点和建议下一步。
 3. 回复修正意见，或说：`继续推进这个项目`。
 4. 需要吸收新资料时，放入 `project/inbox/`，然后说：`整合 ai/project/inbox/ 里的新资料`。
-5. 执行后检查 `project/result.json`、`project/result.md` 和 `project/metrics.json`。
-6. 需要时归档旧任务和结果文件。
+5. 有新的方向灵感时，放入 `project/inbox/ideas/`，让 AI 生成 `strategy_update` 提案。
+6. 人类确认提案后，再执行 `apply_strategy_update` 合并到正式方向文档。
+7. 执行后检查 `project/result.json`、`project/result.md` 和 `project/metrics.json`。
+8. 需要时归档旧任务和结果文件。
 
 ## 上下文整合
 
@@ -51,6 +60,25 @@ ai/project/inbox/
 ```
 
 整合流程会先给出计划，等你确认后才更新 `project.md`、`runtime.md` 和 `refs/*`。
+
+## 方向修订
+
+北极星、模块地图和路线图属于项目方向层：
+
+```text
+ai/project/refs/final-shape.md
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
+```
+
+普通执行任务不能直接修改这些文件。新灵感先放入：
+
+```text
+ai/project/inbox/ideas/
+```
+
+然后让 AI 生成 `strategy_update` 提案。人类确认后，再用
+`apply_strategy_update` 合并到正式方向文档。
 
 ## 同步规则
 

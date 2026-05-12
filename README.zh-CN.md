@@ -52,12 +52,13 @@ AI Coding Agent 已经很强，但大多数项目仍然在用松散聊天上下�
 - 模板升级容易误伤项目自己的上下文。
 - 便宜模型和强模型没有清晰分工。
 - 直接影响执行精度的两个文件经常还需要人手写。
+- 执行很稳定，但缺少判断任务是否值得做、项目是否跑偏的方向层。
 
 AI Execution Template 用一个很小的项目内文件协议解决这些问题：
 
 ```text
 ai/template/  可复用执行协议
-ai/project/   当前项目现场
+ai/project/   当前项目现场和方向层
 ```
 
 `update` 只刷新协议区，项目现场保持受保护。
@@ -127,6 +128,12 @@ npx -y @wnlen/ai-execution-template doctor
 npx -y @wnlen/ai-execution-template update
 ```
 
+查看方向修订入口：
+
+```bash
+npx -y @wnlen/ai-execution-template strategy
+```
+
 ## 你会得到什么
 
 | 能力 | 含义 |
@@ -134,6 +141,8 @@ npx -y @wnlen/ai-execution-template update
 | 可安装执行协议 | 几秒钟给任意仓库加入 AI 执行契约。 |
 | Agent 无关 | 可用于 Codex、Claude Code、Cursor、Aider 和其他编程 Agent。 |
 | Bootstrap 模式 | 读取受控范围内的文档和 manifest，必要时从代码做有边界推断，生成 `project.md` 和 refs 草稿后停下来等人确认。 |
+| 项目北极星 | 在 `ai/project/refs/final-shape.md` 保存最终形态、价值判断和跑偏标准。 |
+| 策略修订门禁 | 新方向先进入 `inbox/ideas/`，生成 proposal，人类确认后才合并进北极星、模块地图或路线图。 |
 | 保护项目现场 | `update` 刷新 `ai/template/**`，不会覆盖 `ai/project/**`。 |
 | 有边界的任务执行 | 目标、范围、权限、风险和验收标准集中在任务文件里。 |
 | 可审计结果 | 每次执行都可以留下人类可读结果、机器可读事实和 metrics。 |
@@ -168,7 +177,14 @@ ai/
     result.md
     metrics.json
     inbox/
+      ideas/
+      raw/
+    proposals/
+      final-shape-updates/
     refs/
+      final-shape.md
+      module-map.md
+      roadmap.md
     archive/
 ```
 
@@ -225,6 +241,15 @@ npx -y @wnlen/ai-execution-template reconcile
 
 打印上下文整合的最短操作说明。
 
+### `strategy`
+
+```bash
+npx -y @wnlen/ai-execution-template strategy
+```
+
+打印方向修订的最短操作说明。新灵感先进入 `ai/project/inbox/ideas/`，
+再由 AI 生成 `strategy_update` 提案；人类确认后再执行 `apply_strategy_update`。
+
 ## 执行模型
 
 AI Execution Template 定义了一个简单循环：
@@ -260,6 +285,28 @@ ai/project/inbox/
 ```
 
 AI 必须先输出整合计划，等待确认后，再把长期有效事实合并进 `project.md`、`runtime.md` 和 `refs/*`。
+
+## 项目北极星
+
+长期方向不要塞进当前任务。AI Execution Template 把方向层放在受保护的
+`ai/project/**` 中：
+
+```text
+ai/project/refs/final-shape.md       # 项目北极星 / 最终形态
+ai/project/refs/module-map.md        # 当前模块地图
+ai/project/refs/roadmap.md           # 阶段路线图
+ai/project/inbox/ideas/              # 新灵感输入区
+ai/project/proposals/final-shape-updates/
+ai/project/proposals/final-shape-updates/_template.md
+```
+
+普通执行任务不能直接修改北极星、模块地图或路线图。方向变化应走：
+
+```text
+idea -> strategy_update proposal -> human confirm -> apply_strategy_update
+```
+
+这样 `task.md` 负责当前施工单，`final-shape.md` 负责判断任务为什么值得做、项目往哪里生长。
 
 ## Token-Efficient 设计
 

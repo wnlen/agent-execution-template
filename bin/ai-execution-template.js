@@ -27,6 +27,16 @@ const REQUIRED_FILES = [
   "ai/project/metrics.json"
 ];
 
+const RECOMMENDED_FILES = [
+  "ai/project/inbox/ideas/.gitkeep",
+  "ai/project/inbox/raw/.gitkeep",
+  "ai/project/proposals/final-shape-updates/.gitkeep",
+  "ai/project/proposals/final-shape-updates/_template.md",
+  "ai/project/refs/final-shape.md",
+  "ai/project/refs/module-map.md",
+  "ai/project/refs/roadmap.md"
+];
+
 const TEXT = {
   zh: {
     usage: `AI Execution Template
@@ -35,6 +45,7 @@ const TEXT = {
   ai-execution-template init [--lang zh|en] [--verbose]
   ai-execution-template update [--lang zh|en]
   ai-execution-template reconcile [--lang zh|en]
+  ai-execution-template strategy [--lang zh|en]
   ai-execution-template doctor
 `,
     unknown: "未知",
@@ -47,6 +58,7 @@ const TEXT = {
     giveTask: "需要执行任务时，说：继续推进这个项目",
     confirmTask: "需要吸收新资料时，先放入 ai/project/inbox/，然后说:",
     executePrompt: "整合 ai/project/inbox/ 里的新资料",
+    strategyHint: "需要修订方向时，先放入 ai/project/inbox/ideas/，然后生成 strategy_update 提案。",
     files: "文件",
     check: "检查",
     details: "详情:",
@@ -69,6 +81,13 @@ const TEXT = {
     reconcilePut: "把新的业务、产品、架构或流程资料放到:",
     reconcileAsk: "然后对 AI 说:",
     reconcilePrompt: "整合 ai/project/inbox/ 里的新资料",
+    strategyTitle: "AI Execution Template 方向修订",
+    strategyPut: "把新的产品、业务、架构或方向灵感放到:",
+    strategyAsk: "然后对 AI 说:",
+    strategyPrompt: "把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案",
+    strategyReview: "人类确认提案后，再说:",
+    strategyApplyPrompt: "确认，合并这个提案",
+    repairHint: "缺失的 project 推荐文件可通过重新运行 init 安全补齐；已有 ai/project/** 不会被覆盖。",
     changeLabels: {
       created: "已创建",
       updated: "已更新",
@@ -83,6 +102,7 @@ Usage:
   ai-execution-template init [--lang zh|en] [--verbose]
   ai-execution-template update [--lang zh|en]
   ai-execution-template reconcile [--lang zh|en]
+  ai-execution-template strategy [--lang zh|en]
   ai-execution-template doctor
 `,
     unknown: "unknown",
@@ -95,6 +115,7 @@ Usage:
     giveTask: "When you want to execute work, say: Continue this project",
     confirmTask: "When you need to absorb new material, put it in ai/project/inbox/, then say:",
     executePrompt: "Reconcile the new material in ai/project/inbox/",
+    strategyHint: "When direction changes, put ideas in ai/project/inbox/ideas/ and produce a strategy_update proposal.",
     files: "Files",
     check: "Check",
     details: "Details:",
@@ -117,6 +138,13 @@ Usage:
     reconcilePut: "Put new business, product, architecture, or process material in:",
     reconcileAsk: "Then tell your agent:",
     reconcilePrompt: "Reconcile the new material in ai/project/inbox/",
+    strategyTitle: "AI Execution Template Strategy Update",
+    strategyPut: "Put new product, business, architecture, or direction ideas in:",
+    strategyAsk: "Then tell your agent:",
+    strategyPrompt: "Generate a direction amendment proposal from ai/project/inbox/ideas/",
+    strategyReview: "After human confirmation, say:",
+    strategyApplyPrompt: "Confirmed, merge this proposal",
+    repairHint: "Missing recommended project files can be safely added by running init again; existing ai/project/** files are not overwritten.",
     changeLabels: {
       created: "CREATED",
       updated: "UPDATED",
@@ -259,6 +287,7 @@ ${text.then}
   ${text.giveTask}
   ${text.confirmTask}
     ${text.executePrompt}
+  ${text.strategyHint}
 
 ${text.files}: ${summarizeChanges(changes, lang)}
 ${text.check}: npx -y @wnlen/ai-execution-template doctor
@@ -309,6 +338,27 @@ ${text.reconcileAsk}
 `);
 }
 
+function strategy({ lang = readInstalledLang() } = {}) {
+  const text = getText(lang);
+  if (!SUPPORTED_LANGS.has(lang)) {
+    console.error(`[${text.fail}] ${text.invalidLang}: ${lang}`);
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log(`${text.strategyTitle}
+
+${text.strategyPut}
+  ai/project/inbox/ideas/
+
+${text.strategyAsk}
+  ${text.strategyPrompt}
+
+${text.strategyReview}
+  ${text.strategyApplyPrompt}
+`);
+}
+
 function doctor() {
   const lang = readInstalledLang();
   const text = getText(lang);
@@ -338,11 +388,22 @@ function doctor() {
     console.log(`[${text.pass}] ${file}`);
   }
 
+  for (const file of RECOMMENDED_FILES) {
+    const fullPath = path.join(process.cwd(), file);
+    if (!fs.existsSync(fullPath)) {
+      console.log(`[${text.warn}] ${file} ${text.missing}`);
+      warnings += 1;
+      continue;
+    }
+    console.log(`[${text.pass}] ${file}`);
+  }
+
   if (missing > 0) {
     console.log(`\n[${text.fail}] ${text.runInit}`);
     process.exitCode = 1;
   } else if (warnings > 0) {
     console.log(`\n[${text.pass}] ${text.readyWithWarnings}`);
+    console.log(text.repairHint);
   } else {
     console.log(`\n[${text.pass}] ${text.readyToRun}`);
   }
@@ -353,7 +414,9 @@ const command = args[0] || "help";
 const verbose = args.includes("--verbose");
 const requestedLang = parseLang(
   args,
-  command === "update" || command === "doctor" || command === "reconcile" ? readInstalledLang() : DEFAULT_LANG
+  command === "update" || command === "doctor" || command === "reconcile" || command === "strategy"
+    ? readInstalledLang()
+    : DEFAULT_LANG
 );
 
 if (command === "init") {
@@ -362,6 +425,8 @@ if (command === "init") {
   update({ lang: requestedLang });
 } else if (command === "reconcile") {
   reconcile({ lang: requestedLang });
+} else if (command === "strategy") {
+  strategy({ lang: requestedLang });
 } else if (command === "doctor") {
   doctor();
 } else {

@@ -15,6 +15,7 @@ Use this workflow when a project has been using the template for a while and a m
 New material should usually live in:
 
 - `ai/project/inbox/*.md`
+- `ai/project/inbox/raw/*.md`
 - `docs/**`
 
 `ai/project/inbox/` is the intake area for material that has not yet been absorbed. After reconciliation is confirmed, the material may stay for traceability or move into project docs or archives.
@@ -37,11 +38,17 @@ Do not read `ai/project/archive/**`, source, tests, config, or dependency files 
 - Split new material into the right places:
   - Project identity, users, and stable conventions -> `ai/project/project.md`
   - Current valid execution context -> `ai/project/runtime.md`
+  - Final shape / North Star / task-worthiness criteria -> `ai/project/refs/final-shape.md`
+  - Current module structure / boundaries / dependency direction -> `ai/project/refs/module-map.md`
+  - Stage goals / near-term roadmap / deferred items -> `ai/project/refs/roadmap.md`
   - Architecture / API / module boundaries -> `ai/project/refs/architecture.md`
   - Commands -> `ai/project/refs/commands.md`
   - Constraints -> `ai/project/refs/constraints.md`
   - Durable decisions -> `ai/project/refs/decisions.md`
 - Do not dump raw source text into `refs/*`; absorb structured, long-lived, reusable context.
+- If new material would change directional content in the North Star, module
+  map, or roadmap, only recommend creating a `strategy_update` proposal. Do not
+  directly modify those direction files during context reconciliation.
 - `task.md`, `result.json`, `result.md`, and `metrics.json` usually do not participate in business-context reconciliation unless the human explicitly asks you to extract long-lived facts from them.
 
 ## Two-Phase Workflow
@@ -76,6 +83,9 @@ Allowed targets:
 Do not modify these unless the human explicitly asks:
 
 - Source, tests, config, dependency files
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
 - `ai/project/task.md`
 - `ai/project/result.json`
 - `ai/project/result.md`

@@ -23,6 +23,12 @@ and relevant `ai/project/refs/*`, then stop with the Post-Bootstrap Handoff.
 Create or update:
 
 - `ai/project/project.md`
+- `ai/project/refs/final-shape.md` when project direction, final shape, or
+  task-worthiness criteria can be inferred
+- `ai/project/refs/module-map.md` when module responsibilities, boundaries, or
+  dependency direction can be inferred
+- `ai/project/refs/roadmap.md` when stage goals, near-term direction, or
+  deferred items can be inferred
 - `ai/project/refs/architecture.md` when architecture can be inferred
 - `ai/project/refs/commands.md` when run/test/build commands can be inferred
 - `ai/project/refs/constraints.md` when constraints can be inferred
@@ -65,6 +71,9 @@ unless the human explicitly references them.
 After reading, summarize and ask the human to confirm or correct these points:
 
 - project name, purpose, and primary users;
+- one-line positioning, final shape, and task-worthiness criteria;
+- current module map, module boundaries, and dependency direction;
+- current stage, near-term roadmap, and what is not being done now;
 - technology stack, package manager, and test runner;
 - source, test, config, and documentation layout;
 - main modules and boundaries;
@@ -80,6 +89,9 @@ or acceptance.
 ## Output Rules
 
 - Mark unknown facts as `Unknown`; do not present guesses as facts.
+- Initialization content in `final-shape.md`, `module-map.md`, and
+  `roadmap.md` must cite evidence sources. If evidence is insufficient, keep
+  placeholders or write `Unknown`; do not invent a vision.
 - Record evidence sources in the relevant file when useful.
 - Keep `ai/project/project.md` stable and long-lived.
 - Keep `ai/project/refs/*.md` focused; do not turn refs into a project diary.
@@ -110,6 +122,8 @@ My understanding of the project:
 - Project:
 - Tech stack:
 - Main modules:
+- North Star:
+- Roadmap:
 - Common commands:
 - Important constraints:
 - Still uncertain: up to 3 items; write "none" if there are none
@@ -122,6 +136,9 @@ Recommended next step:
 
 Written:
 - ai/project/project.md
+- ai/project/refs/final-shape.md
+- ai/project/refs/module-map.md
+- ai/project/refs/roadmap.md
 - ai/project/refs/architecture.md
 - ai/project/refs/commands.md
 - ai/project/refs/constraints.md
@@ -142,6 +159,8 @@ My understanding of the project:
 - Project:
 - Tech stack:
 - Main modules:
+- North Star:
+- Roadmap:
 - Common commands:
 - Important constraints:
 - Still uncertain: up to 3 items; write "none" if there are none
@@ -156,6 +175,9 @@ Task draft summary:
 
 Written:
 - ai/project/project.md
+- ai/project/refs/final-shape.md
+- ai/project/refs/module-map.md
+- ai/project/refs/roadmap.md
 - ai/project/refs/architecture.md
 - ai/project/refs/commands.md
 - ai/project/refs/constraints.md

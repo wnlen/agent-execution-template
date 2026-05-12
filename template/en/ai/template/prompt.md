@@ -12,11 +12,20 @@ First read:
 
 Then choose the mode:
 
+- If the user asks to update the North Star, final shape, product constitution,
+  module map, roadmap, or project direction, or if
+  `ai/project/inbox/ideas/` contains non-`.gitkeep` ideas waiting for
+  evaluation, draft a `strategy_update` task or produce the proposal directly,
+  then stop for human confirmation.
+- If the user explicitly confirms that a proposal under
+  `ai/project/proposals/final-shape-updates/*.md` may be merged, draft or
+  execute an `apply_strategy_update` task.
 - If the user says "Reconcile the new material in ai/project/inbox/", asks to
   reconcile, merge, absorb, update context, handle new material, mentions
   `reconcile` or `ai/project/inbox/`, or if `ai/project/inbox/` contains
-  material waiting to be absorbed, follow `ai/template/reconcile.md` and stop
-  or update according to its two-phase workflow.
+  non-`.gitkeep` material waiting to be absorbed, follow
+  `ai/template/reconcile.md` and stop or update according to its two-phase
+  workflow; `ai/project/inbox/ideas/` should route to `strategy_update` first.
 - If the user says "Start initializing this project", asks to initialize,
   organize, or generate project context, or if `ai/project/project.md` is
   empty, placeholder-only, or incomplete, follow `ai/template/bootstrap.md`
@@ -58,6 +67,31 @@ Confirm or correct:
 
 Reply with:
 - Confirmed, execute
+- Or corrections
+```
+
+## Strategy Update Handoff
+
+In `strategy_update`:
+
+1. Read `final-shape.md`, `module-map.md`, `roadmap.md`, `decisions.md`,
+   `constraints.md`, and relevant `inbox/ideas/*`.
+2. Use `ai/project/proposals/final-shape-updates/_template.md` as the
+   structural template and generate
+   `ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md`.
+3. Stop for human confirmation. Do not modify official direction files or
+   source code.
+
+End with:
+
+```text
+Direction amendment proposal is ready.
+
+Please review:
+- ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
+
+Reply with:
+- Confirmed, merge this proposal
 - Or corrections
 ```
 

@@ -23,6 +23,9 @@
 创建或更新：
 
 - `ai/project/project.md`
+- 能推断项目方向、最终形态或任务价值判断时，更新 `ai/project/refs/final-shape.md`
+- 能推断模块职责、边界或依赖方向时，更新 `ai/project/refs/module-map.md`
+- 能推断阶段目标、近期路线或暂缓事项时，更新 `ai/project/refs/roadmap.md`
 - 能推断架构时，更新 `ai/project/refs/architecture.md`
 - 能推断运行、测试、构建命令时，更新 `ai/project/refs/commands.md`
 - 能推断约束时，更新 `ai/project/refs/constraints.md`
@@ -61,6 +64,9 @@
 读取后，总结并请人类确认或修正这些点：
 
 - 项目名称、目的和主要用户；
+- 一句话定位、最终形态和任务是否值得做的判断标准；
+- 当前模块地图、模块边界和依赖方向；
+- 当前阶段、近期路线和当前阶段不做什么；
 - 技术栈、包管理器和测试运行器；
 - 源码、测试、配置和文档布局；
 - 主要模块和边界；
@@ -74,6 +80,8 @@
 ## 输出规则
 
 - 未知事实标记为 `Unknown`；不要把猜测当成事实。
+- 对 `final-shape.md`、`module-map.md`、`roadmap.md` 的初始化内容必须标明证据来源；
+  如果证据不足，保持占位或写 `Unknown`，不要编造愿景。
 - 有帮助时，在相关文件中记录证据来源。
 - 保持 `ai/project/project.md` 稳定、长期有效。
 - 保持 `ai/project/refs/*.md` 聚焦；不要把引用文件写成项目流水账。
@@ -101,6 +109,8 @@
 - 项目：
 - 技术栈：
 - 主要模块：
+- 北极星：
+- 路线图：
 - 常用命令：
 - 重要约束：
 - 仍不确定：最多 3 条；没有则写“无”
@@ -113,6 +123,9 @@
 
 已写入：
 - ai/project/project.md
+- ai/project/refs/final-shape.md
+- ai/project/refs/module-map.md
+- ai/project/refs/roadmap.md
 - ai/project/refs/architecture.md
 - ai/project/refs/commands.md
 - ai/project/refs/constraints.md
@@ -133,6 +146,8 @@
 - 项目：
 - 技术栈：
 - 主要模块：
+- 北极星：
+- 路线图：
 - 常用命令：
 - 重要约束：
 - 仍不确定：最多 3 条；没有则写“无”
@@ -147,6 +162,9 @@
 
 已写入：
 - ai/project/project.md
+- ai/project/refs/final-shape.md
+- ai/project/refs/module-map.md
+- ai/project/refs/roadmap.md
 - ai/project/refs/architecture.md
 - ai/project/refs/commands.md
 - ai/project/refs/constraints.md
