@@ -69,30 +69,28 @@ const TEXT = {
     unknown: "未知",
     sourceMissing: "找不到模板来源",
     ready: "AI Execution Template 已就绪。",
-    initGuide: `下一步，把这句话发给你的 AI coding 工具:
+    initGuide: `下一步:
+  对 AI 说: 开始初始化这个项目
 
-  开始初始化这个项目
+常见需求:
+  继续让 AI 往下做
+    对 AI 说: 继续推进这个项目
 
-以后常用入口:
+  吸收新的资料
+    先放到: ai/project/inbox/
+    再对 AI 说: 整合 ai/project/inbox/ 里的新资料
 
-  我想让 AI 继续做事
-    继续推进这个项目
+  重新总结和优化项目上下文
+    运行命令: npx -y @wnlen/ai-execution-template refresh
 
-  我有新资料要让 AI 吸收
-    1. 放到 ai/project/inbox/
-    2. 对 AI 说: 整合 ai/project/inbox/ 里的新资料
+  评估新的方向或想法
+    先放到: ai/project/inbox/ideas/
+    再对 AI 说: 把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
 
-  我想重新总结和优化项目上下文
-    npx -y @wnlen/ai-execution-template refresh
+  不确定下一步该做什么
+    运行命令: npx -y @wnlen/ai-execution-template next
 
-  我有新方向/新想法要评估
-    1. 放到 ai/project/inbox/ideas/
-    2. 对 AI 说: 把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
-
-忘了下一步怎么走:
-  npx -y @wnlen/ai-execution-template next
-
-判断标准:
+区分标准:
   资料 = 已确定的事实、文档、流程、接口、业务规则
   方向 = 还没决定的新想法、产品策略、架构调整、路线变化`,
     start: "开始:",
@@ -175,28 +173,26 @@ Usage:
     unknown: "unknown",
     sourceMissing: "Template source not found",
     ready: "AI Execution Template ready.",
-    initGuide: `Next, send this to your AI coding tool:
+    initGuide: `Next:
+  Tell the AI: Start initializing this project
 
-  Start initializing this project
+Common needs:
+  Continue letting the AI work
+    Tell the AI: Continue this project
 
-Common entries later:
+  Absorb new material
+    Put it in: ai/project/inbox/
+    Then tell the AI: Reconcile the new material in ai/project/inbox/
 
-  I want the AI to continue working
-    Continue this project
+  Resummarize and improve project context
+    Run: npx -y @wnlen/ai-execution-template refresh
 
-  I have new material for the AI to absorb
-    1. Put it in ai/project/inbox/
-    2. Tell the AI: Reconcile the new material in ai/project/inbox/
+  Evaluate a new direction or idea
+    Put it in: ai/project/inbox/ideas/
+    Then tell the AI: Generate a direction amendment proposal from ai/project/inbox/ideas/
 
-  I want to resummarize and improve the project context
-    npx -y @wnlen/ai-execution-template refresh
-
-  I have a new direction or idea to evaluate
-    1. Put it in ai/project/inbox/ideas/
-    2. Tell the AI: Generate a direction amendment proposal from ai/project/inbox/ideas/
-
-When you forget what to do next:
-  npx -y @wnlen/ai-execution-template next
+  Not sure what to do next
+    Run: npx -y @wnlen/ai-execution-template next
 
 Rule of thumb:
   Material = confirmed facts, docs, workflows, APIs, or business rules

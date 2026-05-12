@@ -139,7 +139,7 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/reconcile.md").includes("reconciliation plan"), "English reconcile prompt should require a plan first");
   assert(initOutput.includes("Start initializing this project"), "English init output should provide English bootstrap prompt");
   assert(initOutput.includes("Reconcile the new material in ai/project/inbox/"), "English init output should provide English reconcile prompt");
-  assert(initOutput.includes("resummarize and improve the project context"), "English init output should expose context refresh in user language");
+  assert(initOutput.includes("Resummarize and improve project context"), "English init output should expose context refresh in user language");
   assert(initOutput.includes("Generate a direction amendment proposal from ai/project/inbox/ideas/"), "English init output should provide natural strategy prompt");
   assert(initOutput.includes("ai-execution-template next"), "English init output should tell users how to recover the next step");
   assert(initOutput.includes("Files:"), "English init output should summarize file changes");
