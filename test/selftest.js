@@ -88,7 +88,9 @@ function testInitUpdateDoctor() {
   const initOutput = run(["init"], cwd);
   assert(initOutput.includes("开始初始化这个项目"), "init output should provide compact natural bootstrap prompt");
   assert(initOutput.includes("整合 ai/project/inbox/ 里的新资料"), "init output should provide compact natural reconcile prompt");
-  assert(initOutput.includes("strategy_update"), "init output should mention strategy update flow");
+  assert(initOutput.includes("重新总结和优化项目上下文"), "init output should expose project context refresh in user language");
+  assert(initOutput.includes("把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案"), "init output should provide natural strategy prompt");
+  assert(initOutput.includes("ai-execution-template next"), "init output should tell users how to recover the next step");
   assert(initOutput.includes("文件:"), "init output should summarize file changes");
   assert(!initOutput.includes("[已更新]"), "init output should hide detailed file changes by default");
   assert(!initOutput.includes("Read ai/template/bootstrap.md"), "init output should not use weak Read bootstrap command");
@@ -137,7 +139,9 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/reconcile.md").includes("reconciliation plan"), "English reconcile prompt should require a plan first");
   assert(initOutput.includes("Start initializing this project"), "English init output should provide English bootstrap prompt");
   assert(initOutput.includes("Reconcile the new material in ai/project/inbox/"), "English init output should provide English reconcile prompt");
-  assert(initOutput.includes("strategy_update"), "English init output should mention strategy update flow");
+  assert(initOutput.includes("resummarize and improve the project context"), "English init output should expose context refresh in user language");
+  assert(initOutput.includes("Generate a direction amendment proposal from ai/project/inbox/ideas/"), "English init output should provide natural strategy prompt");
+  assert(initOutput.includes("ai-execution-template next"), "English init output should tell users how to recover the next step");
   assert(initOutput.includes("Files:"), "English init output should summarize file changes");
   assert(!initOutput.includes("[UPDATED]"), "English init output should hide detailed file changes by default");
   assert(run(["init", "--lang=en", "--verbose"], cwd).includes("[UPDATED] ai/template/VERSION"), "English init --verbose should show detailed file changes");
@@ -204,6 +208,37 @@ function testRefreshBacksUpAndImportsOldProject() {
   );
   assert(output.includes("AI Execution Template 项目上下文重整"), "refresh should print a refresh summary");
   assert(output.includes("基于旧上下文重新生成更精良的 ai/project/"), "refresh should print the next agent prompt");
+
+  const improveOutput = run(["improve-context"], cwd);
+  assert(improveOutput.includes("AI Execution Template 上下文总结优化"), "improve-context should use user-facing context improvement language");
+  assert(improveOutput.includes("基于旧上下文重新生成更精良的 ai/project/"), "improve-context should reuse refresh behavior");
+}
+
+function testNextCommandRoutesByProjectState() {
+  const missingCwd = createTempProject("ai-execution-template-next-missing");
+  const missingOutput = run(["next"], missingCwd);
+  assert(missingOutput.includes("ai-execution-template init"), "next should tell uninitialized projects to install first");
+
+  const cwd = createTempProject("ai-execution-template-next");
+  run(["init"], cwd);
+  assert(run(["next"], cwd).includes("开始初始化这个项目"), "next should bootstrap a freshly installed project");
+
+  write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
+  assert(run(["next"], cwd).includes("继续推进这个项目"), "next should continue when no intake is waiting");
+
+  write(cwd, "ai/project/inbox/product.md", "# Product material\n");
+  assert(run(["next"], cwd).includes("整合 ai/project/inbox/ 里的新资料"), "next should route material inbox to reconcile");
+  fs.unlinkSync(path.join(cwd, "ai/project/inbox/product.md"));
+
+  write(cwd, "ai/project/inbox/ideas/new-direction.md", "# Direction idea\n");
+  assert(run(["next"], cwd).includes("方向修订提案"), "next should route ideas inbox to strategy update");
+  fs.unlinkSync(path.join(cwd, "ai/project/inbox/ideas/new-direction.md"));
+
+  write(cwd, "ai/project/proposals/final-shape-updates/proposal.md", "---\nstatus: \"applied\"\n---\n");
+  assert(run(["next"], cwd).includes("继续推进这个项目"), "next should ignore already applied proposals");
+
+  write(cwd, "ai/project/proposals/final-shape-updates/proposal.md", "---\nstatus: \"proposed\"\n---\n");
+  assert(run(["next"], cwd).includes("已有方向修订提案"), "next should route existing proposals to human review");
 }
 
 function testPermissionErrorIsActionable() {
@@ -226,6 +261,7 @@ function main() {
   testEnglishInitUpdateDoctor();
   testDoctorFailureAndWarning();
   testRefreshBacksUpAndImportsOldProject();
+  testNextCommandRoutesByProjectState();
   testPermissionErrorIsActionable();
   console.log("selftest ok");
 }

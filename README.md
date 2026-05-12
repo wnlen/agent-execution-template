@@ -112,6 +112,18 @@ Check the installation:
 npx -y @wnlen/ai-execution-template doctor
 ```
 
+When you forget what to do next:
+
+```bash
+npx -y @wnlen/ai-execution-template next --lang en
+```
+
+Resummarize and improve the project context:
+
+```bash
+npx -y @wnlen/ai-execution-template refresh --lang en
+```
+
 Upgrade only the reusable protocol files:
 
 ```bash
@@ -199,6 +211,20 @@ Creates `ai/` in the current project.
 - Keeps existing `ai/project/**` files intact.
 - Use `--lang zh` or omit `--lang` for the Chinese template.
 
+### `next`
+
+```bash
+npx -y @wnlen/ai-execution-template next --lang en
+```
+
+Prints the next step based on the current project state:
+
+- If the template is not installed, it tells you to run `init`.
+- If `ai/project/inbox/` has material, it routes to context reconcile.
+- If `ai/project/inbox/ideas/` has ideas, it routes to a direction amendment proposal.
+- If a direction proposal exists, it asks for human review and confirmation.
+- If no intake is waiting, it tells the agent to continue the project.
+
 ### `update`
 
 ```bash
@@ -216,12 +242,18 @@ Without `--lang`, `update` follows the installed language in `ai/template/LANG`.
 npx -y @wnlen/ai-execution-template refresh --lang en
 ```
 
-Refreshes project context.
+Resummarizes and improves project context.
 
 - Renames old `ai/project/**` to `ai/project.backup.<timestamp>`.
 - Generates a fresh `ai/project/**`.
 - Copies the old context into `ai/project/inbox/raw/old-project/`.
 - Prints the next prompt to give your agent.
+
+You can also use the more explicit alias:
+
+```bash
+npx -y @wnlen/ai-execution-template improve-context --lang en
+```
 
 ### `doctor`
 

@@ -36,14 +36,27 @@ project is the field workspace
 
 ## Normal Use
 
-1. During initialization, tell the AI tool: `Start initializing this project`.
-2. The AI summarizes project context, confirmation points, and the recommended next step in chat.
-3. Reply with corrections, or say: `Continue this project`.
-4. To absorb new material, put it in `project/inbox/`, then say: `Reconcile the new material in ai/project/inbox/`.
-5. For a new direction idea, put it in `project/inbox/ideas/` and have the AI produce a `strategy_update` proposal.
-6. After human confirmation, run `apply_strategy_update` to merge it into the official direction docs.
-7. Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
-8. Archive old task/result files if needed.
+When first connecting a project, tell the AI tool:
+
+```text
+Start initializing this project
+```
+
+Common entries later:
+
+- Continue work: `Continue this project`
+- Absorb new material: put it in `project/inbox/`, then say `Reconcile the new material in ai/project/inbox/`
+- Resummarize and improve project context: run `npx -y @wnlen/ai-execution-template refresh`
+- Evaluate a new direction or idea: put it in `project/inbox/ideas/`, then say `Generate a direction amendment proposal from ai/project/inbox/ideas/`
+- Recover the next step: run `npx -y @wnlen/ai-execution-template next`
+
+Rule of thumb:
+
+- Material = confirmed facts, docs, workflows, APIs, or business rules.
+- Direction = undecided ideas, product strategy, architecture changes, or roadmap changes.
+
+Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
+Archive old task/result files if needed.
 
 ## Context Reconcile
 

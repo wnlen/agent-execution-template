@@ -122,6 +122,18 @@ ai/project/metrics.json
 npx -y @wnlen/ai-execution-template doctor
 ```
 
+忘了下一步怎么走：
+
+```bash
+npx -y @wnlen/ai-execution-template next
+```
+
+重新总结和优化项目上下文：
+
+```bash
+npx -y @wnlen/ai-execution-template refresh
+```
+
 只升级可复用协议文件：
 
 ```bash
@@ -209,6 +221,20 @@ npx -y @wnlen/ai-execution-template init
 - 保留已有的 `ai/project/**` 文件。
 - 默认安装中文模板；英文模板使用 `--lang en`。
 
+### `next`
+
+```bash
+npx -y @wnlen/ai-execution-template next
+```
+
+根据当前项目状态打印下一步：
+
+- 未安装时，提示先运行 `init`。
+- `ai/project/inbox/` 有资料时，提示执行上下文整合。
+- `ai/project/inbox/ideas/` 有灵感时，提示生成方向修订提案。
+- 有待确认方向提案时，提示先审查并确认。
+- 没有待处理输入时，提示继续推进项目。
+
 ### `update`
 
 ```bash
@@ -226,12 +252,18 @@ npx -y @wnlen/ai-execution-template update
 npx -y @wnlen/ai-execution-template refresh
 ```
 
-重整项目上下文。
+重新总结和优化项目上下文。
 
 - 将旧 `ai/project/**` 改名备份为 `ai/project.backup.<timestamp>`。
 - 生成新的 `ai/project/**`。
 - 将旧上下文复制到 `ai/project/inbox/raw/old-project/`。
 - 输出下一句要交给 AI 的整理指令。
+
+也可以使用更直白的别名：
+
+```bash
+npx -y @wnlen/ai-execution-template improve-context
+```
 
 ### `doctor`
 

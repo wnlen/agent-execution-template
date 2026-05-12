@@ -36,14 +36,27 @@ project 是现场工作区
 
 ## 常规用法
 
-1. 初始化时，对 AI 工具说：`开始初始化这个项目`。
-2. AI 会在聊天里给出项目上下文摘要、需要确认的点和建议下一步。
-3. 回复修正意见，或说：`继续推进这个项目`。
-4. 需要吸收新资料时，放入 `project/inbox/`，然后说：`整合 ai/project/inbox/ 里的新资料`。
-5. 有新的方向灵感时，放入 `project/inbox/ideas/`，让 AI 生成 `strategy_update` 提案。
-6. 人类确认提案后，再执行 `apply_strategy_update` 合并到正式方向文档。
-7. 执行后检查 `project/result.json`、`project/result.md` 和 `project/metrics.json`。
-8. 需要时归档旧任务和结果文件。
+第一次接入项目时，对 AI 工具说：
+
+```text
+开始初始化这个项目
+```
+
+以后常用入口：
+
+- 想让 AI 继续做事：`继续推进这个项目`
+- 有新资料要吸收：放入 `project/inbox/`，然后说 `整合 ai/project/inbox/ 里的新资料`
+- 想重新总结和优化项目上下文：运行 `npx -y @wnlen/ai-execution-template refresh`
+- 有新方向或新想法要评估：放入 `project/inbox/ideas/`，然后说 `把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案`
+- 忘了下一步怎么走：运行 `npx -y @wnlen/ai-execution-template next`
+
+判断标准：
+
+- 资料 = 已确定的事实、文档、流程、接口、业务规则。
+- 方向 = 还没决定的新想法、产品策略、架构调整、路线变化。
+
+执行后检查 `project/result.json`、`project/result.md` 和 `project/metrics.json`。
+需要时归档旧任务和结果文件。
 
 ## 上下文整合
 

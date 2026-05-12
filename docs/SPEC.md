@@ -22,7 +22,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.10
+Package: @wnlen/ai-execution-template@0.8.11
 中文安装: npx -y @wnlen/ai-execution-template init
 英文安装: npx -y @wnlen/ai-execution-template init --lang en
 ```
@@ -30,7 +30,7 @@ Package: @wnlen/ai-execution-template@0.8.10
 当前 v0.8 已经具备：
 
 - npm `bin` 入口；
-- `init` / `update` / `reconcile` / `strategy` / `doctor` 五个命令；
+- `init` / `next` / `refresh` / `improve-context` / `update` / `reconcile` / `strategy` / `doctor` 命令；
 - `init --lang zh|en` 双语安装入口，默认中文；
 - `template/project` 双区结构；
 - 保护 `ai/project/**` 不被升级覆盖；
@@ -326,7 +326,27 @@ npx -y @wnlen/ai-execution-template update
 update 只升级协议，不碰现场。
 ```
 
-### 9.3 `refresh`
+### 9.3 `next`
+
+```bash
+npx -y @wnlen/ai-execution-template next
+```
+
+作用：
+
+- 当前项目尚未安装时，提示先运行 `init`；
+- `ai/project/inbox/` 有待吸收资料时，提示上下文整合入口；
+- `ai/project/inbox/ideas/` 有待评估灵感时，提示方向修订提案入口；
+- 存在待确认方向提案时，提示人类审查和确认；
+- 没有待处理输入时，提示继续推进项目。
+
+安全原则：
+
+```text
+next 只判断和提示下一步，不修改项目文件。
+```
+
+### 9.4 `refresh`
 
 ```bash
 npx -y @wnlen/ai-execution-template refresh
@@ -345,7 +365,13 @@ npx -y @wnlen/ai-execution-template refresh
 refresh 可以重建项目上下文，但必须先备份旧现场。
 ```
 
-### 9.4 `doctor`
+`improve-context` 是 `refresh` 的用户语义别名：
+
+```bash
+npx -y @wnlen/ai-execution-template improve-context
+```
+
+### 9.5 `doctor`
 
 ```bash
 npx -y @wnlen/ai-execution-template doctor
@@ -363,7 +389,7 @@ npx -y @wnlen/ai-execution-template doctor
 ```text
 AI Execution Template 检查
 
-模板版本: 0.8.10
+模板版本: 0.8.11
 模板语言: zh
 
 [通过] ai/template/LANG

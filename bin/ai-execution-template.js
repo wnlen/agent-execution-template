@@ -58,7 +58,9 @@ const TEXT = {
 
 用法:
   ai-execution-template init [--lang zh|en] [--verbose]
+  ai-execution-template next [--lang zh|en]
   ai-execution-template refresh [--lang zh|en]
+  ai-execution-template improve-context [--lang zh|en]
   ai-execution-template update [--lang zh|en]
   ai-execution-template reconcile [--lang zh|en]
   ai-execution-template strategy [--lang zh|en]
@@ -67,6 +69,32 @@ const TEXT = {
     unknown: "未知",
     sourceMissing: "找不到模板来源",
     ready: "AI Execution Template 已就绪。",
+    initGuide: `下一步，把这句话发给你的 AI coding 工具:
+
+  开始初始化这个项目
+
+以后常用入口:
+
+  我想让 AI 继续做事
+    继续推进这个项目
+
+  我有新资料要让 AI 吸收
+    1. 放到 ai/project/inbox/
+    2. 对 AI 说: 整合 ai/project/inbox/ 里的新资料
+
+  我想重新总结和优化项目上下文
+    npx -y @wnlen/ai-execution-template refresh
+
+  我有新方向/新想法要评估
+    1. 放到 ai/project/inbox/ideas/
+    2. 对 AI 说: 把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
+
+忘了下一步怎么走:
+  npx -y @wnlen/ai-execution-template next
+
+判断标准:
+  资料 = 已确定的事实、文档、流程、接口、业务规则
+  方向 = 还没决定的新想法、产品策略、架构调整、路线变化`,
     start: "开始:",
     startPrompt: "开始初始化这个项目",
     then: "然后:",
@@ -79,6 +107,7 @@ const TEXT = {
     check: "检查",
     details: "详情:",
     refreshTitle: "AI Execution Template 项目上下文重整",
+    improveContextTitle: "AI Execution Template 上下文总结优化",
     refreshBackedUp: "已备份旧项目上下文",
     refreshImported: "已将旧项目上下文放入",
     refreshReady: "新的 ai/project/** 已生成。",
@@ -112,6 +141,11 @@ const TEXT = {
     strategyPrompt: "把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案",
     strategyReview: "人类确认提案后，再说:",
     strategyApplyPrompt: "确认，合并这个提案",
+    nextTitle: "AI Execution Template 下一步",
+    nextRunInit: "当前项目还没有安装模板。先运行:",
+    nextTellAgent: "把这句话发给你的 AI coding 工具:",
+    nextRunCommand: "运行这个命令:",
+    nextReviewProposal: "已有方向修订提案。先审查提案；确认后对 AI 说:",
     repairHint: "缺失的 project 推荐文件可通过重新运行 init 安全补齐；已有 ai/project/** 不会被覆盖。",
     permissionDenied: "无法写入目标路径",
     permissionHint: `请检查 ai/** 的归属和权限。常见修复:
@@ -130,7 +164,9 @@ const TEXT = {
 
 Usage:
   ai-execution-template init [--lang zh|en] [--verbose]
+  ai-execution-template next [--lang zh|en]
   ai-execution-template refresh [--lang zh|en]
+  ai-execution-template improve-context [--lang zh|en]
   ai-execution-template update [--lang zh|en]
   ai-execution-template reconcile [--lang zh|en]
   ai-execution-template strategy [--lang zh|en]
@@ -139,6 +175,32 @@ Usage:
     unknown: "unknown",
     sourceMissing: "Template source not found",
     ready: "AI Execution Template ready.",
+    initGuide: `Next, send this to your AI coding tool:
+
+  Start initializing this project
+
+Common entries later:
+
+  I want the AI to continue working
+    Continue this project
+
+  I have new material for the AI to absorb
+    1. Put it in ai/project/inbox/
+    2. Tell the AI: Reconcile the new material in ai/project/inbox/
+
+  I want to resummarize and improve the project context
+    npx -y @wnlen/ai-execution-template refresh
+
+  I have a new direction or idea to evaluate
+    1. Put it in ai/project/inbox/ideas/
+    2. Tell the AI: Generate a direction amendment proposal from ai/project/inbox/ideas/
+
+When you forget what to do next:
+  npx -y @wnlen/ai-execution-template next
+
+Rule of thumb:
+  Material = confirmed facts, docs, workflows, APIs, or business rules
+  Direction = undecided ideas, product strategy, architecture changes, or roadmap changes`,
     start: "Start:",
     startPrompt: "Start initializing this project",
     then: "Then:",
@@ -151,6 +213,7 @@ Usage:
     check: "Check",
     details: "Details:",
     refreshTitle: "AI Execution Template project context refresh",
+    improveContextTitle: "AI Execution Template project context improvement",
     refreshBackedUp: "Backed up old project context",
     refreshImported: "Imported old project context into",
     refreshReady: "Generated a fresh ai/project/**.",
@@ -184,6 +247,11 @@ Usage:
     strategyPrompt: "Generate a direction amendment proposal from ai/project/inbox/ideas/",
     strategyReview: "After human confirmation, say:",
     strategyApplyPrompt: "Confirmed, merge this proposal",
+    nextTitle: "AI Execution Template next step",
+    nextRunInit: "This project has not installed the template yet. Run:",
+    nextTellAgent: "Send this to your AI coding tool:",
+    nextRunCommand: "Run this command:",
+    nextReviewProposal: "A direction amendment proposal exists. Review it first; after confirmation, tell the AI:",
     repairHint: "Missing recommended project files can be safely added by running init again; existing ai/project/** files are not overwritten.",
     permissionDenied: "Cannot write target path",
     permissionHint: `Check ownership and permissions under ai/**. Common fix:
@@ -328,6 +396,62 @@ function summarizeChanges(changes, lang) {
     .join(", ");
 }
 
+function hasUsefulFile(dir, { excludeDirs = [], excludeFiles = [] } = {}) {
+  if (!fs.existsSync(dir)) return false;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name === ".gitkeep" || excludeFiles.includes(entry.name)) {
+      continue;
+    }
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (excludeDirs.includes(entry.name)) {
+        continue;
+      }
+      if (hasUsefulFile(fullPath, { excludeDirs, excludeFiles })) {
+        return true;
+      }
+    } else if (entry.isFile()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function readProjectTemplate(lang) {
+  const projectFile = path.join(getSourceAi(lang), "project", "project.md");
+  if (!fs.existsSync(projectFile)) return null;
+  return fs.readFileSync(projectFile, "utf8");
+}
+
+function projectStillLooksFresh(lang) {
+  const projectFile = path.join(TARGET_AI, "project", "project.md");
+  if (!fs.existsSync(projectFile)) return true;
+  const template = readProjectTemplate(lang);
+  if (!template) return false;
+  return fs.readFileSync(projectFile, "utf8") === template;
+}
+
+function proposalState() {
+  const proposalDir = path.join(TARGET_AI, "project", "proposals", "final-shape-updates");
+  if (!fs.existsSync(proposalDir)) return null;
+  const proposalFiles = listFiles(proposalDir)
+    .filter((file) => file.endsWith(".md") && file !== "_template.md");
+  let hasProposed = false;
+  for (const file of proposalFiles) {
+    const content = fs.readFileSync(path.join(proposalDir, file), "utf8");
+    const statusMatch = content.match(/^status:\s*["']?([^"'\s]+)["']?\s*$/m);
+    const status = statusMatch ? statusMatch[1] : null;
+    if (/^status:\s*["']?accepted["']?\s*$/m.test(content)) {
+      return "accepted";
+    }
+    if (!status || status === "proposed") {
+      hasProposed = true;
+    }
+  }
+  return hasProposed ? "proposed" : null;
+}
+
 function init({ lang = DEFAULT_LANG, verbose = false, quiet = false } = {}) {
   const text = getText(lang);
   if (!SUPPORTED_LANGS.has(lang)) {
@@ -358,15 +482,7 @@ function init({ lang = DEFAULT_LANG, verbose = false, quiet = false } = {}) {
   if (!quiet) {
     console.log(`${text.ready}
 
-${text.start}
-  ${text.startPrompt}
-
-${text.then}
-  ${text.reviewProject}
-  ${text.giveTask}
-  ${text.confirmTask}
-    ${text.executePrompt}
-  ${text.strategyHint}
+${text.initGuide}
 
 ${text.files}: ${summarizeChanges(changes, lang)}
 ${text.check}: npx -y @wnlen/ai-execution-template doctor
@@ -378,7 +494,7 @@ ${text.check}: npx -y @wnlen/ai-execution-template doctor
   }
 }
 
-function refresh({ lang = DEFAULT_LANG } = {}) {
+function refresh({ lang = DEFAULT_LANG, title } = {}) {
   const text = getText(lang);
   if (!SUPPORTED_LANGS.has(lang)) {
     console.error(`[${text.fail}] ${text.invalidLang}: ${lang}`);
@@ -404,13 +520,72 @@ function refresh({ lang = DEFAULT_LANG } = {}) {
   ensureDir(importPath);
   copyTree(backupPath, importPath, false);
 
-  console.log(`${text.refreshTitle}
+  console.log(`${title || text.refreshTitle}
 [${text.pass}] ${text.refreshBackedUp}: ${path.relative(process.cwd(), backupPath)}
 [${text.pass}] ${text.refreshImported}: ${path.relative(process.cwd(), importPath)}
 [${text.pass}] ${text.refreshReady}
 
 ${text.then}
   ${text.refreshPrompt}
+`);
+}
+
+function next({ lang = readInstalledLang() } = {}) {
+  const text = getText(lang);
+  if (!SUPPORTED_LANGS.has(lang)) {
+    console.error(`[${text.fail}] ${text.invalidLang}: ${lang}`);
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log(`${text.nextTitle}\n`);
+
+  const templatePath = path.join(TARGET_AI, "template");
+  const projectPath = path.join(TARGET_AI, "project");
+  if (!fs.existsSync(templatePath) || !fs.existsSync(projectPath)) {
+    console.log(`${text.nextRunInit}
+  npx -y @wnlen/ai-execution-template init
+`);
+    return;
+  }
+
+  const state = proposalState();
+  if (state === "accepted") {
+    console.log(`${text.nextTellAgent}
+  ${text.strategyApplyPrompt}
+`);
+    return;
+  }
+  if (state === "proposed") {
+    console.log(`${text.nextReviewProposal}
+  ${text.strategyApplyPrompt}
+`);
+    return;
+  }
+
+  if (hasUsefulFile(path.join(projectPath, "inbox", "ideas"))) {
+    console.log(`${text.nextTellAgent}
+  ${text.strategyPrompt}
+`);
+    return;
+  }
+
+  if (hasUsefulFile(path.join(projectPath, "inbox"), { excludeDirs: ["ideas"] })) {
+    console.log(`${text.nextTellAgent}
+  ${text.executePrompt}
+`);
+    return;
+  }
+
+  if (projectStillLooksFresh(lang)) {
+    console.log(`${text.nextTellAgent}
+  ${text.startPrompt}
+`);
+    return;
+  }
+
+  console.log(`${text.nextTellAgent}
+  ${lang === "zh" ? "继续推进这个项目" : "Continue this project"}
 `);
 }
 
@@ -581,7 +756,13 @@ const command = args[0] || "help";
 const verbose = args.includes("--verbose");
 const requestedLang = parseLang(
   args,
-  command === "update" || command === "doctor" || command === "reconcile" || command === "strategy" || command === "refresh"
+  command === "update" ||
+    command === "doctor" ||
+    command === "reconcile" ||
+    command === "strategy" ||
+    command === "refresh" ||
+    command === "improve-context" ||
+    command === "next"
     ? readInstalledLang()
     : DEFAULT_LANG
 );
@@ -589,8 +770,12 @@ const requestedLang = parseLang(
 try {
   if (command === "init") {
     init({ lang: requestedLang, verbose });
+  } else if (command === "next") {
+    next({ lang: requestedLang });
   } else if (command === "refresh") {
     refresh({ lang: requestedLang });
+  } else if (command === "improve-context") {
+    refresh({ lang: requestedLang, title: getText(requestedLang).improveContextTitle });
   } else if (command === "update") {
     update({ lang: requestedLang });
   } else if (command === "reconcile") {
