@@ -22,7 +22,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/agent-execution-template@0.8.15
+Package: @wnlen/agent-execution-template@0.8.16
 中文安装: npx -y @wnlen/agent-execution-template init
 英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
@@ -390,7 +390,7 @@ npx -y @wnlen/agent-execution-template doctor
 ```text
 Agent Execution Template 检查
 
-模板版本: 0.8.15
+模板版本: 0.8.16
 模板语言: zh
 
 [通过] ai/template/LANG
@@ -610,6 +610,7 @@ ai/project/refs/roadmap.md
 - 任务类型；
 - 优先级；
 - 风险等级；
+- 执行策略；
 - 模型分工策略；
 - refs 要求；
 - 修改权限；
@@ -645,7 +646,44 @@ apply_strategy_update
 权限不允许，不越界修改。
 ```
 
-## 14. 模型分工协议
+## 14. 执行授权策略
+
+执行策略写在：
+
+```text
+ai/project/task.md.execution_policy
+```
+
+默认模式是 `auto`。AI 每次执行前先做任务分解和风险判断，再决定使用
+`normal` 还是 `bounded_continuous`，不依赖用户口令。
+
+执行前规划：
+
+- AI 根据用户目标、项目上下文和仓库事实推断目标、范围、验收、权限和验证方式；
+- 先列 L1 任务清单，并给每个 L1 标注 Green / Yellow / Red；
+- L1 少于 2 个时使用 `normal`；
+- L1 为 2 个或更多时自动使用 `bounded_continuous`；
+- 任一 L1 为 Red 时停止等待人类确认；Green 和 Yellow 不阻塞启动。
+
+`bounded_continuous` 规则：
+
+- 按 L1 -> L2 -> L3 执行，执行 L1 前规划 L2，执行 L2 前按需规划 L3；
+- 默认最多 3 层，只有当 L3 仍过大、不可验证或不可回退时才动态增加 L4；
+- 每个任务节点必须有风险评级、预期改动范围、验收方式和证据要求；
+- L1 清单必须用待办列表展示，每完成一个 L1 就打勾并划掉；
+- 默认按 `vertical_slice` 推进，每轮都要产生可检查增量；
+- 每个 Checkpoint 必须包含证据：已改文件、已运行命令、验证结果或无法验证原因；
+- Green 可自动继续；
+- Yellow 做局部低风险修正后继续；
+- Red 必须停止等待人类确认；
+- 目标、范围、验收和权限由 AI 推断，但不能越过项目规则、显式用户限制、
+  `permission.modify.denied`、安全边界或破坏性操作限制；
+- 需要扩大权限、运行未允许命令、访问网络、执行破坏性操作、改变产品方向或核心架构时，
+  当前节点必须标为 Red。
+
+它不适用于方向未定且无法推断、验收无法定义或高风险架构取舍任务；这些应直接评为 Red。
+
+## 15. 模型分工协议
 
 模型分工写在：
 
@@ -673,7 +711,7 @@ Default cheap. Escalate for judgment. Record why.
 - 写明需要的 strong model role；
 - 记录到 `ai/project/metrics.json`。
 
-## 15. 风险门禁
+## 16. 风险门禁
 
 任务涉及以下内容时必须谨慎：
 
@@ -687,7 +725,7 @@ Default cheap. Escalate for judgment. Record why.
 
 如果风险高且 `task.md` 未明确授权，AI 必须停止并写 blocked 结果。
 
-## 16. refs 延迟加载
+## 17. refs 延迟加载
 
 `ai/project/refs/` 存放按需读取的详细资料。
 
@@ -707,7 +745,7 @@ Default cheap. Escalate for judgment. Record why.
 
 每次读取 ref 都必须在 `result.json.refs_read` 中记录原因。
 
-## 16.1 inbox 待吸收资料
+## 17.1 inbox 待吸收资料
 
 `ai/project/inbox/` 存放尚未整合进项目上下文的新资料。
 已完成整合的资料统一移动到 `ai/project/inbox/processed/`，用于追溯并避免重复处理。
@@ -732,11 +770,13 @@ AI 必须先输出整合计划，等人类确认后，才更新 `project.md`、`
 应用整合完成后，AI 必须把本次已处理的 `ai/project/inbox/*.md`
 移动到 `ai/project/inbox/processed/`。`processed/` 中的资料默认不再触发
 `reconcile` 或 `next` 的待处理资料判断。
+即使用户口语上说“整合整个 inbox”，默认也只处理 `ai/project/inbox/*.md`
+和 `ai/project/inbox/raw/*.md`；`ai/project/inbox/ideas/**` 不参与上下文整合。
 
 如果新资料会改变 `final-shape.md`、`module-map.md` 或 `roadmap.md` 的方向性内容，
 上下文整合只能建议创建 `strategy_update` 提案，不能直接改这些文件。
 
-## 16.2 项目北极星与策略修订
+## 17.2 项目北极星与策略修订
 
 `ai/project/refs/final-shape.md` 是项目北极星说明书，也可以理解为
 Product Constitution / Final Shape Spec。它负责保存：
@@ -812,7 +852,7 @@ ai/project/refs/decisions.md
 ai/project/refs/constraints.md
 ```
 
-## 17. 输出结果
+## 18. 输出结果
 
 每次执行必须写：
 
@@ -822,7 +862,7 @@ ai/project/result.md
 ai/project/metrics.json
 ```
 
-### 17.1 `result.json`
+### 18.1 `result.json`
 
 机器可读结果，是当前最新权威执行记录。
 
@@ -840,7 +880,7 @@ ai/project/metrics.json
 - next；
 - runtime update proposal。
 
-### 17.2 `result.md`
+### 18.2 `result.md`
 
 人类可读摘要。
 
@@ -852,7 +892,7 @@ ai/project/metrics.json
 - 有什么问题；
 - 下一步。
 
-### 17.3 `metrics.json`
+### 18.3 `metrics.json`
 
 执行经济性和模型分工记录。
 
@@ -867,7 +907,7 @@ ai/project/metrics.json
 - human fix required；
 - reuse potential。
 
-## 18. 状态规则
+## 19. 状态规则
 
 允许状态：
 
@@ -885,7 +925,7 @@ blocked
 - 任务不可执行，使用 `blocked`；
 - 执行失败且无法完成，使用 `failed`。
 
-## 19. runtime 治理
+## 20. runtime 治理
 
 `ai/project/runtime.md` 只存当前仍然有效的执行上下文。
 
@@ -904,7 +944,7 @@ ai/project/result.json.runtime_update
 
 再由单独任务决定是否更新 runtime。
 
-## 20. 同步规则
+## 21. 同步规则
 
 从模板仓库导入真实项目：
 
@@ -922,7 +962,7 @@ ai/project/result.json.runtime_update
 
 这是整个项目的安全底线。
 
-## 21. npm 包结构
+## 22. npm 包结构
 
 模板仓库内部结构：
 
@@ -952,7 +992,7 @@ LICENSE
 - `bin/agent-execution-template.js` 是 CLI；
 - `test/selftest.js` 是本地自测。
 
-## 22. 自测与发布检查
+## 23. 自测与发布检查
 
 本地自测：
 
@@ -997,7 +1037,7 @@ diff 检查：
 git diff --check
 ```
 
-## 23. 当前能力边界
+## 24. 当前能力边界
 
 当前项目已经能做到：
 
@@ -1018,7 +1058,7 @@ git diff --check
 - IDE 插件；
 - 发布流水线。
 
-## 24. 最终判断
+## 25. 最终判断
 
 Agent Execution Template v0.8 已经从一个 prompt/template 原型，升级为：
 

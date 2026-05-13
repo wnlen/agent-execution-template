@@ -48,6 +48,7 @@ const TASK_HEALTH_PATTERNS = [
   /^type:\s*/m,
   /^priority:\s*/m,
   /^risk_level:\s*/m,
+  /^execution_policy:/m,
   /^model_policy:/m,
   /^refs:/m,
   /^permission:/m

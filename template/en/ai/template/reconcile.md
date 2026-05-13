@@ -22,6 +22,9 @@ New material should usually live in:
 absorbed. After reconciliation is confirmed, move processed material to
 `ai/project/inbox/processed/` for traceability and to avoid repeated
 reconciliation.
+Even when the human says to reconcile the whole inbox, default to only
+`ai/project/inbox/*.md` and `ai/project/inbox/raw/*.md`; do not recursively
+read `processed/**` or `ideas/**`.
 
 ## First Read
 
@@ -30,11 +33,12 @@ reconciliation.
 3. `ai/project/project.md`
 4. `ai/project/runtime.md`
 5. `ai/project/refs/*.md`
-6. The new material named by the human; if none is named, read `ai/project/inbox/*.md`
+6. The new material named by the human; if none is named, read only
+   `ai/project/inbox/*.md` and `ai/project/inbox/raw/*.md`
 
-Do not read `ai/project/inbox/processed/**`, `ai/project/archive/**`, source,
-tests, config, or dependency files by default unless the human explicitly asks
-you to use them for fact checking.
+Do not read `ai/project/inbox/processed/**`, `ai/project/inbox/ideas/**`,
+`ai/project/archive/**`, source, tests, config, or dependency files by default
+unless the human explicitly asks you to use them for fact checking.
 
 ## Reconciliation Principles
 

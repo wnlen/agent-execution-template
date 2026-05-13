@@ -47,6 +47,74 @@ Project Bootstrap / Context Reconcile / Strategy Update -> Project Confirm -> Ta
 9. Execute only within the project task boundary.
 10. Write `ai/project/result.json`, `ai/project/result.md`, and `ai/project/metrics.json`.
 
+## Execution Authorization Modes
+
+The default execution policy is `auto`: before each execution, the AI first
+decomposes the task and judges risk, then chooses `normal` or
+`bounded_continuous`. Continuous execution does not depend on a human keyword.
+
+Pre-execution planning must:
+
+- Infer goal, scope, acceptance, permissions, and verification method from the
+  human goal, project context, and repository facts.
+- List the L1 task checklist and assign Green / Yellow / Red risk to each L1.
+- Use `normal` if there are fewer than 2 L1 tasks.
+- Automatically use `bounded_continuous` if there are 2 or more L1 tasks.
+- Stop for human confirmation first if any L1 is Red; Green and Yellow do not
+  block startup.
+
+Bounded continuous execution rules:
+
+- Execute the task tree in L1 -> L2 -> L3 order. Before executing an L1, plan
+  its naturally derived L2 tasks; before executing an L2, plan L3 tasks if it
+  still needs decomposition.
+- Default to at most 3 levels. Add L4 dynamically only when L3 would otherwise
+  be too large, unverifiable, or hard to revert.
+- Every L1/L2/L3/L4 node must have risk, expected edit scope, acceptance method,
+  and evidence requirements.
+- Show the L1 checklist as task items; when an L1 is complete, check it off and
+  strike it through.
+- Default to `vertical_slice` progress: each loop should produce a runnable,
+  reviewable, or reversible increment.
+- The AI infers goal, scope, acceptance, and permissions, but must not cross
+  project rules, explicit human limits, `permission.modify.denied`, security
+  boundaries, or destructive-action limits.
+- `Green` may continue automatically.
+- `Yellow` may continue after local low-risk correction.
+- `Red` must stop for human confirmation.
+- If permission must expand, an unallowed command must run, network access is
+  needed, a destructive action is needed, or product direction / core
+  architecture would change, the current node must be Red.
+- After all work is complete, run one final review; re-check only Yellow, Red,
+  failed verification, or high-impact modules.
+- Every checkpoint must include evidence; a purely subjective Green is not valid.
+- Continuous execution does not change model policy; still escalate through
+  `model_policy` for planning, architecture, failure review, or acceptance disputes.
+
+Must stop when:
+
+- The task would change product direction, core architecture, data structures,
+  security boundaries, payment, accounts, or permissions.
+- The task would delete many files or rewrite a core module.
+- The task outline, acceptance, or permission contains a material conflict.
+- The current implementation affects multiple later modules and the task
+  contract does not cover that impact.
+- Tests fail and cannot be fixed locally.
+- There are two or more high-cost options that need human judgment.
+
+Use this compact checkpoint format:
+
+```text
+## Checkpoint
+### Task Tree
+### Progress
+### Completed
+### Evidence
+### Drift Risk: Green / Yellow / Red
+### Recommended Next Step
+### Auto-Continue Decision
+```
+
 ## Bootstrap Mode
 
 Bootstrap Mode prepares stable project understanding:

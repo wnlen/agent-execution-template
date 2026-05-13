@@ -29,7 +29,9 @@
   更新上下文/处理新资料，提到 `reconcile` 或 `ai/project/inbox/`，
   或 `ai/project/inbox/` 里存在 `.gitkeep` 之外的待吸收资料，执行 `ai/template/reconcile.md`，
   并按它的两阶段流程停止或更新；但 `ai/project/inbox/processed/` 是已处理资料，
-  不应触发整合，`ai/project/inbox/ideas/` 应优先走 `strategy_update`。
+  不应触发整合，`ai/project/inbox/ideas/` 应优先走 `strategy_update`。即使用户说
+  “整合整个 inbox”，默认也只处理 `ai/project/inbox/*.md` 和
+  `ai/project/inbox/raw/*.md`。
 - 如果用户说“开始初始化这个项目”、要求初始化/整理/生成项目上下文，
   或 `ai/project/project.md` 为空、只有占位内容、
   或不完整，执行 `ai/template/bootstrap.md`，并在项目上下文确认后停止。
@@ -46,9 +48,14 @@
 在任务草稿模式中：
 
 1. 读取已确认的 `ai/project/project.md` 和相关 `ai/project/refs/*.md`。
-2. 根据用户当前目标起草 `ai/project/task.md`。
-3. 只为范围、风险、权限或验收阻塞项最多问 3 个问题。
-4. 停止等待人类确认。不要修改源码或业务文件。
+2. 根据用户当前目标、项目上下文和仓库事实，推断目标、范围、验收、权限、
+   验证方式和初始风险；不要要求用户逐项提供。
+3. 起草 `ai/project/task.md`，并将 `execution_policy.mode` 设为 `auto`。
+4. 执行前列出 L1 任务清单并标注 Green / Yellow / Red。L1 少于 2 个时使用
+   `normal`；L1 为 2 个或更多时自动使用 `bounded_continuous`。
+5. 只有出现 Red 预检项时才停止等待人类确认。若用户要求的是执行或继续，且预检
+   只有 Green / Yellow，可以直接进入执行模式。
+6. 不要在任务草稿模式中修改源码或业务文件。
 
 任务草稿模式必须以下面结构结束：
 
@@ -97,7 +104,11 @@
 2. `ai/project/runtime.md`
 3. `ai/project/task.md`
 
-然后执行任务，并把结果写入：
+然后先做执行前规划：列出 L1 清单，给每个 L1 标注 Green / Yellow / Red，
+并根据 L1 数量自动选择 `normal` 或 `bounded_continuous`。执行 L1 前规划 L2，
+执行 L2 前按需规划 L3；默认最多 3 层，必要时允许 L4。每完成一个 L1，
+在清单中打勾并划掉。只有 Red 停止等待人类确认；Green 自动继续，Yellow 做局部
+低风险修正后继续。最后把结果写入：
 
 - `ai/project/result.json`
 - `ai/project/result.md`

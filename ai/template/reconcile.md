@@ -20,6 +20,8 @@
 
 `ai/project/inbox/` 是待吸收资料区。资料被整合确认后，统一移动到
 `ai/project/inbox/processed/`，用于追溯并避免后续重复整合。
+即使用户说“整合整个 inbox”，默认也只处理 `ai/project/inbox/*.md`
+和 `ai/project/inbox/raw/*.md`；不要递归读取 `processed/**` 或 `ideas/**`。
 
 ## 先读
 
@@ -28,10 +30,11 @@
 3. `ai/project/project.md`
 4. `ai/project/runtime.md`
 5. `ai/project/refs/*.md`
-6. 人类指定的新资料；未指定时，读取 `ai/project/inbox/*.md`
+6. 人类指定的新资料；未指定时，只读取 `ai/project/inbox/*.md`
+   和 `ai/project/inbox/raw/*.md`
 
-不要默认读取 `ai/project/inbox/processed/**`、`ai/project/archive/**`、源码、
-测试、配置或依赖文件，除非人类明确要求用它们核对事实。
+不要默认读取 `ai/project/inbox/processed/**`、`ai/project/inbox/ideas/**`、
+`ai/project/archive/**`、源码、测试、配置或依赖文件，除非人类明确要求用它们核对事实。
 
 ## 整合原则
 

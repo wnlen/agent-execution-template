@@ -77,6 +77,10 @@ The workflow produces a reconciliation plan first and updates `project.md`,
 `runtime.md`, and `refs/*` only after confirmation. After reconciliation,
 processed material is moved to `ai/project/inbox/processed/`.
 
+By default, only `ai/project/inbox/*.md` and `ai/project/inbox/raw/*.md` are
+absorbed. `processed/**` is trace history and is not reconciled again;
+`ideas/**` goes through the direction amendment proposal flow.
+
 ## Direction Amendments
 
 The North Star, module map, and roadmap belong to the project direction layer:

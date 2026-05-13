@@ -36,7 +36,9 @@ Then choose the mode:
   `ai/template/reconcile.md` and stop or update according to its two-phase
   workflow; `ai/project/inbox/processed/` is already processed material and
   should not trigger reconciliation, while `ai/project/inbox/ideas/` should
-  route to `strategy_update` first.
+  route to `strategy_update` first. Even if the human says to reconcile the
+  whole inbox, default to only `ai/project/inbox/*.md` and
+  `ai/project/inbox/raw/*.md`.
 - If the user says "Start initializing this project", asks to initialize,
   organize, or generate project context, or if `ai/project/project.md` is
   empty, placeholder-only, or incomplete, follow `ai/template/bootstrap.md`
@@ -58,10 +60,17 @@ Then choose the mode:
 In Task Draft Mode:
 
 1. Read confirmed `ai/project/project.md` and relevant `ai/project/refs/*.md`.
-2. Draft `ai/project/task.md` from the user's current goal.
-3. Ask at most 3 questions only for scope, risk, permission, or acceptance
-   blockers.
-4. Stop for human confirmation. Do not modify source or business files.
+2. Infer goal, scope, acceptance, permissions, verification method, and initial
+   risk from the user's current goal, project context, and repository facts; do
+   not require the human to provide each field upfront.
+3. Draft `ai/project/task.md` and set `execution_policy.mode` to `auto`.
+4. Before execution, list the L1 checklist and mark each L1 Green / Yellow /
+   Red. Use `normal` if there are fewer than 2 L1 tasks; automatically use
+   `bounded_continuous` if there are 2 or more L1 tasks.
+5. Stop for human confirmation only when a Red preflight item appears. If the
+   human asked to execute or continue, and preflight contains only Green /
+   Yellow, proceed directly to Execution Mode.
+6. Do not modify source or business files in Task Draft Mode.
 
 End Task Draft Mode with:
 
@@ -112,7 +121,13 @@ In Execution Mode, read:
 2. `ai/project/runtime.md`
 3. `ai/project/task.md`
 
-Then execute the task and write results to:
+Then perform pre-execution planning: list the L1 checklist, mark each L1 Green
+/ Yellow / Red, and automatically choose `normal` or `bounded_continuous` from
+the L1 count. Plan L2 before executing an L1, and plan L3 as needed before
+executing an L2; default to at most 3 levels, with L4 allowed when needed. When
+an L1 is complete, check it off and strike it through. Only Red stops for human
+confirmation; Green continues automatically, and Yellow continues after local
+low-risk correction. Write results to:
 
 - `ai/project/result.json`
 - `ai/project/result.md`

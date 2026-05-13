@@ -157,7 +157,7 @@ npx -y @wnlen/agent-execution-template strategy
 | 策略修订门禁 | 新方向先进入 `inbox/ideas/`，生成 proposal，人类确认后才合并进北极星、模块地图或路线图。 |
 | 保护项目现场 | `update` 刷新 `ai/template/**`，不会覆盖 `ai/project/**`。 |
 | 项目上下文重整 | `refresh` 备份旧 `ai/project/**`，生成新项目上下文，并把旧上下文放入 inbox 供 AI 整理。 |
-| 有边界的任务执行 | 目标、范围、权限、风险和验收标准集中在任务文件里。 |
+| 自动连续执行 | AI 执行前自动拆 L1/L2/L3 任务树；L1 两个以上自动启用边界内连续执行，只有 Red 风险停下来确认。 |
 | 可审计结果 | 每次执行都可以留下人类可读结果、机器可读事实和 metrics。 |
 | Token-efficient 模型策略 | 便宜模型处理边界清楚的工作，强模型只用于关键判断点。 |
 | 可升级模板 | 协议可以持续改进，不丢失项目本地记忆。 |
@@ -332,6 +332,8 @@ ai/project/inbox/
 
 AI 必须先输出整合计划，等待确认后，再把长期有效事实合并进 `project.md`、`runtime.md` 和 `refs/*`。
 整合完成后，已处理资料统一移动到 `ai/project/inbox/processed/`，保留用于追溯。
+默认只吸收 `ai/project/inbox/*.md` 和 `ai/project/inbox/raw/*.md`；
+`processed/**` 不会再次参与整合，`ideas/**` 走方向修订提案。
 
 ## 项目北极星
 

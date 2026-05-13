@@ -147,7 +147,7 @@ npx -y @wnlen/agent-execution-template strategy --lang en
 | Strategy amendment gate | New direction goes through `inbox/ideas/`, a proposal, human confirmation, then an explicit apply task. |
 | Protected project context | `update` refreshes `ai/template/**` without overwriting `ai/project/**`. |
 | Project context refresh | `refresh` backs up old `ai/project/**`, creates a fresh project context, and imports the old context into the inbox for reconciliation. |
-| Bounded task execution | Goals, scope, permissions, risk, and acceptance criteria live in one task file. |
+| Automatic continuous execution | The agent decomposes L1/L2/L3 before execution; 2+ L1 tasks automatically enable bounded continuous execution, and only Red risk stops for confirmation. |
 | Auditable results | Every run can leave human-readable output, machine-readable facts, and metrics. |
 | Token-efficient model policy | Cheap models handle bounded work; strong models are reserved for judgment points. |
 | Upgradeable template | Reuse protocol improvements without losing local project memory. |
@@ -323,6 +323,8 @@ Reconcile the new material in ai/project/inbox/
 
 The agent must produce a reconciliation plan first, wait for confirmation, then merge long-lived facts into `project.md`, `runtime.md`, and `refs/*`.
 After reconciliation, processed material is moved to `ai/project/inbox/processed/` for traceability.
+By default, only `ai/project/inbox/*.md` and `ai/project/inbox/raw/*.md` are absorbed;
+`processed/**` is not reconciled again, and `ideas/**` goes through the direction amendment proposal flow.
 
 ## Project North Star
 

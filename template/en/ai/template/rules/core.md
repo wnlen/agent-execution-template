@@ -8,6 +8,7 @@ Before editing code, check that `ai/project/task.md` clearly defines:
 - Scope
 - Acceptance
 - Permission
+- Execution policy
 
 If readiness fails, do not edit code. Write blocked results to:
 
@@ -115,6 +116,45 @@ must not directly modify:
 
 Do not modify current task, results, metrics, archives, source, tests, config,
 or dependency files unless the human explicitly authorizes it.
+
+## Bounded Continuous Execution Gate
+
+Before every execution, the AI must decompose the task and judge risk instead
+of waiting for the human to explicitly say "enable continuous execution".
+
+Before execution:
+
+- Infer goal, scope, acceptance, permissions, and verification method from the
+  human goal, project context, and repository facts.
+- List the L1 task checklist and mark each L1 Green / Yellow / Red.
+- Use `normal` when there are fewer than 2 L1 tasks; automatically use
+  `bounded_continuous` when there are 2 or more L1 tasks.
+- Stop for human confirmation if any L1 is Red; Green and Yellow may continue.
+
+When enabled:
+
+- Execute in L1 -> L2 -> L3 order; plan L2 before executing an L1, and plan L3
+  as needed before executing an L2.
+- Default to at most 3 levels; add L4 dynamically only when L3 is still too
+  large, unverifiable, or hard to revert.
+- Show the L1 checklist as task items; when an L1 is complete, check it off and
+  strike it through.
+- Every task node must have risk, expected edit scope, acceptance method, and
+  evidence requirements.
+- The checkpoint budget is a maximum, not a required count.
+- Every checkpoint must include evidence.
+- `Green` may continue automatically.
+- `Yellow` continues after local low-risk correction.
+- `Red` must stop for human confirmation.
+- Any product direction, core architecture, data structure, security, payment,
+  account, permission, large deletion, core rewrite, or high-cost option choice
+  must stop.
+- Any need to expand scope, permission, commands, network access, or acceptance
+  must stop.
+
+The AI infers goal, scope, acceptance, and permissions, but must not cross
+project rules, explicit human limits, `permission.modify.denied`, security
+boundaries, or destructive-action limits.
 
 ## Strategy Update Gate
 

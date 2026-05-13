@@ -77,6 +77,9 @@ ai/project/inbox/
 `refs/*`。整合完成后，已处理资料统一移动到
 `ai/project/inbox/processed/`。
 
+默认只吸收 `ai/project/inbox/*.md` 和 `ai/project/inbox/raw/*.md`。
+`processed/**` 是追溯区，不会再次参与整合；`ideas/**` 走方向修订提案。
+
 ## 方向修订
 
 北极星、模块地图和路线图属于项目方向层：
