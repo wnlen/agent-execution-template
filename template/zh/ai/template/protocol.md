@@ -1,6 +1,6 @@
 # 协议
 
-AI Execution Template v0.8 将可复用协议和项目专属执行上下文分开。
+Agent Execution Template v0.8 将可复用协议和项目专属执行上下文分开。
 
 ```text
 ai/template/ = 可复用执行协议
@@ -168,6 +168,8 @@ ai/project/task.md             = 当前执行契约
 - `ai/project/inbox/*.md`
 - `docs/**`
 
+已整合资料统一移动到 `ai/project/inbox/processed/`，默认不再作为待吸收资料读取。
+
 用户可以直接说“整合 ai/project/inbox/ 里的新资料”。使用上下文整合模式时，
 执行 `ai/template/reconcile.md`。
 
@@ -177,6 +179,7 @@ ai/project/task.md             = 当前执行契约
 - 读取人类指定的新资料；未指定时读取 `ai/project/inbox/*.md`；
 - 先输出整合计划，不修改文件；
 - 等人类确认后，才更新 `ai/project/project.md`、`ai/project/runtime.md` 和 `ai/project/refs/*.md`；
+- 应用整合后，把本次已处理的 `ai/project/inbox/*.md` 移动到 `ai/project/inbox/processed/`；
 - 不要默认修改 `task.md`、`result.*`、`metrics.json`、源码、测试、配置或依赖文件；
 - 不要把新资料整段塞进 refs，而是吸收长期有效、结构化、可复用的事实。
 

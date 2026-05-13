@@ -1,6 +1,6 @@
 # 项目
 
-这个文件是 AI Execution Template 使用的稳定项目身份。
+这个文件是 Agent Execution Template 使用的稳定项目身份。
 优先在引导模式中，根据现有仓库文档和清单生成，然后由人类检查。
 未知事实标记为 `Unknown`。
 

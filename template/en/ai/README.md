@@ -28,6 +28,7 @@ project is the field workspace
 - `project/refs/roadmap.md`: staged roadmap.
 - `project/refs/`: detailed references loaded only when needed.
 - `project/inbox/ideas/`: product, business, architecture, or direction ideas waiting for evaluation.
+- `project/inbox/processed/`: new material already absorbed into context, kept for traceability.
 - `project/inbox/raw/`: raw long-form inputs, interviews, notes, or fragments.
 - `project/inbox/`: new material waiting to be absorbed, such as authoritative business docs.
 - `project/proposals/final-shape-updates/`: North Star and roadmap amendment proposals.
@@ -46,9 +47,9 @@ Common entries later:
 
 - Continue work: `Continue this project`
 - Absorb new material: put it in `project/inbox/`, then say `Reconcile the new material in ai/project/inbox/`
-- Resummarize and improve project context: run `npx -y @wnlen/ai-execution-template refresh`
+- Resummarize and improve project context: run `npx -y @wnlen/agent-execution-template refresh`
 - Evaluate a new direction or idea: put it in `project/inbox/ideas/`, then say `Generate a direction amendment proposal from ai/project/inbox/ideas/`
-- Recover the next step: run `npx -y @wnlen/ai-execution-template next`
+- Recover the next step: run `npx -y @wnlen/agent-execution-template next`
 
 Rule of thumb:
 
@@ -72,7 +73,9 @@ Then ask the AI tool:
 Reconcile the new material in ai/project/inbox/
 ```
 
-The workflow produces a reconciliation plan first and updates `project.md`, `runtime.md`, and `refs/*` only after confirmation.
+The workflow produces a reconciliation plan first and updates `project.md`,
+`runtime.md`, and `refs/*` only after confirmation. After reconciliation,
+processed material is moved to `ai/project/inbox/processed/`.
 
 ## Direction Amendments
 

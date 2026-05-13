@@ -3,7 +3,7 @@
 Do not summarize this file.
 Execute the bootstrap workflow below.
 
-You are bootstrapping project context for AI Execution Template.
+You are bootstrapping project context for Agent Execution Template.
 
 Goal: build the stable project understanding that future tasks will rely on.
 This is a discovery and confirmation step, not an implementation step.

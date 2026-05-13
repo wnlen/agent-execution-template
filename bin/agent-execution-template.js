@@ -29,6 +29,7 @@ const REQUIRED_FILES = [
 
 const RECOMMENDED_FILES = [
   "ai/project/inbox/ideas/.gitkeep",
+  "ai/project/inbox/processed/.gitkeep",
   "ai/project/inbox/raw/.gitkeep",
   "ai/project/proposals/final-shape-updates/.gitkeep",
   "ai/project/proposals/final-shape-updates/_template.md",
@@ -54,21 +55,21 @@ const TASK_HEALTH_PATTERNS = [
 
 const TEXT = {
   zh: {
-    usage: `AI Execution Template
+    usage: `Agent Execution Template
 
 用法:
-  ai-execution-template init [--lang zh|en] [--verbose]
-  ai-execution-template next [--lang zh|en]
-  ai-execution-template refresh [--lang zh|en]
-  ai-execution-template improve-context [--lang zh|en]
-  ai-execution-template update [--lang zh|en]
-  ai-execution-template reconcile [--lang zh|en]
-  ai-execution-template strategy [--lang zh|en]
-  ai-execution-template doctor
+  agent-execution-template init [--lang zh|en] [--verbose]
+  agent-execution-template next [--lang zh|en]
+  agent-execution-template refresh [--lang zh|en]
+  agent-execution-template improve-context [--lang zh|en]
+  agent-execution-template update [--lang zh|en]
+  agent-execution-template reconcile [--lang zh|en]
+  agent-execution-template strategy [--lang zh|en]
+  agent-execution-template doctor
 `,
     unknown: "未知",
     sourceMissing: "找不到模板来源",
-    ready: "AI Execution Template 已就绪。",
+    ready: "Agent Execution Template 已就绪。",
     initGuide: `[初始化]
 1. 直接初始化
    对 AI 说: 开始初始化这个项目
@@ -83,12 +84,12 @@ const TEXT = {
    先放到: ai/project/inbox/
    对 AI 说: 整合 ai/project/inbox/ 里的新资料
 3. 优化上下文
-   运行命令: npx -y @wnlen/ai-execution-template refresh
+   运行命令: npx -y @wnlen/agent-execution-template refresh
 4. 评估方向
    先放到: ai/project/inbox/ideas/
    对 AI 说: 把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
 5. 查看下一步
-   运行命令: npx -y @wnlen/ai-execution-template next
+   运行命令: npx -y @wnlen/agent-execution-template next
 
 [区分标准]
   资料 = 已确定的事实、文档、流程、接口、业务规则
@@ -104,17 +105,17 @@ const TEXT = {
     files: "文件",
     check: "检查",
     details: "详情:",
-    refreshTitle: "AI Execution Template 项目上下文重整",
-    improveContextTitle: "AI Execution Template 上下文总结优化",
+    refreshTitle: "Agent Execution Template 项目上下文重整",
+    improveContextTitle: "Agent Execution Template 上下文总结优化",
     refreshBackedUp: "已备份旧项目上下文",
     refreshImported: "已将旧项目上下文放入",
     refreshReady: "新的 ai/project/** 已生成。",
     refreshPrompt: "整合 ai/project/inbox/ 里的新资料，基于旧上下文重新生成更精良的 ai/project/",
     refreshNoProject: "未发现旧 ai/project/**，已执行普通初始化。",
-    updateTitle: "AI Execution Template 更新",
+    updateTitle: "Agent Execution Template 更新",
     updated: "已将 ai/template/** 更新到",
     projectNotModified: "ai/project/** 未修改。",
-    doctorTitle: "AI Execution Template 检查",
+    doctorTitle: "Agent Execution Template 检查",
     templateVersion: "模板版本",
     templateLang: "模板语言",
     missing: "缺失",
@@ -125,21 +126,21 @@ const TEXT = {
     invalidJson: "JSON 无效",
     taskFrontMatterIncomplete: "任务 front matter 缺少关键字段",
     versionMismatch: "模板版本与包版本不一致",
-    runInit: "请运行 npx -y @wnlen/ai-execution-template init",
+    runInit: "请运行 npx -y @wnlen/agent-execution-template init",
     readyWithWarnings: "已就绪，但存在警告",
     readyToRun: "已就绪",
     invalidLang: "不支持的语言，请使用 zh 或 en",
-    reconcileTitle: "AI Execution Template 上下文整合",
+    reconcileTitle: "Agent Execution Template 上下文整合",
     reconcilePut: "把新的业务、产品、架构或流程资料放到:",
     reconcileAsk: "然后对 AI 说:",
     reconcilePrompt: "整合 ai/project/inbox/ 里的新资料",
-    strategyTitle: "AI Execution Template 方向修订",
+    strategyTitle: "Agent Execution Template 方向修订",
     strategyPut: "把新的产品、业务、架构或方向灵感放到:",
     strategyAsk: "然后对 AI 说:",
     strategyPrompt: "把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案",
     strategyReview: "人类确认提案后，再说:",
     strategyApplyPrompt: "确认，合并这个提案",
-    nextTitle: "AI Execution Template 下一步",
+    nextTitle: "Agent Execution Template 下一步",
     nextRunInit: "当前项目还没有安装模板。先运行:",
     nextTellAgent: "把这句话发给你的 AI coding 工具:",
     nextRunCommand: "运行这个命令:",
@@ -158,21 +159,21 @@ const TEXT = {
     changeUnit: (label, count) => `${label} ${count} 个`
   },
   en: {
-    usage: `AI Execution Template
+    usage: `Agent Execution Template
 
 Usage:
-  ai-execution-template init [--lang zh|en] [--verbose]
-  ai-execution-template next [--lang zh|en]
-  ai-execution-template refresh [--lang zh|en]
-  ai-execution-template improve-context [--lang zh|en]
-  ai-execution-template update [--lang zh|en]
-  ai-execution-template reconcile [--lang zh|en]
-  ai-execution-template strategy [--lang zh|en]
-  ai-execution-template doctor
+  agent-execution-template init [--lang zh|en] [--verbose]
+  agent-execution-template next [--lang zh|en]
+  agent-execution-template refresh [--lang zh|en]
+  agent-execution-template improve-context [--lang zh|en]
+  agent-execution-template update [--lang zh|en]
+  agent-execution-template reconcile [--lang zh|en]
+  agent-execution-template strategy [--lang zh|en]
+  agent-execution-template doctor
 `,
     unknown: "unknown",
     sourceMissing: "Template source not found",
-    ready: "AI Execution Template ready.",
+    ready: "Agent Execution Template ready.",
     initGuide: `[Initialize]
 1. Initialize directly
    Tell the AI: Start initializing this project
@@ -187,12 +188,12 @@ Usage:
    Put it in: ai/project/inbox/
    Tell the AI: Reconcile the new material in ai/project/inbox/
 3. Improve context
-   Run: npx -y @wnlen/ai-execution-template refresh
+   Run: npx -y @wnlen/agent-execution-template refresh
 4. Evaluate direction
    Put it in: ai/project/inbox/ideas/
    Tell the AI: Generate a direction amendment proposal from ai/project/inbox/ideas/
 5. Show next step
-   Run: npx -y @wnlen/ai-execution-template next
+   Run: npx -y @wnlen/agent-execution-template next
 
 [Rule of thumb]
   Material = confirmed facts, docs, workflows, APIs, or business rules
@@ -208,17 +209,17 @@ Usage:
     files: "Files",
     check: "Check",
     details: "Details:",
-    refreshTitle: "AI Execution Template project context refresh",
-    improveContextTitle: "AI Execution Template project context improvement",
+    refreshTitle: "Agent Execution Template project context refresh",
+    improveContextTitle: "Agent Execution Template project context improvement",
     refreshBackedUp: "Backed up old project context",
     refreshImported: "Imported old project context into",
     refreshReady: "Generated a fresh ai/project/**.",
     refreshPrompt: "Reconcile the new material in ai/project/inbox/ and regenerate a stronger ai/project/ from the old context",
     refreshNoProject: "No old ai/project/** found; ran normal init.",
-    updateTitle: "AI Execution Template update",
+    updateTitle: "Agent Execution Template update",
     updated: "Updated ai/template/** to",
     projectNotModified: "ai/project/** was not modified.",
-    doctorTitle: "AI Execution Template Doctor",
+    doctorTitle: "Agent Execution Template Doctor",
     templateVersion: "Template version",
     templateLang: "Template language",
     missing: "MISSING",
@@ -229,21 +230,21 @@ Usage:
     invalidJson: "contains invalid JSON",
     taskFrontMatterIncomplete: "task front matter is missing required fields",
     versionMismatch: "template version does not match package version",
-    runInit: "Run npx -y @wnlen/ai-execution-template init",
+    runInit: "Run npx -y @wnlen/agent-execution-template init",
     readyWithWarnings: "Ready to run with warnings",
     readyToRun: "Ready to run",
     invalidLang: "Unsupported language. Use zh or en",
-    reconcileTitle: "AI Execution Template Context Reconcile",
+    reconcileTitle: "Agent Execution Template Context Reconcile",
     reconcilePut: "Put new business, product, architecture, or process material in:",
     reconcileAsk: "Then tell your agent:",
     reconcilePrompt: "Reconcile the new material in ai/project/inbox/",
-    strategyTitle: "AI Execution Template Strategy Update",
+    strategyTitle: "Agent Execution Template Strategy Update",
     strategyPut: "Put new product, business, architecture, or direction ideas in:",
     strategyAsk: "Then tell your agent:",
     strategyPrompt: "Generate a direction amendment proposal from ai/project/inbox/ideas/",
     strategyReview: "After human confirmation, say:",
     strategyApplyPrompt: "Confirmed, merge this proposal",
-    nextTitle: "AI Execution Template next step",
+    nextTitle: "Agent Execution Template next step",
     nextRunInit: "This project has not installed the template yet. Run:",
     nextTellAgent: "Send this to your AI coding tool:",
     nextRunCommand: "Run this command:",
@@ -481,7 +482,7 @@ function init({ lang = DEFAULT_LANG, verbose = false, quiet = false } = {}) {
 ${text.initGuide}
 
 ${text.files}: ${summarizeChanges(changes, lang)}
-${text.check}: npx -y @wnlen/ai-execution-template doctor
+${text.check}: npx -y @wnlen/agent-execution-template doctor
 `);
 
     if (verbose) {
@@ -540,7 +541,7 @@ function next({ lang = readInstalledLang() } = {}) {
   const projectPath = path.join(TARGET_AI, "project");
   if (!fs.existsSync(templatePath) || !fs.existsSync(projectPath)) {
     console.log(`${text.nextRunInit}
-  npx -y @wnlen/ai-execution-template init
+  npx -y @wnlen/agent-execution-template init
 `);
     return;
   }
@@ -566,7 +567,7 @@ function next({ lang = readInstalledLang() } = {}) {
     return;
   }
 
-  if (hasUsefulFile(path.join(projectPath, "inbox"), { excludeDirs: ["ideas"] })) {
+  if (hasUsefulFile(path.join(projectPath, "inbox"), { excludeDirs: ["ideas", "processed"] })) {
     console.log(`${text.nextTellAgent}
   ${text.executePrompt}
 `);

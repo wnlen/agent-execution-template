@@ -3,7 +3,7 @@
 Do not summarize this file.
 Execute the context reconciliation workflow below.
 
-You are absorbing new authoritative material into an existing AI Execution Template project context.
+You are absorbing new authoritative material into an existing Agent Execution Template project context.
 This is not a fresh bootstrap and not a full overwrite.
 
 Goal: merge long-lived facts from the new material, correct outdated or inaccurate context, and preserve existing context that is still correct.
@@ -18,7 +18,10 @@ New material should usually live in:
 - `ai/project/inbox/raw/*.md`
 - `docs/**`
 
-`ai/project/inbox/` is the intake area for material that has not yet been absorbed. After reconciliation is confirmed, the material may stay for traceability or move into project docs or archives.
+`ai/project/inbox/` is the intake area for material that has not yet been
+absorbed. After reconciliation is confirmed, move processed material to
+`ai/project/inbox/processed/` for traceability and to avoid repeated
+reconciliation.
 
 ## First Read
 
@@ -29,7 +32,9 @@ New material should usually live in:
 5. `ai/project/refs/*.md`
 6. The new material named by the human; if none is named, read `ai/project/inbox/*.md`
 
-Do not read `ai/project/archive/**`, source, tests, config, or dependency files by default unless the human explicitly asks you to use them for fact checking.
+Do not read `ai/project/inbox/processed/**`, `ai/project/archive/**`, source,
+tests, config, or dependency files by default unless the human explicitly asks
+you to use them for fact checking.
 
 ## Reconciliation Principles
 
@@ -79,6 +84,7 @@ Allowed targets:
 - `ai/project/project.md`
 - `ai/project/runtime.md`
 - `ai/project/refs/*.md`
+- `ai/project/inbox/processed/**`, for material processed in this run
 
 Do not modify these unless the human explicitly asks:
 
@@ -92,6 +98,12 @@ Do not modify these unless the human explicitly asks:
 - `ai/project/metrics.json`
 - `ai/project/archive/**`
 
+After applying reconciliation, move the processed `ai/project/inbox/*.md`
+material into `ai/project/inbox/processed/`. If a filename conflicts, keep the
+original name and add a date or sequence number. Do not move
+`ai/project/inbox/ideas/**`; direction ideas should continue through
+`strategy_update`.
+
 ## Final Handoff
 
 After applying reconciliation, the final response must include:
@@ -101,6 +113,9 @@ Context reconciliation is complete.
 
 Updated:
 - file
+
+Archived material:
+- ai/project/inbox/processed/file.md
 
 Key changes:
 - Added:

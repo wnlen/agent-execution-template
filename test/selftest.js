@@ -6,7 +6,7 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 
 const repoRoot = path.resolve(__dirname, "..");
-const cli = path.join(repoRoot, "bin", "ai-execution-template.js");
+const cli = path.join(repoRoot, "bin", "agent-execution-template.js");
 
 function assert(condition, message) {
   if (!condition) {
@@ -45,7 +45,7 @@ function createTempProject(name) {
 }
 
 function testInitUpdateDoctor() {
-  const cwd = createTempProject("ai-execution-template-selftest");
+  const cwd = createTempProject("agent-execution-template-selftest");
 
   run(["init"], cwd);
   assert(read(cwd, "ai/template/LANG") === "zh\n", "init should default to zh template");
@@ -60,6 +60,7 @@ function testInitUpdateDoctor() {
   assert(exists(cwd, "ai/project/refs/module-map.md"), "init should create module map");
   assert(exists(cwd, "ai/project/refs/roadmap.md"), "init should create roadmap");
   assert(exists(cwd, "ai/project/inbox/ideas/.gitkeep"), "init should create ideas inbox");
+  assert(exists(cwd, "ai/project/inbox/processed/.gitkeep"), "init should create processed inbox");
   assert(exists(cwd, "ai/project/proposals/final-shape-updates/.gitkeep"), "init should create strategy proposal directory");
   assert(exists(cwd, "ai/project/proposals/final-shape-updates/_template.md"), "init should create strategy proposal template");
   assert(read(cwd, "ai/template/bootstrap.md").includes("确认维度"), "init should install bootstrap prompt");
@@ -93,16 +94,16 @@ function testInitUpdateDoctor() {
   assert(initOutput.includes("整合 ai/project/inbox/ 里的新资料"), "init output should provide compact natural reconcile prompt");
   assert(initOutput.includes("优化上下文"), "init output should expose project context refresh in user language");
   assert(initOutput.includes("把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案"), "init output should provide natural strategy prompt");
-  assert(initOutput.includes("ai-execution-template next"), "init output should tell users how to recover the next step");
+  assert(initOutput.includes("agent-execution-template next"), "init output should tell users how to recover the next step");
   assert(initOutput.includes("文件:"), "init output should summarize file changes");
   assert(!initOutput.includes("[已更新]"), "init output should hide detailed file changes by default");
   assert(!initOutput.includes("Read ai/template/bootstrap.md"), "init output should not use weak Read bootstrap command");
   assert(run(["init", "--verbose"], cwd).includes("[已更新] ai/template/VERSION"), "init --verbose should show detailed file changes");
   const reconcileOutput = run(["reconcile"], cwd);
-  assert(reconcileOutput.includes("AI Execution Template 上下文整合"), "reconcile should use installed Chinese language");
+  assert(reconcileOutput.includes("Agent Execution Template 上下文整合"), "reconcile should use installed Chinese language");
   assert(reconcileOutput.includes("整合 ai/project/inbox/ 里的新资料"), "reconcile should print natural Chinese prompt");
   const strategyOutput = run(["strategy"], cwd);
-  assert(strategyOutput.includes("AI Execution Template 方向修订"), "strategy should use installed Chinese language");
+  assert(strategyOutput.includes("Agent Execution Template 方向修订"), "strategy should use installed Chinese language");
   assert(strategyOutput.includes("ai/project/inbox/ideas/"), "strategy should point to ideas inbox");
   assert(strategyOutput.includes("方向修订提案"), "strategy should print natural Chinese strategy prompt");
 
@@ -117,7 +118,7 @@ function testInitUpdateDoctor() {
 }
 
 function testEnglishInitUpdateDoctor() {
-  const cwd = createTempProject("ai-execution-template-en");
+  const cwd = createTempProject("agent-execution-template-en");
 
   const initOutput = run(["init", "--lang", "en"], cwd);
   assert(read(cwd, "ai/template/LANG") === "en\n", "init --lang en should install English template");
@@ -147,14 +148,14 @@ function testEnglishInitUpdateDoctor() {
   assert(initOutput.includes("Reconcile the new material in ai/project/inbox/"), "English init output should provide English reconcile prompt");
   assert(initOutput.includes("Improve context"), "English init output should expose context refresh in user language");
   assert(initOutput.includes("Generate a direction amendment proposal from ai/project/inbox/ideas/"), "English init output should provide natural strategy prompt");
-  assert(initOutput.includes("ai-execution-template next"), "English init output should tell users how to recover the next step");
+  assert(initOutput.includes("agent-execution-template next"), "English init output should tell users how to recover the next step");
   assert(initOutput.includes("Files:"), "English init output should summarize file changes");
   assert(!initOutput.includes("[UPDATED]"), "English init output should hide detailed file changes by default");
   assert(run(["init", "--lang=en", "--verbose"], cwd).includes("[UPDATED] ai/template/VERSION"), "English init --verbose should show detailed file changes");
 
   write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
   const updateOutput = run(["update"], cwd);
-  assert(updateOutput.includes("AI Execution Template update"), "update should use installed English language");
+  assert(updateOutput.includes("Agent Execution Template update"), "update should use installed English language");
   assert(read(cwd, "ai/project/project.md") === "USER PROJECT MARKER\n", "English update must not overwrite project.md");
 
   const doctorOutput = run(["doctor"], cwd);
@@ -163,10 +164,10 @@ function testEnglishInitUpdateDoctor() {
   assert(doctorOutput.includes("ai/project/task.md front matter"), "English doctor should validate task front matter");
   assert(doctorOutput.includes("[OK] Ready to run"), "doctor should use installed English language");
   const reconcileOutput = run(["reconcile"], cwd);
-  assert(reconcileOutput.includes("AI Execution Template Context Reconcile"), "reconcile should use installed English language");
+  assert(reconcileOutput.includes("Agent Execution Template Context Reconcile"), "reconcile should use installed English language");
   assert(reconcileOutput.includes("Reconcile the new material in ai/project/inbox/"), "reconcile should print natural English prompt");
   const strategyOutput = run(["strategy"], cwd);
-  assert(strategyOutput.includes("AI Execution Template Strategy Update"), "strategy should use installed English language");
+  assert(strategyOutput.includes("Agent Execution Template Strategy Update"), "strategy should use installed English language");
   assert(strategyOutput.includes("ai/project/inbox/ideas/"), "strategy should point to ideas inbox");
   assert(strategyOutput.includes("direction amendment proposal"), "strategy should print natural English strategy prompt");
   assert(run(["reconcile", "--lang", "zh"], cwd).includes("整合 ai/project/inbox/ 里的新资料"), "reconcile --lang zh should override installed language");
@@ -174,23 +175,23 @@ function testEnglishInitUpdateDoctor() {
 }
 
 function testDoctorFailureAndWarning() {
-  const missingCwd = createTempProject("ai-execution-template-missing");
+  const missingCwd = createTempProject("agent-execution-template-missing");
   run(["init"], missingCwd);
   fs.unlinkSync(path.join(missingCwd, "ai/project/runtime.md"));
   run(["doctor"], missingCwd, 1);
 
-  const warnCwd = createTempProject("ai-execution-template-warn");
+  const warnCwd = createTempProject("agent-execution-template-warn");
   run(["init"], warnCwd);
   write(warnCwd, "ai/project/runtime.md", "");
   run(["doctor"], warnCwd);
 
-  const invalidJsonCwd = createTempProject("ai-execution-template-invalid-json");
+  const invalidJsonCwd = createTempProject("agent-execution-template-invalid-json");
   run(["init"], invalidJsonCwd);
   write(invalidJsonCwd, "ai/project/result.json", "{invalid\n");
   const invalidJsonOutput = run(["doctor"], invalidJsonCwd, 1);
   assert(invalidJsonOutput.includes("JSON 无效"), "doctor should fail invalid result JSON");
 
-  const taskWarnCwd = createTempProject("ai-execution-template-task-frontmatter");
+  const taskWarnCwd = createTempProject("agent-execution-template-task-frontmatter");
   run(["init"], taskWarnCwd);
   write(taskWarnCwd, "ai/project/task.md", "# Task only\n");
   const taskWarnOutput = run(["doctor"], taskWarnCwd);
@@ -198,7 +199,7 @@ function testDoctorFailureAndWarning() {
 }
 
 function testRefreshBacksUpAndImportsOldProject() {
-  const cwd = createTempProject("ai-execution-template-refresh");
+  const cwd = createTempProject("agent-execution-template-refresh");
   run(["init"], cwd);
   write(cwd, "ai/project/project.md", "OLD PROJECT CONTEXT\n");
 
@@ -212,20 +213,20 @@ function testRefreshBacksUpAndImportsOldProject() {
     read(cwd, "ai/project/inbox/raw/old-project/project.md") === "OLD PROJECT CONTEXT\n",
     "refresh should import old project context into the new inbox"
   );
-  assert(output.includes("AI Execution Template 项目上下文重整"), "refresh should print a refresh summary");
+  assert(output.includes("Agent Execution Template 项目上下文重整"), "refresh should print a refresh summary");
   assert(output.includes("基于旧上下文重新生成更精良的 ai/project/"), "refresh should print the next agent prompt");
 
   const improveOutput = run(["improve-context"], cwd);
-  assert(improveOutput.includes("AI Execution Template 上下文总结优化"), "improve-context should use user-facing context improvement language");
+  assert(improveOutput.includes("Agent Execution Template 上下文总结优化"), "improve-context should use user-facing context improvement language");
   assert(improveOutput.includes("基于旧上下文重新生成更精良的 ai/project/"), "improve-context should reuse refresh behavior");
 }
 
 function testNextCommandRoutesByProjectState() {
-  const missingCwd = createTempProject("ai-execution-template-next-missing");
+  const missingCwd = createTempProject("agent-execution-template-next-missing");
   const missingOutput = run(["next"], missingCwd);
-  assert(missingOutput.includes("ai-execution-template init"), "next should tell uninitialized projects to install first");
+  assert(missingOutput.includes("agent-execution-template init"), "next should tell uninitialized projects to install first");
 
-  const cwd = createTempProject("ai-execution-template-next");
+  const cwd = createTempProject("agent-execution-template-next");
   run(["init"], cwd);
   assert(run(["next"], cwd).includes("开始初始化这个项目"), "next should bootstrap a freshly installed project");
 
@@ -235,6 +236,10 @@ function testNextCommandRoutesByProjectState() {
   write(cwd, "ai/project/inbox/product.md", "# Product material\n");
   assert(run(["next"], cwd).includes("整合 ai/project/inbox/ 里的新资料"), "next should route material inbox to reconcile");
   fs.unlinkSync(path.join(cwd, "ai/project/inbox/product.md"));
+
+  write(cwd, "ai/project/inbox/processed/product.md", "# Processed material\n");
+  assert(run(["next"], cwd).includes("继续推进这个项目"), "next should ignore processed inbox material");
+  fs.unlinkSync(path.join(cwd, "ai/project/inbox/processed/product.md"));
 
   write(cwd, "ai/project/inbox/ideas/new-direction.md", "# Direction idea\n");
   assert(run(["next"], cwd).includes("方向修订提案"), "next should route ideas inbox to strategy update");
@@ -248,7 +253,7 @@ function testNextCommandRoutesByProjectState() {
 }
 
 function testPermissionErrorIsActionable() {
-  const cwd = createTempProject("ai-execution-template-permission");
+  const cwd = createTempProject("agent-execution-template-permission");
   const inbox = path.join(cwd, "ai/project/inbox");
   fs.mkdirSync(inbox, { recursive: true });
   fs.chmodSync(inbox, 0o555);

@@ -81,6 +81,8 @@
 - `ai/project/inbox/raw/*.md`
 - `docs/**`
 
+已整合资料统一移动到 `ai/project/inbox/processed/`，默认不再触发上下文整合。
+
 上下文整合必须先输出整合计划，等待人类确认后才更新文件。
 
 上下文整合默认只能更新：

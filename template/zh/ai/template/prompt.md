@@ -3,7 +3,7 @@
 不要总结这个文件。
 执行下面的工作流。
 
-你正在 AI Execution Template 工作区内操作。
+你正在 Agent Execution Template 工作区内操作。
 
 先读取：
 
@@ -26,8 +26,8 @@
 - 如果用户说“整合 ai/project/inbox/ 里的新资料”，要求整合/合并/吸收/
   更新上下文/处理新资料，提到 `reconcile` 或 `ai/project/inbox/`，
   或 `ai/project/inbox/` 里存在 `.gitkeep` 之外的待吸收资料，执行 `ai/template/reconcile.md`，
-  并按它的两阶段流程停止或更新；但 `ai/project/inbox/ideas/` 应优先走
-  `strategy_update`。
+  并按它的两阶段流程停止或更新；但 `ai/project/inbox/processed/` 是已处理资料，
+  不应触发整合，`ai/project/inbox/ideas/` 应优先走 `strategy_update`。
 - 如果用户说“开始初始化这个项目”、要求初始化/整理/生成项目上下文，
   或 `ai/project/project.md` 为空、只有占位内容、
   或不完整，执行 `ai/template/bootstrap.md`，并在项目上下文确认后停止。

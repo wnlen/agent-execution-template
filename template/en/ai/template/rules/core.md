@@ -93,6 +93,9 @@ New material should usually live in:
 - `ai/project/inbox/raw/*.md`
 - `docs/**`
 
+Processed material is moved to `ai/project/inbox/processed/` and should not
+trigger context reconciliation again by default.
+
 Context reconciliation must produce a plan first and wait for human
 confirmation before updating files.
 

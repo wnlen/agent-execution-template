@@ -3,7 +3,7 @@
 Do not summarize this file.
 Execute the workflow below.
 
-You are operating inside an AI Execution Template workspace.
+You are operating inside an Agent Execution Template workspace.
 
 First read:
 
@@ -31,7 +31,9 @@ Then choose the mode:
   `reconcile` or `ai/project/inbox/`, or if `ai/project/inbox/` contains
   non-`.gitkeep` material waiting to be absorbed, follow
   `ai/template/reconcile.md` and stop or update according to its two-phase
-  workflow; `ai/project/inbox/ideas/` should route to `strategy_update` first.
+  workflow; `ai/project/inbox/processed/` is already processed material and
+  should not trigger reconciliation, while `ai/project/inbox/ideas/` should
+  route to `strategy_update` first.
 - If the user says "Start initializing this project", asks to initialize,
   organize, or generate project context, or if `ai/project/project.md` is
   empty, placeholder-only, or incomplete, follow `ai/template/bootstrap.md`

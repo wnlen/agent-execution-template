@@ -28,6 +28,7 @@ project 是现场工作区
 - `project/refs/roadmap.md`：阶段路线图。
 - `project/refs/`：只在需要时加载的详细引用。
 - `project/inbox/ideas/`：待评估的产品、业务、架构或方向灵感。
+- `project/inbox/processed/`：已经吸收进上下文的新资料，保留用于追溯。
 - `project/inbox/raw/`：长文本、访谈、碎片材料等原始输入。
 - `project/inbox/`：待吸收的新资料，例如更权威的业务文档。
 - `project/proposals/final-shape-updates/`：北极星和路线图修订提案。
@@ -46,9 +47,9 @@ project 是现场工作区
 
 - 想让 AI 继续做事：`继续推进这个项目`
 - 有新资料要吸收：放入 `project/inbox/`，然后说 `整合 ai/project/inbox/ 里的新资料`
-- 想重新总结和优化项目上下文：运行 `npx -y @wnlen/ai-execution-template refresh`
+- 想重新总结和优化项目上下文：运行 `npx -y @wnlen/agent-execution-template refresh`
 - 有新方向或新想法要评估：放入 `project/inbox/ideas/`，然后说 `把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案`
-- 忘了下一步怎么走：运行 `npx -y @wnlen/ai-execution-template next`
+- 忘了下一步怎么走：运行 `npx -y @wnlen/agent-execution-template next`
 
 判断标准：
 
@@ -72,7 +73,9 @@ ai/project/inbox/
 整合 ai/project/inbox/ 里的新资料
 ```
 
-整合流程会先给出计划，等你确认后才更新 `project.md`、`runtime.md` 和 `refs/*`。
+整合流程会先给出计划，等你确认后才更新 `project.md`、`runtime.md` 和
+`refs/*`。整合完成后，已处理资料统一移动到
+`ai/project/inbox/processed/`。
 
 ## 方向修订
 

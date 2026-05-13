@@ -1,8 +1,8 @@
-# AI Execution Template
+# Agent Execution Template
 
 English | [简体中文](README.zh-CN.md)
 
-[![npm](https://img.shields.io/npm/v/@wnlen/ai-execution-template?color=cb3837)](https://www.npmjs.com/package/@wnlen/ai-execution-template)
+[![npm](https://img.shields.io/npm/v/@wnlen/agent-execution-template?color=cb3837)](https://www.npmjs.com/package/@wnlen/agent-execution-template)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![protocol](https://img.shields.io/badge/protocol-v0.8-blue.svg)](docs/SPEC.md)
 [![agent agnostic](https://img.shields.io/badge/agent-agnostic-111111.svg)](#works-with)
@@ -11,7 +11,7 @@ English | [简体中文](README.zh-CN.md)
 > Install it into any repository, let the agent bootstrap project context from existing docs, confirm the task contract, and keep execution auditable.
 
 ```bash
-npx -y @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/agent-execution-template init --lang en
 ```
 
 Then tell your coding agent:
@@ -20,7 +20,7 @@ Then tell your coding agent:
 Start initializing this project
 ```
 
-AI Execution Template is not another agent framework. It is the missing execution layer between your repository and tools like Codex, Claude Code, Cursor, Aider, or any other AI coding agent.
+Agent Execution Template is not another agent framework. It is the missing execution layer between your repository and tools like Codex, Claude Code, Cursor, Aider, or any other AI coding agent.
 
 It turns AI coding from:
 
@@ -49,7 +49,7 @@ AI coding agents are powerful, but most teams still run them through loose chat 
 - Execution can become stable while still lacking a direction layer for judging
   whether a task is worth doing or whether the project is drifting.
 
-AI Execution Template fixes this with a small, installable file protocol:
+Agent Execution Template fixes this with a small, installable file protocol:
 
 ```text
 ai/template/  reusable execution protocol
@@ -63,7 +63,7 @@ ai/project/   project-specific working context and direction layer
 Install the protocol into the current repository:
 
 ```bash
-npx -y @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/agent-execution-template init --lang en
 ```
 
 Ask your agent to bootstrap project context from existing docs and manifests:
@@ -109,31 +109,31 @@ ai/project/metrics.json
 Check the installation:
 
 ```bash
-npx -y @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template doctor
 ```
 
 When you forget what to do next:
 
 ```bash
-npx -y @wnlen/ai-execution-template next --lang en
+npx -y @wnlen/agent-execution-template next --lang en
 ```
 
 Resummarize and improve the project context:
 
 ```bash
-npx -y @wnlen/ai-execution-template refresh --lang en
+npx -y @wnlen/agent-execution-template refresh --lang en
 ```
 
 Upgrade only the reusable protocol files:
 
 ```bash
-npx -y @wnlen/ai-execution-template update --lang en
+npx -y @wnlen/agent-execution-template update --lang en
 ```
 
 Print the direction-amendment entrypoint:
 
 ```bash
-npx -y @wnlen/ai-execution-template strategy --lang en
+npx -y @wnlen/agent-execution-template strategy --lang en
 ```
 
 ## What You Get
@@ -201,7 +201,7 @@ The split is the core design:
 ### `init`
 
 ```bash
-npx -y @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/agent-execution-template init --lang en
 ```
 
 Creates `ai/` in the current project.
@@ -214,7 +214,7 @@ Creates `ai/` in the current project.
 ### `next`
 
 ```bash
-npx -y @wnlen/ai-execution-template next --lang en
+npx -y @wnlen/agent-execution-template next --lang en
 ```
 
 Prints the next step based on the current project state:
@@ -228,7 +228,7 @@ Prints the next step based on the current project state:
 ### `update`
 
 ```bash
-npx -y @wnlen/ai-execution-template update --lang en
+npx -y @wnlen/agent-execution-template update --lang en
 ```
 
 Updates only `ai/template/**`.
@@ -239,7 +239,7 @@ Without `--lang`, `update` follows the installed language in `ai/template/LANG`.
 ### `refresh`
 
 ```bash
-npx -y @wnlen/ai-execution-template refresh --lang en
+npx -y @wnlen/agent-execution-template refresh --lang en
 ```
 
 Resummarizes and improves project context.
@@ -252,13 +252,13 @@ Resummarizes and improves project context.
 You can also use the more explicit alias:
 
 ```bash
-npx -y @wnlen/ai-execution-template improve-context --lang en
+npx -y @wnlen/agent-execution-template improve-context --lang en
 ```
 
 ### `doctor`
 
 ```bash
-npx -y @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template doctor
 ```
 
 Checks the installed template version and required files.
@@ -272,7 +272,7 @@ It reports:
 ### `reconcile`
 
 ```bash
-npx -y @wnlen/ai-execution-template reconcile --lang en
+npx -y @wnlen/agent-execution-template reconcile --lang en
 ```
 
 Prints the shortest context-reconcile instructions.
@@ -280,7 +280,7 @@ Prints the shortest context-reconcile instructions.
 ### `strategy`
 
 ```bash
-npx -y @wnlen/ai-execution-template strategy --lang en
+npx -y @wnlen/agent-execution-template strategy --lang en
 ```
 
 Prints the shortest direction-amendment instructions. New ideas go to
@@ -289,7 +289,7 @@ proposal. After human confirmation, `apply_strategy_update` merges it.
 
 ## Execution Model
 
-AI Execution Template defines a simple loop:
+Agent Execution Template defines a simple loop:
 
 ```text
 Project Bootstrap -> Project Confirm -> Task Draft -> Task Confirm -> Plan -> Execute -> Review -> Result
@@ -322,10 +322,11 @@ Reconcile the new material in ai/project/inbox/
 ```
 
 The agent must produce a reconciliation plan first, wait for confirmation, then merge long-lived facts into `project.md`, `runtime.md`, and `refs/*`.
+After reconciliation, processed material is moved to `ai/project/inbox/processed/` for traceability.
 
 ## Project North Star
 
-Long-term direction does not belong in the current task. AI Execution Template
+Long-term direction does not belong in the current task. Agent Execution Template
 stores the direction layer inside protected `ai/project/**` files:
 
 ```text
@@ -361,7 +362,7 @@ Read more in [Token-Efficient AI Execution Protocol v0.1](docs/token-efficient-p
 
 ## Works With
 
-AI Execution Template is intentionally tool-neutral. Any agent that can read project files and follow instructions can use it.
+Agent Execution Template is intentionally tool-neutral. Any agent that can read project files and follow instructions can use it.
 
 Common pairings:
 
@@ -383,7 +384,7 @@ Common pairings:
 
 ## Not This
 
-AI Execution Template is not:
+Agent Execution Template is not:
 
 - an IDE,
 - an agent platform,
@@ -402,7 +403,7 @@ It is a small file protocol for making those tools behave more consistently insi
 Current package:
 
 ```text
-Package:  @wnlen/ai-execution-template
+Package:  @wnlen/agent-execution-template
 Protocol: v0.8
 License:  MIT
 ```

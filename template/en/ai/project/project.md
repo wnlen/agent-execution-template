@@ -1,6 +1,6 @@
 # Project
 
-This file is the stable project identity used by AI Execution Template.
+This file is the stable project identity used by Agent Execution Template.
 Prefer generating it in Bootstrap Mode from existing repository docs and
 manifests, then have a human review it. Mark unknown facts as `Unknown`.
 

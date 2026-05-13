@@ -1,8 +1,8 @@
-# AI Execution Template
+# Agent Execution Template
 
 [English](README.md) | 简体中文
 
-[![npm](https://img.shields.io/npm/v/@wnlen/ai-execution-template?color=cb3837)](https://www.npmjs.com/package/@wnlen/ai-execution-template)
+[![npm](https://img.shields.io/npm/v/@wnlen/agent-execution-template?color=cb3837)](https://www.npmjs.com/package/@wnlen/agent-execution-template)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![protocol](https://img.shields.io/badge/protocol-v0.8-blue.svg)](docs/SPEC.md)
 [![agent agnostic](https://img.shields.io/badge/agent-agnostic-111111.svg)](#适配工具)
@@ -11,13 +11,13 @@
 > 把它装进任意代码仓库，让 AI 从现有文档整理项目上下文，人类确认任务契约，然后在可复用、可验证、可复盘的协议里执行。
 
 ```bash
-npx -y @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 默认安装中文模板；也可以显式指定：
 
 ```bash
-npx -y @wnlen/ai-execution-template init --lang zh
+npx -y @wnlen/agent-execution-template init --lang zh
 ```
 
 然后告诉你的 AI 编程工具：
@@ -26,7 +26,7 @@ npx -y @wnlen/ai-execution-template init --lang zh
 开始初始化这个项目
 ```
 
-AI Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
+Agent Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
 
 它把 AI 编程从：
 
@@ -54,7 +54,7 @@ AI Coding Agent 已经很强，但大多数项目仍然在用松散聊天上下�
 - 直接影响执行精度的两个文件经常还需要人手写。
 - 执行很稳定，但缺少判断任务是否值得做、项目是否跑偏的方向层。
 
-AI Execution Template 用一个很小的项目内文件协议解决这些问题：
+Agent Execution Template 用一个很小的项目内文件协议解决这些问题：
 
 ```text
 ai/template/  可复用执行协议
@@ -68,13 +68,13 @@ ai/project/   当前项目现场和方向层
 在当前仓库安装协议：
 
 ```bash
-npx -y @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 英文项目可使用：
 
 ```bash
-npx -y @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/agent-execution-template init --lang en
 ```
 
 让 Agent 从现有文档和 manifest 里整理项目上下文：
@@ -119,31 +119,31 @@ ai/project/metrics.json
 检查安装状态：
 
 ```bash
-npx -y @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template doctor
 ```
 
 忘了下一步怎么走：
 
 ```bash
-npx -y @wnlen/ai-execution-template next
+npx -y @wnlen/agent-execution-template next
 ```
 
 重新总结和优化项目上下文：
 
 ```bash
-npx -y @wnlen/ai-execution-template refresh
+npx -y @wnlen/agent-execution-template refresh
 ```
 
 只升级可复用协议文件：
 
 ```bash
-npx -y @wnlen/ai-execution-template update
+npx -y @wnlen/agent-execution-template update
 ```
 
 查看方向修订入口：
 
 ```bash
-npx -y @wnlen/ai-execution-template strategy
+npx -y @wnlen/agent-execution-template strategy
 ```
 
 ## 你会得到什么
@@ -211,7 +211,7 @@ ai/
 ### `init`
 
 ```bash
-npx -y @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 在当前项目创建 `ai/`。
@@ -224,7 +224,7 @@ npx -y @wnlen/ai-execution-template init
 ### `next`
 
 ```bash
-npx -y @wnlen/ai-execution-template next
+npx -y @wnlen/agent-execution-template next
 ```
 
 根据当前项目状态打印下一步：
@@ -238,7 +238,7 @@ npx -y @wnlen/ai-execution-template next
 ### `update`
 
 ```bash
-npx -y @wnlen/ai-execution-template update
+npx -y @wnlen/agent-execution-template update
 ```
 
 只更新 `ai/template/**`。
@@ -249,7 +249,7 @@ npx -y @wnlen/ai-execution-template update
 ### `refresh`
 
 ```bash
-npx -y @wnlen/ai-execution-template refresh
+npx -y @wnlen/agent-execution-template refresh
 ```
 
 重新总结和优化项目上下文。
@@ -262,13 +262,13 @@ npx -y @wnlen/ai-execution-template refresh
 也可以使用更直白的别名：
 
 ```bash
-npx -y @wnlen/ai-execution-template improve-context
+npx -y @wnlen/agent-execution-template improve-context
 ```
 
 ### `doctor`
 
 ```bash
-npx -y @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template doctor
 ```
 
 检查已安装模板版本和必要文件。
@@ -282,7 +282,7 @@ npx -y @wnlen/ai-execution-template doctor
 ### `reconcile`
 
 ```bash
-npx -y @wnlen/ai-execution-template reconcile
+npx -y @wnlen/agent-execution-template reconcile
 ```
 
 打印上下文整合的最短操作说明。
@@ -290,7 +290,7 @@ npx -y @wnlen/ai-execution-template reconcile
 ### `strategy`
 
 ```bash
-npx -y @wnlen/ai-execution-template strategy
+npx -y @wnlen/agent-execution-template strategy
 ```
 
 打印方向修订的最短操作说明。新灵感先进入 `ai/project/inbox/ideas/`，
@@ -298,7 +298,7 @@ npx -y @wnlen/ai-execution-template strategy
 
 ## 执行模型
 
-AI Execution Template 定义了一个简单循环：
+Agent Execution Template 定义了一个简单循环：
 
 ```text
 项目引导 -> 项目确认 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
@@ -331,10 +331,11 @@ ai/project/inbox/
 ```
 
 AI 必须先输出整合计划，等待确认后，再把长期有效事实合并进 `project.md`、`runtime.md` 和 `refs/*`。
+整合完成后，已处理资料统一移动到 `ai/project/inbox/processed/`，保留用于追溯。
 
 ## 项目北极星
 
-长期方向不要塞进当前任务。AI Execution Template 把方向层放在受保护的
+长期方向不要塞进当前任务。Agent Execution Template 把方向层放在受保护的
 `ai/project/**` 中：
 
 ```text
@@ -368,7 +369,7 @@ idea -> strategy_update proposal -> human confirm -> apply_strategy_update
 
 ## 适配工具
 
-AI Execution Template 有意保持工具无关。只要一个 Agent 能读取项目文件并遵循指令，就可以使用它。
+Agent Execution Template 有意保持工具无关。只要一个 Agent 能读取项目文件并遵循指令，就可以使用它。
 
 常见组合：
 
@@ -390,7 +391,7 @@ AI Execution Template 有意保持工具无关。只要一个 Agent 能读取项
 
 ## 它不是什么
 
-AI Execution Template 不是：
+Agent Execution Template 不是：
 
 - IDE；
 - Agent 平台；
@@ -409,7 +410,7 @@ AI Execution Template 不是：
 当前包信息：
 
 ```text
-Package:  @wnlen/ai-execution-template
+Package:  @wnlen/agent-execution-template
 Protocol: v0.8
 License:  MIT
 ```

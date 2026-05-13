@@ -1,14 +1,14 @@
-# AI Execution Template Specification
+# Agent Execution Template Specification
 
 Current protocol: v0.8
 
 ## 1. 项目名称
 
-**AI Execution Template**
+**Agent Execution Template**
 
 ## 2. 一句话定位
 
-**AI Execution Template 是一个 30 秒可安装、可升级、保护用户项目现场的 AI Coding Agent 执行协议模板。**
+**Agent Execution Template 是一个 30 秒可安装、可升级、保护用户项目现场的 AI Coding Agent 执行协议模板。**
 
 它把 AI 编程从“聊天式执行”变成：
 
@@ -22,9 +22,9 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.11
-中文安装: npx -y @wnlen/ai-execution-template init
-英文安装: npx -y @wnlen/ai-execution-template init --lang en
+Package: @wnlen/agent-execution-template@0.8.14
+中文安装: npx -y @wnlen/agent-execution-template init
+英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
 
 当前 v0.8 已经具备：
@@ -44,7 +44,7 @@ Package: @wnlen/ai-execution-template@0.8.11
 
 ## 4. 解决的问题
 
-AI Execution Template 主要解决十类问题：
+Agent Execution Template 主要解决十类问题：
 
 1. 每次都要重复向 AI 解释项目背景。
 2. 任务边界容易漂移，AI 做多、改多、跑多。
@@ -65,7 +65,7 @@ AI Execution Template 主要解决十类问题：
 
 ## 5. 非目标
 
-AI Execution Template 不是：
+Agent Execution Template 不是：
 
 - AI IDE；
 - Agent 平台；
@@ -86,13 +86,13 @@ AI Coding Agent 在项目里工作的文件协议和安全边界。
 在任意项目根目录执行：
 
 ```bash
-npx -y @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 默认安装中文模板。英文模板使用：
 
 ```bash
-npx -y @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/agent-execution-template init --lang en
 ```
 
 然后让 AI Agent 先整理项目上下文：
@@ -151,25 +151,25 @@ ai/project/metrics.json
 检查安装状态：
 
 ```bash
-npx -y @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template doctor
 ```
 
 升级模板协议：
 
 ```bash
-npx -y @wnlen/ai-execution-template update
+npx -y @wnlen/agent-execution-template update
 ```
 
 `update` 默认沿用已安装语言，也可以显式指定：
 
 ```bash
-npx -y @wnlen/ai-execution-template update --lang en
+npx -y @wnlen/agent-execution-template update --lang en
 ```
 
 查看方向修订入口：
 
 ```bash
-npx -y @wnlen/ai-execution-template strategy
+npx -y @wnlen/agent-execution-template strategy
 ```
 
 ## 7. 安装后的目录结构
@@ -274,6 +274,7 @@ ai/project/result.md
 ai/project/metrics.json
 ai/project/inbox/
 ai/project/inbox/ideas/
+ai/project/inbox/processed/
 ai/project/inbox/raw/
 ai/project/proposals/final-shape-updates/
 ai/project/proposals/final-shape-updates/_template.md
@@ -289,7 +290,7 @@ ai/project/archive/
 ### 9.1 `init`
 
 ```bash
-npx -y @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 作用：
@@ -310,7 +311,7 @@ init 可以安装模板协议，但不能覆盖用户现场。
 ### 9.2 `update`
 
 ```bash
-npx -y @wnlen/ai-execution-template update
+npx -y @wnlen/agent-execution-template update
 ```
 
 作用：
@@ -329,7 +330,7 @@ update 只升级协议，不碰现场。
 ### 9.3 `next`
 
 ```bash
-npx -y @wnlen/ai-execution-template next
+npx -y @wnlen/agent-execution-template next
 ```
 
 作用：
@@ -349,7 +350,7 @@ next 只判断和提示下一步，不修改项目文件。
 ### 9.4 `refresh`
 
 ```bash
-npx -y @wnlen/ai-execution-template refresh
+npx -y @wnlen/agent-execution-template refresh
 ```
 
 作用：
@@ -368,13 +369,13 @@ refresh 可以重建项目上下文，但必须先备份旧现场。
 `improve-context` 是 `refresh` 的用户语义别名：
 
 ```bash
-npx -y @wnlen/ai-execution-template improve-context
+npx -y @wnlen/agent-execution-template improve-context
 ```
 
 ### 9.5 `doctor`
 
 ```bash
-npx -y @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template doctor
 ```
 
 作用：
@@ -387,9 +388,9 @@ npx -y @wnlen/ai-execution-template doctor
 示例输出：
 
 ```text
-AI Execution Template 检查
+Agent Execution Template 检查
 
-模板版本: 0.8.11
+模板版本: 0.8.14
 模板语言: zh
 
 [通过] ai/template/LANG
@@ -414,7 +415,7 @@ AI Execution Template 检查
 ### 9.5 `strategy`
 
 ```bash
-npx -y @wnlen/ai-execution-template strategy
+npx -y @wnlen/agent-execution-template strategy
 ```
 
 作用：
@@ -427,7 +428,7 @@ npx -y @wnlen/ai-execution-template strategy
 ### 9.6 `reconcile`
 
 ```bash
-npx -y @wnlen/ai-execution-template reconcile
+npx -y @wnlen/agent-execution-template reconcile
 ```
 
 作用：
@@ -709,6 +710,7 @@ Default cheap. Escalate for judgment. Record why.
 ## 16.1 inbox 待吸收资料
 
 `ai/project/inbox/` 存放尚未整合进项目上下文的新资料。
+已完成整合的资料统一移动到 `ai/project/inbox/processed/`，用于追溯并避免重复处理。
 
 典型内容：
 
@@ -717,6 +719,7 @@ ai/project/inbox/business-context.md
 ai/project/inbox/product-workflows.md
 ai/project/inbox/domain-model.md
 ai/project/inbox/raw/interview-notes.md
+ai/project/inbox/processed/business-context.md
 ```
 
 当 inbox 中的资料需要吸收时，执行：
@@ -726,6 +729,9 @@ ai/project/inbox/raw/interview-notes.md
 ```
 
 AI 必须先输出整合计划，等人类确认后，才更新 `project.md`、`runtime.md` 和 `refs/*`。
+应用整合完成后，AI 必须把本次已处理的 `ai/project/inbox/*.md`
+移动到 `ai/project/inbox/processed/`。`processed/` 中的资料默认不再触发
+`reconcile` 或 `next` 的待处理资料判断。
 
 如果新资料会改变 `final-shape.md`、`module-map.md` 或 `roadmap.md` 的方向性内容，
 上下文整合只能建议创建 `strategy_update` 提案，不能直接改这些文件。
@@ -928,7 +934,7 @@ template/
     project/
 
 bin/
-  ai-execution-template.js
+  agent-execution-template.js
 
 test/
   selftest.js
@@ -943,7 +949,7 @@ LICENSE
 - `template/zh/ai/**` 是中文 npm 包安装源；
 - `template/en/ai/**` 是英文 npm 包安装源；
 - 根目录 `ai/**` 是本仓库 dogfood 工作区；
-- `bin/ai-execution-template.js` 是 CLI；
+- `bin/agent-execution-template.js` 是 CLI；
 - `test/selftest.js` 是本地自测。
 
 ## 22. 自测与发布检查
@@ -957,7 +963,7 @@ npm test
 doctor：
 
 ```bash
-node bin/ai-execution-template.js doctor
+node bin/agent-execution-template.js doctor
 ```
 
 JSON 解析检查：
@@ -982,7 +988,7 @@ node -e "for (const f of process.argv.slice(1)) JSON.parse(require('fs').readFil
 npm 打包检查：
 
 ```bash
-npm_config_cache=/tmp/npm-cache-ai-execution-template npm pack --dry-run
+npm_config_cache=/tmp/npm-cache-agent-execution-template npm pack --dry-run
 ```
 
 diff 检查：
@@ -1014,7 +1020,7 @@ git diff --check
 
 ## 24. 最终判断
 
-AI Execution Template v0.8 已经从一个 prompt/template 原型，升级为：
+Agent Execution Template v0.8 已经从一个 prompt/template 原型，升级为：
 
 ```text
 低摩擦、可安装、可升级、保护用户现场的 AI 执行协议 npm 包雏形。

@@ -1,6 +1,6 @@
 # Protocol
 
-AI Execution Template v0.8 separates reusable protocol from project-specific
+Agent Execution Template v0.8 separates reusable protocol from project-specific
 execution context.
 
 ```text
@@ -187,6 +187,9 @@ New material should usually live in:
 - `ai/project/inbox/*.md`
 - `docs/**`
 
+Processed material is moved to `ai/project/inbox/processed/` and is not read
+again as pending intake by default.
+
 The user can simply say "Reconcile the new material in ai/project/inbox/".
 Use Context Reconcile Mode by following `ai/template/reconcile.md`.
 
@@ -196,6 +199,7 @@ Context Reconcile Mode must:
 - read the new material named by the human; if none is named, read `ai/project/inbox/*.md`;
 - produce a reconciliation plan first without modifying files;
 - update `ai/project/project.md`, `ai/project/runtime.md`, and `ai/project/refs/*.md` only after human confirmation;
+- after applying reconciliation, move processed `ai/project/inbox/*.md` material to `ai/project/inbox/processed/`;
 - not modify `task.md`, `result.*`, `metrics.json`, source, tests, config, or dependency files by default;
 - not dump raw new material into refs; absorb long-lived, structured, reusable facts.
 

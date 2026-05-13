@@ -3,7 +3,7 @@
 不要总结这个文件。
 执行下面的上下文整合流程。
 
-你正在把新的权威资料吸收到现有 AI Execution Template 项目上下文中。
+你正在把新的权威资料吸收到现有 Agent Execution Template 项目上下文中。
 这不是重新引导，也不是全量覆盖。
 
 目标：合并新资料中的长期有效事实，修正过期或不准确的旧上下文，保留仍然正确的既有内容。
@@ -18,7 +18,8 @@
 - `ai/project/inbox/raw/*.md`
 - `docs/**`
 
-`ai/project/inbox/` 是待吸收资料区。资料被整合确认后，可以保留用于追溯，也可以移动到项目文档或归档。
+`ai/project/inbox/` 是待吸收资料区。资料被整合确认后，统一移动到
+`ai/project/inbox/processed/`，用于追溯并避免后续重复整合。
 
 ## 先读
 
@@ -29,7 +30,8 @@
 5. `ai/project/refs/*.md`
 6. 人类指定的新资料；未指定时，读取 `ai/project/inbox/*.md`
 
-不要默认读取 `ai/project/archive/**`、源码、测试、配置或依赖文件，除非人类明确要求用它们核对事实。
+不要默认读取 `ai/project/inbox/processed/**`、`ai/project/archive/**`、源码、
+测试、配置或依赖文件，除非人类明确要求用它们核对事实。
 
 ## 整合原则
 
@@ -78,6 +80,7 @@
 - `ai/project/project.md`
 - `ai/project/runtime.md`
 - `ai/project/refs/*.md`
+- `ai/project/inbox/processed/**`，用于存放本次已整合资料
 
 除非人类明确要求，否则不要修改：
 
@@ -91,6 +94,10 @@
 - `ai/project/metrics.json`
 - `ai/project/archive/**`
 
+应用整合完成后，必须把本次已整合的 `ai/project/inbox/*.md` 资料移动到
+`ai/project/inbox/processed/`。如果文件名冲突，保留原文件名并添加日期或序号。
+不要移动 `ai/project/inbox/ideas/**`；方向灵感应继续走 `strategy_update`。
+
 ## 最终交接
 
 应用整合后，最终回复必须包含：
@@ -100,6 +107,9 @@
 
 已更新：
 - file
+
+已归档资料：
+- ai/project/inbox/processed/file.md
 
 关键变化：
 - 新增：

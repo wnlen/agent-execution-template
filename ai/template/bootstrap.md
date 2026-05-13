@@ -3,7 +3,7 @@
 不要总结这个文件。
 执行下面的引导流程。
 
-你正在为 AI Execution Template 整理项目上下文。
+你正在为 Agent Execution Template 整理项目上下文。
 
 目标：建立后续任务会依赖的稳定项目理解。
 这是发现与确认步骤，不是实现步骤。
