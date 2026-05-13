@@ -98,8 +98,10 @@ Do not modify these unless the human explicitly asks:
 - `ai/project/metrics.json`
 - `ai/project/archive/**`
 
-After applying reconciliation, move the processed `ai/project/inbox/*.md`
-material into `ai/project/inbox/processed/`. If a filename conflicts, keep the
+After applying reconciliation, move the processed `ai/project/inbox/*.md` and
+`ai/project/inbox/raw/*.md` material into `ai/project/inbox/processed/`.
+Preserve relative paths: move `ai/project/inbox/raw/file.md` to
+`ai/project/inbox/processed/raw/file.md`. If a filename conflicts, keep the
 original name and add a date or sequence number. Do not move
 `ai/project/inbox/ideas/**`; direction ideas should continue through
 `strategy_update`.
@@ -117,10 +119,16 @@ Updated:
 Archived material:
 - ai/project/inbox/processed/file.md
 
+Unabsorbed material:
+- file: reason; write "none" if there is none
+
 Key changes:
 - Added:
 - Corrected:
 - Deprecated:
+
+Conflict handling:
+- conflict or tradeoff; write "none" if there is none
 
 Still uncertain:
 - Up to 3 items; write "none" if there are none

@@ -94,9 +94,11 @@
 - `ai/project/metrics.json`
 - `ai/project/archive/**`
 
-应用整合完成后，必须把本次已整合的 `ai/project/inbox/*.md` 资料移动到
-`ai/project/inbox/processed/`。如果文件名冲突，保留原文件名并添加日期或序号。
-不要移动 `ai/project/inbox/ideas/**`；方向灵感应继续走 `strategy_update`。
+应用整合完成后，必须把本次已整合的 `ai/project/inbox/*.md` 和
+`ai/project/inbox/raw/*.md` 资料移动到 `ai/project/inbox/processed/`。保留相对路径：
+`ai/project/inbox/raw/file.md` 移动到 `ai/project/inbox/processed/raw/file.md`。
+如果文件名冲突，保留原文件名并添加日期或序号。不要移动
+`ai/project/inbox/ideas/**`；方向灵感应继续走 `strategy_update`。
 
 ## 最终交接
 
@@ -111,10 +113,16 @@
 已归档资料：
 - ai/project/inbox/processed/file.md
 
+未吸收资料：
+- file：原因；没有则写“无”
+
 关键变化：
 - 新增：
 - 修正：
 - 废弃：
+
+冲突处理：
+- 冲突或取舍；没有则写“无”
 
 仍不确定：
 - 最多 3 条；没有则写“无”

@@ -89,6 +89,14 @@ or acceptance.
 ## Output Rules
 
 - Mark unknown facts as `Unknown`; do not present guesses as facts.
+- If this bootstrap run absorbs `ai/project/inbox/*.md` or
+  `ai/project/inbox/raw/*.md`, move absorbed material to
+  `ai/project/inbox/processed/` after writing context. Preserve relative paths:
+  move `ai/project/inbox/raw/file.md` to
+  `ai/project/inbox/processed/raw/file.md`. If a filename conflicts, keep the
+  original filename and add a date or sequence number. Do not move
+  `ai/project/inbox/ideas/**`.
+- Leave unabsorbed material in place and explain why in the final response.
 - Initialization content in `final-shape.md`, `module-map.md`, and
   `roadmap.md` must cite evidence sources. If evidence is insufficient, keep
   placeholders or write `Unknown`; do not invent a vision.
@@ -144,6 +152,15 @@ Written:
 - ai/project/refs/constraints.md
 - ai/project/refs/decisions.md
 
+Absorbed material:
+- file; write "none" if there is none
+
+Unabsorbed material:
+- file: reason; write "none" if there is none
+
+Conflict handling:
+- conflict or tradeoff; write "none" if there is none
+
 Reply with:
 - Confirm, draft task 1
 - Confirm, but do: <one-sentence task>
@@ -183,6 +200,15 @@ Written:
 - ai/project/refs/constraints.md
 - ai/project/refs/decisions.md
 - ai/project/task.md
+
+Absorbed material:
+- file; write "none" if there is none
+
+Unabsorbed material:
+- file: reason; write "none" if there is none
+
+Conflict handling:
+- conflict or tradeoff; write "none" if there is none
 
 Reply with:
 - Confirm, execute

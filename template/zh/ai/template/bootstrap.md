@@ -80,6 +80,11 @@
 ## 输出规则
 
 - 未知事实标记为 `Unknown`；不要把猜测当成事实。
+- 如果本次引导吸收了 `ai/project/inbox/*.md` 或 `ai/project/inbox/raw/*.md`，
+  写入上下文后必须把已吸收资料移动到 `ai/project/inbox/processed/`。保留相对路径：
+  `ai/project/inbox/raw/file.md` 移动到 `ai/project/inbox/processed/raw/file.md`。
+  如果文件名冲突，保留原文件名并添加日期或序号。不要移动 `ai/project/inbox/ideas/**`。
+- 未吸收资料必须留在原位置，并在最终回复中说明原因。
 - 对 `final-shape.md`、`module-map.md`、`roadmap.md` 的初始化内容必须标明证据来源；
   如果证据不足，保持占位或写 `Unknown`，不要编造愿景。
 - 有帮助时，在相关文件中记录证据来源。
@@ -131,6 +136,15 @@
 - ai/project/refs/constraints.md
 - ai/project/refs/decisions.md
 
+已吸收资料：
+- file；没有则写“无”
+
+未吸收资料：
+- file：原因；没有则写“无”
+
+冲突处理：
+- 冲突或取舍；没有则写“无”
+
 请直接回复：
 - 确认，按建议 1 起草任务
 - 确认，但改做：<一句话任务>
@@ -170,6 +184,15 @@
 - ai/project/refs/constraints.md
 - ai/project/refs/decisions.md
 - ai/project/task.md
+
+已吸收资料：
+- file；没有则写“无”
+
+未吸收资料：
+- file：原因；没有则写“无”
+
+冲突处理：
+- 冲突或取舍；没有则写“无”
 
 请直接回复：
 - 确认，执行
