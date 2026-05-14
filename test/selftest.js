@@ -122,6 +122,7 @@ function testInitUpdateDoctor() {
   assert(initOutput.includes("把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案"), "init output should provide natural strategy prompt");
   assert(initOutput.includes("agent-execution-template next"), "init output should tell users how to recover the next step");
   assert(initOutput.includes("文件:"), "init output should summarize file changes");
+  assert(!initOutput.includes("维护者提示"), "init output should not show source checkout guidance in user projects");
   assert(!initOutput.includes("[已更新]"), "init output should hide detailed file changes by default");
   assert(!initOutput.includes("Read ai/template/bootstrap.md"), "init output should not use weak Read bootstrap command");
   assert(run(["init", "--verbose"], cwd).includes("[已更新] ai/template/VERSION"), "init --verbose should show detailed file changes");
@@ -202,6 +203,7 @@ function testEnglishInitUpdateDoctor() {
   assert(initOutput.includes("Generate a direction amendment proposal from ai/project/inbox/ideas/"), "English init output should provide natural strategy prompt");
   assert(initOutput.includes("agent-execution-template next"), "English init output should tell users how to recover the next step");
   assert(initOutput.includes("Files:"), "English init output should summarize file changes");
+  assert(!initOutput.includes("Maintainer note"), "English init output should not show source checkout guidance in user projects");
   assert(!initOutput.includes("[UPDATED]"), "English init output should hide detailed file changes by default");
   assert(run(["init", "--lang=en", "--verbose"], cwd).includes("[UPDATED] ai/template/VERSION"), "English init --verbose should show detailed file changes");
 
@@ -338,6 +340,16 @@ function testPermissionErrorIsActionable() {
   }
 }
 
+function testSourceCheckoutNotice() {
+  const doctorOutput = run(["doctor"], repoRoot);
+  assert(doctorOutput.includes("维护者提示"), "doctor should warn when run in the package source checkout");
+  assert(doctorOutput.includes("node bin/agent-execution-template.js <command>"), "source checkout notice should show local node command");
+  assert(doctorOutput.includes("不要把维护者本地初始化产生的 ai/project/** 当成产品改动提交"), "source checkout notice should warn against committing local bootstrap context");
+
+  const nextOutput = run(["next"], repoRoot);
+  assert(nextOutput.includes("维护者提示"), "next should warn when run in the package source checkout");
+}
+
 function main() {
   testInitUpdateDoctor();
   testEnglishInitUpdateDoctor();
@@ -345,6 +357,7 @@ function main() {
   testRefreshBacksUpAndImportsOldProject();
   testNextCommandRoutesByProjectState();
   testPermissionErrorIsActionable();
+  testSourceCheckoutNotice();
   console.log("selftest ok");
 }
 

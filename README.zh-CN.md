@@ -449,11 +449,22 @@ License:  MIT
 npm test
 ```
 
+发布前检查：
+
+```bash
+npm run check:release
+```
+
 测试会验证核心 CLI 契约：
 
 - `init` 创建预期的协议和项目文件。
 - `update` 不覆盖 `ai/project/**`。
 - `doctor` 正确报告缺失文件和空的必要文件。
+- `check:release` 验证版本号、模板结构、安装态协议和规格文档一致。
+
+维护这个 npm 包源码仓库时，用 `node bin/agent-execution-template.js <command>`
+测试当前 checkout；用户项目才使用 `npx -y @wnlen/agent-execution-template <command>`。
+维护者本地 `ai/project/**` 初始化内容不应作为产品改动提交。
 
 ## 贡献
 

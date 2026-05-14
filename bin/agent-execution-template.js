@@ -155,6 +155,10 @@ const TEXT = {
     nextReviewProposal: "已有方向修订提案。先审查提案；确认后对 AI 说:",
     nextContinuePrompt: "继续推进这个项目。执行前先拆 L1 任务；若 L1 >= 2，自动启用边界内连续执行；只有 Red 风险停下来确认。",
     repairHint: "缺失的 project 推荐文件可通过重新运行 init 安全补齐；已有 ai/project/** 不会被覆盖。",
+    sourceCheckoutNotice: `维护者提示: 当前目录看起来是 @wnlen/agent-execution-template 源码仓库。
+  源码仓库内调试请使用: node bin/agent-execution-template.js <command>
+  用户项目中安装才使用: npx -y @wnlen/agent-execution-template <command>
+  不要把维护者本地初始化产生的 ai/project/** 当成产品改动提交。`,
     permissionDenied: "无法写入目标路径",
     permissionHint: `请检查 ai/** 的归属和权限。常见修复:
   sudo chown -R "$(id -un):$(id -gn)" ai
@@ -260,6 +264,10 @@ Usage:
     nextReviewProposal: "A direction amendment proposal exists. Review it first; after confirmation, tell the AI:",
     nextContinuePrompt: "Continue this project. Before execution, decompose L1 tasks; if L1 >= 2, automatically use bounded continuous execution; only Red risk stops for confirmation.",
     repairHint: "Missing recommended project files can be safely added by running init again; existing ai/project/** files are not overwritten.",
+    sourceCheckoutNotice: `Maintainer note: this directory looks like the @wnlen/agent-execution-template source checkout.
+  In the source repository, test with: node bin/agent-execution-template.js <command>
+  In user projects, install with: npx -y @wnlen/agent-execution-template <command>
+  Do not commit maintainer-local ai/project/** bootstrap content as product changes.`,
     permissionDenied: "Cannot write target path",
     permissionHint: `Check ownership and permissions under ai/**. Common fix:
   sudo chown -R "$(id -un):$(id -gn)" ai
@@ -291,11 +299,40 @@ function readPackageVersion() {
   }
 }
 
+function readTargetPackageName() {
+  const packageFile = path.join(process.cwd(), "package.json");
+  if (!fs.existsSync(packageFile)) return null;
+  try {
+    const pkg = JSON.parse(fs.readFileSync(packageFile, "utf8"));
+    return pkg.name || null;
+  } catch {
+    return null;
+  }
+}
+
 function readInstalledLang() {
   const langFile = path.join(TARGET_AI, "template", "LANG");
   if (!fs.existsSync(langFile)) return DEFAULT_LANG;
   const lang = fs.readFileSync(langFile, "utf8").trim();
   return SUPPORTED_LANGS.has(lang) ? lang : DEFAULT_LANG;
+}
+
+function isSourceCheckout() {
+  return process.cwd() === PACKAGE_ROOT &&
+    readTargetPackageName() === "@wnlen/agent-execution-template";
+}
+
+function commandHint(command) {
+  if (isSourceCheckout()) {
+    return `node bin/agent-execution-template.js ${command}`;
+  }
+  return `npx -y @wnlen/agent-execution-template ${command}`;
+}
+
+function printSourceCheckoutNotice(lang) {
+  if (isSourceCheckout()) {
+    console.log(`${getText(lang).sourceCheckoutNotice}\n`);
+  }
 }
 
 function parseLang(args, fallback = DEFAULT_LANG) {
@@ -487,12 +524,14 @@ function init({ lang = DEFAULT_LANG, verbose = false, quiet = false } = {}) {
     .map((change) => ({ ...change, path: path.join("ai/project", change.path) })));
 
   if (!quiet) {
+    const sourceNotice = isSourceCheckout() ? `${text.sourceCheckoutNotice}\n\n` : "";
     console.log(`${text.ready}
 
 ${text.initGuide}
 
+${sourceNotice}
 ${text.files}: ${summarizeChanges(changes, lang)}
-${text.check}: npx -y @wnlen/agent-execution-template doctor
+${text.check}: ${commandHint("doctor")}
 `);
 
     if (verbose) {
@@ -546,12 +585,13 @@ function next({ lang = readInstalledLang() } = {}) {
   }
 
   console.log(`${text.nextTitle}\n`);
+  printSourceCheckoutNotice(lang);
 
   const templatePath = path.join(TARGET_AI, "template");
   const projectPath = path.join(TARGET_AI, "project");
   if (!fs.existsSync(templatePath) || !fs.existsSync(projectPath)) {
     console.log(`${text.nextRunInit}
-  npx -y @wnlen/agent-execution-template init
+  ${commandHint("init")}
 `);
     return;
   }
@@ -678,6 +718,7 @@ function doctor() {
   const lang = readInstalledLang();
   const text = getText(lang);
   console.log(`${text.doctorTitle}\n`);
+  printSourceCheckoutNotice(lang);
   console.log(`${text.templateVersion}: ${readVersion(path.join(TARGET_AI, "template")) || text.unknown}`);
   console.log(`${text.templateLang}: ${lang}\n`);
 
@@ -748,7 +789,7 @@ function doctor() {
   }
 
   if (missing > 0) {
-    console.log(`\n[${text.fail}] ${text.runInit}`);
+    console.log(`\n[${text.fail}] ${commandHint("init")}`);
     process.exitCode = 1;
   } else if (warnings > 0) {
     console.log(`\n[${text.pass}] ${text.readyWithWarnings}`);

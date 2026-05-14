@@ -444,11 +444,25 @@ Run the self-test:
 npm test
 ```
 
+Run the release consistency check:
+
+```bash
+npm run check:release
+```
+
 The test suite verifies the core CLI contract:
 
 - `init` creates the expected protocol and project files.
 - `update` does not overwrite `ai/project/**`.
 - `doctor` reports missing and empty required files correctly.
+- `check:release` verifies versions, template shape, installed protocol state,
+  and the spec's package version.
+
+When maintaining this npm package source checkout, test the local CLI with
+`node bin/agent-execution-template.js <command>`. Use
+`npx -y @wnlen/agent-execution-template <command>` in user projects only.
+Maintainer-local `ai/project/**` bootstrap content should not be committed as
+product changes.
 
 ## Contributing
 
