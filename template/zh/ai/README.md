@@ -11,6 +11,7 @@ project 是现场工作区
 
 - `template/prompt.md`：AI 启动提示。
 - `template/bootstrap.md`：项目发现和上下文引导提示。
+- `template/execution-policy.md`：自动连续执行、任务树、风险分级和 Checkpoint 规则。
 - `template/reconcile.md`：把新的权威资料合并进现有项目上下文。
 - `template/VERSION`：已安装模板版本。
 - `template/protocol.md`：引导流程、执行流程、模型分工、同步规则。

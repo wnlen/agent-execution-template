@@ -9,6 +9,7 @@
 
 1. `ai/template/protocol.md`
 2. `ai/template/rules/core.md`
+3. `ai/template/execution-policy.md`
 
 然后选择模式：
 
@@ -51,11 +52,14 @@
 2. 根据用户当前目标、项目上下文和仓库事实，推断目标、范围、验收、权限、
    验证方式和初始风险；不要要求用户逐项提供。
 3. 起草 `ai/project/task.md`，并将 `execution_policy.mode` 设为 `auto`。
-4. 执行前列出 L1 任务清单并标注 Green / Yellow / Red。L1 少于 2 个时使用
-   `normal`；L1 为 2 个或更多时自动使用 `bounded_continuous`。
-5. 只有出现 Red 预检项时才停止等待人类确认。若用户要求的是执行或继续，且预检
+4. 执行前列出 L1 任务清单并标注 Green / Yellow / Red，同时写入
+   `execution_policy.task_tree`。L1 少于 2 个时使用 `normal`；L1 为 2 个或更多时
+   自动使用 `bounded_continuous`。
+5. 如果没有 Red 预检项，将 `readiness` 设为 `ready_to_execute`；如果需要人类确认，
+   设为 `draft_for_confirmation`；如果不可执行，设为 `blocked`。
+6. 只有出现 Red 预检项时才停止等待人类确认。若用户要求的是执行或继续，且预检
    只有 Green / Yellow，可以直接进入执行模式。
-6. 不要在任务草稿模式中修改源码或业务文件。
+7. 不要在任务草稿模式中修改源码或业务文件。
 
 任务草稿模式必须以下面结构结束：
 
@@ -104,10 +108,11 @@
 2. `ai/project/runtime.md`
 3. `ai/project/task.md`
 
-然后先做执行前规划：列出 L1 清单，给每个 L1 标注 Green / Yellow / Red，
-并根据 L1 数量自动选择 `normal` 或 `bounded_continuous`。执行 L1 前规划 L2，
-执行 L2 前按需规划 L3；默认最多 3 层，必要时允许 L4。每完成一个 L1，
-在清单中打勾并划掉。只有 Red 停止等待人类确认；Green 自动继续，Yellow 做局部
+然后按 `ai/template/execution-policy.md` 做执行前规划：列出 L1 清单，给每个 L1
+标注 Green / Yellow / Red，并写入 `execution_policy.task_tree`。根据 L1 数量自动选择
+`normal` 或 `bounded_continuous`。执行 L1 前规划 L2，执行 L2 前按需规划 L3；
+默认最多 3 层，必要时允许 L4。每完成一个 L1，在清单中打勾并划掉，并更新
+`task_tree` 节点状态。只有 Red 停止等待人类确认；Green 自动继续，Yellow 做局部
 低风险修正后继续。最后把结果写入：
 
 - `ai/project/result.json`

@@ -163,6 +163,29 @@ npx -y @wnlen/agent-execution-template strategy
 | 可升级模板 | 协议可以持续改进，不丢失项目本地记忆。 |
 | Doctor 检查 | 执行前检查必要文件和模板版本。 |
 
+## 自动连续执行怎么工作
+
+用户仍然只需要说自然语言目标，例如：
+
+```text
+实现设置页，包括资料编辑、通知开关和导出入口
+```
+
+AI 会在执行前先拆 L1 任务：
+
+```text
+- [ ] L1-1 资料编辑 Green
+- [ ] L1-2 通知开关 Green
+- [ ] L1-3 导出入口 Yellow
+```
+
+因为 L1 有两个以上，协议会自动使用边界内连续执行。执行每个 L1 前，AI 再规划
+自然衍生的 L2/L3；完成一个 L1 后，在清单中打勾并划掉，同时把状态写回
+`ai/project/task.md` 的 `execution_policy.task_tree`。
+
+只有 Red 风险会停下来让你确认。Green 自动继续，Yellow 只做局部低风险修正后继续。
+每个 Checkpoint 都必须带证据：改了哪些文件、跑了哪些命令、验证结果是什么。
+
 ## 安装后的结构
 
 ```text
@@ -172,6 +195,7 @@ ai/
   template/
     VERSION
     bootstrap.md
+    execution-policy.md
     prompt.md
     reconcile.md
     protocol.md

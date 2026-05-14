@@ -22,7 +22,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/agent-execution-template@0.8.16
+Package: @wnlen/agent-execution-template@0.8.17
 中文安装: npx -y @wnlen/agent-execution-template init
 英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
@@ -181,6 +181,7 @@ ai/
   template/
     VERSION
     bootstrap.md
+    execution-policy.md
     prompt.md
     reconcile.md
     protocol.md
@@ -243,6 +244,7 @@ project 是现场。
 ```text
 ai/template/VERSION
 ai/template/bootstrap.md
+ai/template/execution-policy.md
 ai/template/prompt.md
 ai/template/reconcile.md
 ai/template/protocol.md
@@ -390,12 +392,13 @@ npx -y @wnlen/agent-execution-template doctor
 ```text
 Agent Execution Template 检查
 
-模板版本: 0.8.16
+模板版本: 0.8.17
 模板语言: zh
 
 [通过] ai/template/LANG
 [通过] ai/template/VERSION
 [通过] ai/template/bootstrap.md
+[通过] ai/template/execution-policy.md
 [通过] ai/template/prompt.md
 [通过] ai/template/reconcile.md
 [通过] ai/template/protocol.md
@@ -648,10 +651,11 @@ apply_strategy_update
 
 ## 14. 执行授权策略
 
-执行策略写在：
+执行策略入口写在：
 
 ```text
 ai/project/task.md.execution_policy
+ai/template/execution-policy.md
 ```
 
 默认模式是 `auto`。AI 每次执行前先做任务分解和风险判断，再决定使用
@@ -665,12 +669,13 @@ ai/project/task.md.execution_policy
 - L1 为 2 个或更多时自动使用 `bounded_continuous`；
 - 任一 L1 为 Red 时停止等待人类确认；Green 和 Yellow 不阻塞启动。
 
-`bounded_continuous` 规则：
+`bounded_continuous` 规则集中在 `ai/template/execution-policy.md`。核心要求：
 
 - 按 L1 -> L2 -> L3 执行，执行 L1 前规划 L2，执行 L2 前按需规划 L3；
 - 默认最多 3 层，只有当 L3 仍过大、不可验证或不可回退时才动态增加 L4；
 - 每个任务节点必须有风险评级、预期改动范围、验收方式和证据要求；
 - L1 清单必须用待办列表展示，每完成一个 L1 就打勾并划掉；
+- 执行前和执行中必须把任务树写回 `ai/project/task.md.execution_policy.task_tree`；
 - 默认按 `vertical_slice` 推进，每轮都要产生可检查增量；
 - 每个 Checkpoint 必须包含证据：已改文件、已运行命令、验证结果或无法验证原因；
 - Green 可自动继续；

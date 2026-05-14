@@ -153,6 +153,31 @@ npx -y @wnlen/agent-execution-template strategy --lang en
 | Upgradeable template | Reuse protocol improvements without losing local project memory. |
 | Doctor checks | Validate required files and template version before running the agent. |
 
+## How Automatic Continuous Execution Works
+
+The user can still give a natural-language goal, for example:
+
+```text
+Build the settings page with profile editing, notification toggles, and export entrypoint
+```
+
+Before execution, the AI decomposes L1 tasks:
+
+```text
+- [ ] L1-1 Profile editing Green
+- [ ] L1-2 Notification toggles Green
+- [ ] L1-3 Export entrypoint Yellow
+```
+
+Because there are two or more L1 tasks, the protocol automatically uses bounded
+continuous execution. Before each L1, the AI plans naturally derived L2/L3 work.
+After completing an L1, it checks and strikes the item, then writes status back
+to `execution_policy.task_tree` in `ai/project/task.md`.
+
+Only Red risk stops for confirmation. Green continues automatically, and Yellow
+continues after local low-risk correction. Every checkpoint must include
+evidence: changed files, commands run, and verification results.
+
 ## Installed Layout
 
 ```text
@@ -162,6 +187,7 @@ ai/
   template/
     VERSION
     bootstrap.md
+    execution-policy.md
     prompt.md
     reconcile.md
     protocol.md

@@ -13,6 +13,7 @@ const REQUIRED_FILES = [
   "ai/template/LANG",
   "ai/template/VERSION",
   "ai/template/bootstrap.md",
+  "ai/template/execution-policy.md",
   "ai/template/prompt.md",
   "ai/template/reconcile.md",
   "ai/template/protocol.md",
@@ -48,7 +49,13 @@ const TASK_HEALTH_PATTERNS = [
   /^type:\s*/m,
   /^priority:\s*/m,
   /^risk_level:\s*/m,
+  /^readiness:\s*/m,
   /^execution_policy:/m,
+  /^\s+mode:\s*/m,
+  /^\s+activation_rule:\s*/m,
+  /^\s+task_tree:/m,
+  /^\s+risk_gate:/m,
+  /^\s+evidence_required:\s*/m,
   /^model_policy:/m,
   /^refs:/m,
   /^permission:/m
@@ -146,6 +153,7 @@ const TEXT = {
     nextTellAgent: "把这句话发给你的 AI coding 工具:",
     nextRunCommand: "运行这个命令:",
     nextReviewProposal: "已有方向修订提案。先审查提案；确认后对 AI 说:",
+    nextContinuePrompt: "继续推进这个项目。执行前先拆 L1 任务；若 L1 >= 2，自动启用边界内连续执行；只有 Red 风险停下来确认。",
     repairHint: "缺失的 project 推荐文件可通过重新运行 init 安全补齐；已有 ai/project/** 不会被覆盖。",
     permissionDenied: "无法写入目标路径",
     permissionHint: `请检查 ai/** 的归属和权限。常见修复:
@@ -250,6 +258,7 @@ Usage:
     nextTellAgent: "Send this to your AI coding tool:",
     nextRunCommand: "Run this command:",
     nextReviewProposal: "A direction amendment proposal exists. Review it first; after confirmation, tell the AI:",
+    nextContinuePrompt: "Continue this project. Before execution, decompose L1 tasks; if L1 >= 2, automatically use bounded continuous execution; only Red risk stops for confirmation.",
     repairHint: "Missing recommended project files can be safely added by running init again; existing ai/project/** files are not overwritten.",
     permissionDenied: "Cannot write target path",
     permissionHint: `Check ownership and permissions under ai/**. Common fix:
@@ -583,7 +592,7 @@ function next({ lang = readInstalledLang() } = {}) {
   }
 
   console.log(`${text.nextTellAgent}
-  ${lang === "zh" ? "继续推进这个项目" : "Continue this project"}
+  ${text.nextContinuePrompt}
 `);
 }
 

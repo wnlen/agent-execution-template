@@ -119,33 +119,16 @@ or dependency files unless the human explicitly authorizes it.
 
 ## Bounded Continuous Execution Gate
 
-Before every execution, the AI must decompose the task and judge risk instead
-of waiting for the human to explicitly say "enable continuous execution".
+Before every execution, the AI must read `ai/template/execution-policy.md`,
+decompose the task, and judge risk instead of waiting for the human to
+explicitly say "enable continuous execution".
 
-Before execution:
+Hard gates:
 
-- Infer goal, scope, acceptance, permissions, and verification method from the
-  human goal, project context, and repository facts.
-- List the L1 task checklist and mark each L1 Green / Yellow / Red.
-- Use `normal` when there are fewer than 2 L1 tasks; automatically use
-  `bounded_continuous` when there are 2 or more L1 tasks.
-- Stop for human confirmation if any L1 is Red; Green and Yellow may continue.
-
-When enabled:
-
-- Execute in L1 -> L2 -> L3 order; plan L2 before executing an L1, and plan L3
-  as needed before executing an L2.
-- Default to at most 3 levels; add L4 dynamically only when L3 is still too
-  large, unverifiable, or hard to revert.
-- Show the L1 checklist as task items; when an L1 is complete, check it off and
-  strike it through.
-- Every task node must have risk, expected edit scope, acceptance method, and
-  evidence requirements.
-- The checkpoint budget is a maximum, not a required count.
-- Every checkpoint must include evidence.
-- `Green` may continue automatically.
-- `Yellow` continues after local low-risk correction.
-- `Red` must stop for human confirmation.
+- `execution_policy.task_tree` must record the L1 checklist and execution state.
+- Every task node must have Green / Yellow / Red risk.
+- Every checkpoint must include evidence; a purely subjective Green is not valid.
+- Red must stop for human confirmation.
 - Any product direction, core architecture, data structure, security, payment,
   account, permission, large deletion, core rewrite, or high-cost option choice
   must stop.

@@ -9,6 +9,7 @@ First read:
 
 1. `ai/template/protocol.md`
 2. `ai/template/rules/core.md`
+3. `ai/template/execution-policy.md`
 
 Then choose the mode:
 
@@ -64,13 +65,17 @@ In Task Draft Mode:
    risk from the user's current goal, project context, and repository facts; do
    not require the human to provide each field upfront.
 3. Draft `ai/project/task.md` and set `execution_policy.mode` to `auto`.
-4. Before execution, list the L1 checklist and mark each L1 Green / Yellow /
-   Red. Use `normal` if there are fewer than 2 L1 tasks; automatically use
-   `bounded_continuous` if there are 2 or more L1 tasks.
-5. Stop for human confirmation only when a Red preflight item appears. If the
+4. Before execution, list the L1 checklist, mark each L1 Green / Yellow / Red,
+   and write it to `execution_policy.task_tree`. Use `normal` if there are
+   fewer than 2 L1 tasks; automatically use `bounded_continuous` if there are 2
+   or more L1 tasks.
+5. If no Red preflight item exists, set `readiness` to `ready_to_execute`; if
+   human confirmation is needed, set it to `draft_for_confirmation`; if the task
+   cannot execute, set it to `blocked`.
+6. Stop for human confirmation only when a Red preflight item appears. If the
    human asked to execute or continue, and preflight contains only Green /
    Yellow, proceed directly to Execution Mode.
-6. Do not modify source or business files in Task Draft Mode.
+7. Do not modify source or business files in Task Draft Mode.
 
 End Task Draft Mode with:
 
@@ -121,13 +126,15 @@ In Execution Mode, read:
 2. `ai/project/runtime.md`
 3. `ai/project/task.md`
 
-Then perform pre-execution planning: list the L1 checklist, mark each L1 Green
-/ Yellow / Red, and automatically choose `normal` or `bounded_continuous` from
-the L1 count. Plan L2 before executing an L1, and plan L3 as needed before
-executing an L2; default to at most 3 levels, with L4 allowed when needed. When
-an L1 is complete, check it off and strike it through. Only Red stops for human
-confirmation; Green continues automatically, and Yellow continues after local
-low-risk correction. Write results to:
+Then follow `ai/template/execution-policy.md` for pre-execution planning: list
+the L1 checklist, mark each L1 Green / Yellow / Red, and write it to
+`execution_policy.task_tree`. Automatically choose `normal` or
+`bounded_continuous` from the L1 count. Plan L2 before executing an L1, and
+plan L3 as needed before executing an L2; default to at most 3 levels, with L4
+allowed when needed. When an L1 is complete, check it off, strike it through,
+and update the `task_tree` node status. Only Red stops for human confirmation;
+Green continues automatically, and Yellow continues after local low-risk
+correction. Write results to:
 
 - `ai/project/result.json`
 - `ai/project/result.md`

@@ -3,6 +3,7 @@ task_id: ""
 type: "bugfix | feature | refactor | docs | config | test | research | strategy_update | apply_strategy_update"
 priority: "P0 | P1 | P2 | P3"
 risk_level: "low | medium | high"
+readiness: "draft_for_confirmation | ready_to_execute | blocked"
 depends_on_previous_result: false
 execution_policy:
   mode: "auto | normal | bounded_continuous"
@@ -10,7 +11,17 @@ execution_policy:
   max_depth: 3
   allow_depth_4_when_needed: true
   progress_unit: "vertical_slice"
-  task_tree: []
+  task_tree:
+    - id: "L1-1"
+      title: ""
+      risk: "Green | Yellow | Red"
+      status: "pending | running | done | blocked"
+      scope:
+        allowed: []
+        denied: []
+      acceptance: []
+      evidence: []
+      children: []
   checkpoint_budget:
     l1: 0
     l2: 0
@@ -69,7 +80,9 @@ permission:
 这个文件是当前执行契约。优先在引导模式中，根据简短人类目标和仓库上下文生成，
 然后由人类在执行前检查。
 
-优先使用安全假设，少问额外问题；但不要猜测范围、风险、权限或验收。
+优先使用安全假设，少问额外问题。AI 应基于用户目标、项目上下文和仓库事实推断
+范围、风险、权限和验收；如果推断会越过权限、安全边界或验收无法定义，将
+`readiness` 标为 `blocked` 或将相关任务节点标为 `Red`，等待人类确认。
 
 ## 目标
 
@@ -116,6 +129,10 @@ permission:
 
 - 目标、范围、验收、权限和风险评级由 AI 基于用户目标、项目上下文和仓库事实推断；
   不要求用户预先逐项提供。
+- `readiness = ready_to_execute` 表示没有 Red 预检项，可以执行。
+- `readiness = draft_for_confirmation` 表示需要人类确认后才能执行。
+- `readiness = blocked` 表示当前任务不可执行，必须写 blocked 结果。
+- 执行前必须把 L1 任务清单写入 `execution_policy.task_tree`。
 - 执行前必须列出 L1 任务清单；每个 L1 用待办列表表示，完成后打勾并划掉。
 - 执行某个 L1 前，AI 先规划自然衍生出的 L2；如果 L2 仍需拆分，再规划 L3。
 - 默认最多 3 层；只有当不拆 L4 会导致 L3 过大或不可验证时，才允许动态增加 L4。
@@ -125,6 +142,7 @@ permission:
 - `checkpoint_budget` 是最多可用检查点预算，不是必须用完的次数；不要为了消耗预算而汇报。
 - 只有在触发 `checkpoint_triggers`、风险升高或准备收尾时才输出 Checkpoint。
 - 每个 Checkpoint 必须包含证据：已改文件、已运行命令、验证结果或无法验证的原因。
+- 执行中必须更新 `task_tree` 节点状态：`pending`、`running`、`done` 或 `blocked`。
 - 完成后只做一次总复盘；只对 Yellow、Red、失败验证或高影响模块做二次抽检。
 - 连续执行不改变模型策略；涉及判断、架构、失败复盘或验收争议时仍按 `model_policy` 升级。
 

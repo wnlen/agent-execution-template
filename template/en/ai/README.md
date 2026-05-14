@@ -11,6 +11,7 @@ project is the field workspace
 
 - `template/prompt.md`: AI startup prompt.
 - `template/bootstrap.md`: project discovery and context bootstrap prompt.
+- `template/execution-policy.md`: automatic continuous execution, task tree, risk rubric, and checkpoint rules.
 - `template/reconcile.md`: merge new authoritative material into existing project context.
 - `template/VERSION`: installed template version.
 - `template/protocol.md`: bootstrap flow, execution flow, model division, sync rules.
