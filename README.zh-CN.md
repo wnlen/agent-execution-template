@@ -1,8 +1,8 @@
-# AI Execution Template
+# Agent Execution Template
 
 [English](README.md) | 简体中文
 
-[![npm](https://img.shields.io/npm/v/@wnlen/ai-execution-template?color=cb3837)](https://www.npmjs.com/package/@wnlen/ai-execution-template)
+[![npm](https://img.shields.io/npm/v/@wnlen/agent-execution-template?color=cb3837)](https://www.npmjs.com/package/@wnlen/agent-execution-template)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![protocol](https://img.shields.io/badge/protocol-v0.8-blue.svg)](docs/SPEC.md)
 [![agent agnostic](https://img.shields.io/badge/agent-agnostic-111111.svg)](#适配工具)
@@ -11,22 +11,22 @@
 > 把它装进任意代码仓库，让 AI 从现有文档整理项目上下文，人类确认任务契约，然后在可复用、可验证、可复盘的协议里执行。
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 默认安装中文模板；也可以显式指定：
 
 ```bash
-npx @wnlen/ai-execution-template init --lang zh
+npx -y @wnlen/agent-execution-template init --lang zh
 ```
 
 然后告诉你的 AI 编程工具：
 
 ```text
-严格执行 ai/template/bootstrap.md，不要总结它。
+开始初始化这个项目
 ```
 
-AI Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
+Agent Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
 
 它把 AI 编程从：
 
@@ -52,12 +52,13 @@ AI Coding Agent 已经很强，但大多数项目仍然在用松散聊天上下�
 - 模板升级容易误伤项目自己的上下文。
 - 便宜模型和强模型没有清晰分工。
 - 直接影响执行精度的两个文件经常还需要人手写。
+- 执行很稳定，但缺少判断任务是否值得做、项目是否跑偏的方向层。
 
-AI Execution Template 用一个很小的项目内文件协议解决这些问题：
+Agent Execution Template 用一个很小的项目内文件协议解决这些问题：
 
 ```text
 ai/template/  可复用执行协议
-ai/project/   当前项目现场
+ai/project/   当前项目现场和方向层
 ```
 
 `update` 只刷新协议区，项目现场保持受保护。
@@ -67,38 +68,44 @@ ai/project/   当前项目现场
 在当前仓库安装协议：
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 英文项目可使用：
 
 ```bash
-npx @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/agent-execution-template init --lang en
 ```
 
 让 Agent 从现有文档和 manifest 里整理项目上下文：
 
 ```text
-严格执行 ai/template/bootstrap.md，不要总结它。
+开始初始化这个项目
 ```
 
-检查并确认生成的项目上下文：
+Agent 会生成项目上下文，并在聊天里给出需要确认的摘要、风险和建议下一步：
 
 ```text
 ai/project/project.md
 ai/project/refs/*
 ```
 
-回复修正意见或确认，并用一句话描述下一个任务。Agent 会生成：
+回复修正意见，或确认后继续：
+
+```text
+继续推进这个项目
+```
+
+Agent 会根据当前上下文起草或执行：
 
 ```text
 ai/project/task.md
 ```
 
-确认任务草稿后执行：
+当任务草稿已确认后，也可以直接说：
 
 ```text
-严格执行 ai/template/prompt.md，执行已确认的任务。
+继续推进这个项目
 ```
 
 查看执行结果：
@@ -112,13 +119,31 @@ ai/project/metrics.json
 检查安装状态：
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template doctor
+```
+
+忘了下一步怎么走：
+
+```bash
+npx -y @wnlen/agent-execution-template next
+```
+
+重新总结和优化项目上下文：
+
+```bash
+npx -y @wnlen/agent-execution-template refresh
 ```
 
 只升级可复用协议文件：
 
 ```bash
-npx @wnlen/ai-execution-template update
+npx -y @wnlen/agent-execution-template update
+```
+
+查看方向修订入口：
+
+```bash
+npx -y @wnlen/agent-execution-template strategy
 ```
 
 ## 你会得到什么
@@ -128,12 +153,38 @@ npx @wnlen/ai-execution-template update
 | 可安装执行协议 | 几秒钟给任意仓库加入 AI 执行契约。 |
 | Agent 无关 | 可用于 Codex、Claude Code、Cursor、Aider 和其他编程 Agent。 |
 | Bootstrap 模式 | 读取受控范围内的文档和 manifest，必要时从代码做有边界推断，生成 `project.md` 和 refs 草稿后停下来等人确认。 |
+| 项目北极星 | 在 `ai/project/refs/final-shape.md` 保存最终形态、价值判断和跑偏标准。 |
+| 策略修订门禁 | 新方向先进入 `inbox/ideas/`，生成 proposal，人类确认后才合并进北极星、模块地图或路线图。 |
 | 保护项目现场 | `update` 刷新 `ai/template/**`，不会覆盖 `ai/project/**`。 |
-| 有边界的任务执行 | 目标、范围、权限、风险和验收标准集中在任务文件里。 |
+| 项目上下文重整 | `refresh` 备份旧 `ai/project/**`，生成新项目上下文，并把旧上下文放入 inbox 供 AI 整理。 |
+| 自动连续执行 | AI 执行前自动拆 L1/L2/L3 任务树；L1 两个以上自动启用边界内连续执行，只有 Red 风险停下来确认。 |
 | 可审计结果 | 每次执行都可以留下人类可读结果、机器可读事实和 metrics。 |
 | Token-efficient 模型策略 | 便宜模型处理边界清楚的工作，强模型只用于关键判断点。 |
 | 可升级模板 | 协议可以持续改进，不丢失项目本地记忆。 |
 | Doctor 检查 | 执行前检查必要文件和模板版本。 |
+
+## 自动连续执行怎么工作
+
+用户仍然只需要说自然语言目标，例如：
+
+```text
+实现设置页，包括资料编辑、通知开关和导出入口
+```
+
+AI 会在执行前先拆 L1 任务：
+
+```text
+- [ ] L1-1 资料编辑 Green
+- [ ] L1-2 通知开关 Green
+- [ ] L1-3 导出入口 Yellow
+```
+
+因为 L1 有两个以上，协议会自动使用边界内连续执行。执行每个 L1 前，AI 再规划
+自然衍生的 L2/L3；完成一个 L1 后，在清单中打勾并划掉，同时把状态写回
+`ai/project/task.md` 的 `execution_policy.task_tree`。
+
+只有 Red 风险会停下来让你确认。Green 自动继续，Yellow 只做局部低风险修正后继续。
+每个 Checkpoint 都必须带证据：改了哪些文件、跑了哪些命令、验证结果是什么。
 
 ## 安装后的结构
 
@@ -144,7 +195,9 @@ ai/
   template/
     VERSION
     bootstrap.md
+    execution-policy.md
     prompt.md
+    reconcile.md
     protocol.md
     rules/
       core.md
@@ -160,7 +213,15 @@ ai/
     result.json
     result.md
     metrics.json
+    inbox/
+      ideas/
+      raw/
+    proposals/
+      final-shape-updates/
     refs/
+      final-shape.md
+      module-map.md
+      roadmap.md
     archive/
 ```
 
@@ -174,7 +235,7 @@ ai/
 ### `init`
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 在当前项目创建 `ai/`。
@@ -184,10 +245,24 @@ npx @wnlen/ai-execution-template init
 - 保留已有的 `ai/project/**` 文件。
 - 默认安装中文模板；英文模板使用 `--lang en`。
 
+### `next`
+
+```bash
+npx -y @wnlen/agent-execution-template next
+```
+
+根据当前项目状态打印下一步：
+
+- 未安装时，提示先运行 `init`。
+- `ai/project/inbox/` 有资料时，提示执行上下文整合。
+- `ai/project/inbox/ideas/` 有灵感时，提示生成方向修订提案。
+- 有待确认方向提案时，提示先审查并确认。
+- 没有待处理输入时，提示继续推进项目。
+
 ### `update`
 
 ```bash
-npx @wnlen/ai-execution-template update
+npx -y @wnlen/agent-execution-template update
 ```
 
 只更新 `ai/template/**`。
@@ -195,10 +270,29 @@ npx @wnlen/ai-execution-template update
 当协议升级，但项目上下文不应该被覆盖时使用它。
 默认沿用 `ai/template/LANG` 中记录的已安装语言。
 
+### `refresh`
+
+```bash
+npx -y @wnlen/agent-execution-template refresh
+```
+
+重新总结和优化项目上下文。
+
+- 将旧 `ai/project/**` 改名备份为 `ai/project.backup.<timestamp>`。
+- 生成新的 `ai/project/**`。
+- 将旧上下文复制到 `ai/project/inbox/raw/old-project/`。
+- 输出下一句要交给 AI 的整理指令。
+
+也可以使用更直白的别名：
+
+```bash
+npx -y @wnlen/agent-execution-template improve-context
+```
+
 ### `doctor`
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template doctor
 ```
 
 检查已安装模板版本和必要文件。
@@ -209,9 +303,26 @@ npx @wnlen/ai-execution-template doctor
 - `[警告]` 必要的项目上下文文件为空。
 - `[缺失]` 必要文件缺失。
 
+### `reconcile`
+
+```bash
+npx -y @wnlen/agent-execution-template reconcile
+```
+
+打印上下文整合的最短操作说明。
+
+### `strategy`
+
+```bash
+npx -y @wnlen/agent-execution-template strategy
+```
+
+打印方向修订的最短操作说明。新灵感先进入 `ai/project/inbox/ideas/`，
+再由 AI 生成 `strategy_update` 提案；人类确认后再执行 `apply_strategy_update`。
+
 ## 执行模型
 
-AI Execution Template 定义了一个简单循环：
+Agent Execution Template 定义了一个简单循环：
 
 ```text
 项目引导 -> 项目确认 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
@@ -229,6 +340,47 @@ AI Execution Template 定义了一个简单循环：
 - 机器可读执行事实；
 - 模型档位和成本信号。
 
+## 上下文整合
+
+当项目使用一段时间后，出现更完整、更权威的业务、产品、架构或流程资料时，先放到：
+
+```text
+ai/project/inbox/
+```
+
+然后告诉 AI：
+
+```text
+整合 ai/project/inbox/ 里的新资料
+```
+
+AI 必须先输出整合计划，等待确认后，再把长期有效事实合并进 `project.md`、`runtime.md` 和 `refs/*`。
+整合完成后，已处理资料统一移动到 `ai/project/inbox/processed/`，保留用于追溯。
+默认只吸收 `ai/project/inbox/*.md` 和 `ai/project/inbox/raw/*.md`；
+`processed/**` 不会再次参与整合，`ideas/**` 走方向修订提案。
+
+## 项目北极星
+
+长期方向不要塞进当前任务。Agent Execution Template 把方向层放在受保护的
+`ai/project/**` 中：
+
+```text
+ai/project/refs/final-shape.md       # 项目北极星 / 最终形态
+ai/project/refs/module-map.md        # 当前模块地图
+ai/project/refs/roadmap.md           # 阶段路线图
+ai/project/inbox/ideas/              # 新灵感输入区
+ai/project/proposals/final-shape-updates/
+ai/project/proposals/final-shape-updates/_template.md
+```
+
+普通执行任务不能直接修改北极星、模块地图或路线图。方向变化应走：
+
+```text
+idea -> strategy_update proposal -> human confirm -> apply_strategy_update
+```
+
+这样 `task.md` 负责当前施工单，`final-shape.md` 负责判断任务为什么值得做、项目往哪里生长。
+
 ## Token-Efficient 设计
 
 可选的 token-efficient profile 给 Agent 一条模型分工规则：
@@ -243,7 +395,7 @@ AI Execution Template 定义了一个简单循环：
 
 ## 适配工具
 
-AI Execution Template 有意保持工具无关。只要一个 Agent 能读取项目文件并遵循指令，就可以使用它。
+Agent Execution Template 有意保持工具无关。只要一个 Agent 能读取项目文件并遵循指令，就可以使用它。
 
 常见组合：
 
@@ -265,7 +417,7 @@ AI Execution Template 有意保持工具无关。只要一个 Agent 能读取项
 
 ## 它不是什么
 
-AI Execution Template 不是：
+Agent Execution Template 不是：
 
 - IDE；
 - Agent 平台；
@@ -284,7 +436,7 @@ AI Execution Template 不是：
 当前包信息：
 
 ```text
-Package:  @wnlen/ai-execution-template
+Package:  @wnlen/agent-execution-template
 Protocol: v0.8
 License:  MIT
 ```

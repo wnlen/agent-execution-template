@@ -3,7 +3,7 @@
 Do not summarize this file.
 Execute the bootstrap workflow below.
 
-You are bootstrapping project context for AI Execution Template.
+You are bootstrapping project context for Agent Execution Template.
 
 Goal: build the stable project understanding that future tasks will rely on.
 This is a discovery and confirmation step, not an implementation step.
@@ -23,12 +23,19 @@ and relevant `ai/project/refs/*`, then stop with the Post-Bootstrap Handoff.
 Create or update:
 
 - `ai/project/project.md`
+- `ai/project/refs/final-shape.md` when project direction, final shape, or
+  task-worthiness criteria can be inferred
+- `ai/project/refs/module-map.md` when module responsibilities, boundaries, or
+  dependency direction can be inferred
+- `ai/project/refs/roadmap.md` when stage goals, near-term direction, or
+  deferred items can be inferred
 - `ai/project/refs/architecture.md` when architecture can be inferred
 - `ai/project/refs/commands.md` when run/test/build commands can be inferred
 - `ai/project/refs/constraints.md` when constraints can be inferred
 - `ai/project/refs/decisions.md` only when durable decisions are documented
 
 Create `ai/project/task.md` only if the human also provides a current task.
+If you create `ai/project/task.md`, draft only the task contract. Do not enter execution.
 
 Do not edit source code, tests, app config, dependency files, generated files,
 runtime files, result files, or metrics files during bootstrap.
@@ -64,6 +71,9 @@ unless the human explicitly references them.
 After reading, summarize and ask the human to confirm or correct these points:
 
 - project name, purpose, and primary users;
+- one-line positioning, final shape, and task-worthiness criteria;
+- current module map, module boundaries, and dependency direction;
+- current stage, near-term roadmap, and what is not being done now;
 - technology stack, package manager, and test runner;
 - source, test, config, and documentation layout;
 - main modules and boundaries;
@@ -79,6 +89,17 @@ or acceptance.
 ## Output Rules
 
 - Mark unknown facts as `Unknown`; do not present guesses as facts.
+- If this bootstrap run absorbs `ai/project/inbox/*.md` or
+  `ai/project/inbox/raw/*.md`, move absorbed material to
+  `ai/project/inbox/processed/` after writing context. Preserve relative paths:
+  move `ai/project/inbox/raw/file.md` to
+  `ai/project/inbox/processed/raw/file.md`. If a filename conflicts, keep the
+  original filename and add a date or sequence number. Do not move
+  `ai/project/inbox/ideas/**`.
+- Leave unabsorbed material in place and explain why in the final response.
+- Initialization content in `final-shape.md`, `module-map.md`, and
+  `roadmap.md` must cite evidence sources. If evidence is insufficient, keep
+  placeholders or write `Unknown`; do not invent a vision.
 - Record evidence sources in the relevant file when useful.
 - Keep `ai/project/project.md` stable and long-lived.
 - Keep `ai/project/refs/*.md` focused; do not turn refs into a project diary.
@@ -87,33 +108,113 @@ or acceptance.
 
 ## Post-Bootstrap Handoff
 
-After writing project context drafts, end with a `Next` section that tells the
-human exactly what to do next.
+After writing project context drafts, do not only ask the human to open files
+and inspect them. The final response must include a confirmable summary so the
+human can confirm or correct directly in chat.
 
-The final message must include this shape:
+If the human already provided a current task goal in the bootstrap request, you
+must also draft `ai/project/task.md`, then ask the human to confirm both the
+project understanding and the task draft.
+
+If the human did not provide a current task goal, recommend the next best task
+based on the project state.
+
+The final response must use one of these shapes.
+
+When there is no current task goal:
 
 ```text
-Bootstrap draft is ready.
+Bootstrap is complete. I wrote the project context.
 
-Please review:
+My understanding of the project:
+- Project:
+- Tech stack:
+- Main modules:
+- North Star:
+- Roadmap:
+- Common commands:
+- Important constraints:
+- Still uncertain: up to 3 items; write "none" if there are none
+
+Recommended next step:
+1. Priority task:
+   Reason:
+2. Alternative task:
+   Reason:
+
+Written:
 - ai/project/project.md
+- ai/project/refs/final-shape.md
+- ai/project/refs/module-map.md
+- ai/project/refs/roadmap.md
 - ai/project/refs/architecture.md
 - ai/project/refs/commands.md
 - ai/project/refs/constraints.md
 - ai/project/refs/decisions.md
 
-Confirm or correct:
-1. Project identity and users
-2. Tech stack and commands
-3. Module boundaries and constraints
+Absorbed material:
+- file; write "none" if there is none
 
-Next:
-Then reply with:
-- Confirmed, or corrections
-- Your next task in one sentence
+Unabsorbed material:
+- file: reason; write "none" if there is none
+
+Conflict handling:
+- conflict or tradeoff; write "none" if there is none
+
+Reply with:
+- Confirm, draft task 1
+- Confirm, but do: <one-sentence task>
+- Correction: <what to change>
 ```
 
-If important unknowns remain, list at most 3 questions before the `Next` /
-`Then reply
-with` block. Ask only questions whose answers change project identity,
-commands, boundaries, constraints, risk, permission, or acceptance.
+When there is already a current task goal:
+
+```text
+Bootstrap is complete. I wrote the project context and task draft.
+
+My understanding of the project:
+- Project:
+- Tech stack:
+- Main modules:
+- North Star:
+- Roadmap:
+- Common commands:
+- Important constraints:
+- Still uncertain: up to 3 items; write "none" if there are none
+
+Task draft summary:
+- Goal:
+- Scope:
+- Out of scope:
+- Acceptance:
+- Risk:
+- Permissions needed:
+
+Written:
+- ai/project/project.md
+- ai/project/refs/final-shape.md
+- ai/project/refs/module-map.md
+- ai/project/refs/roadmap.md
+- ai/project/refs/architecture.md
+- ai/project/refs/commands.md
+- ai/project/refs/constraints.md
+- ai/project/refs/decisions.md
+- ai/project/task.md
+
+Absorbed material:
+- file; write "none" if there is none
+
+Unabsorbed material:
+- file: reason; write "none" if there is none
+
+Conflict handling:
+- conflict or tradeoff; write "none" if there is none
+
+Reply with:
+- Confirm, execute
+- Correction: <what to change>
+```
+
+If important unknowns remain, list at most 3 of them under "Still uncertain".
+Do not make the human hunt through files to find issues; file paths are only
+for traceability.

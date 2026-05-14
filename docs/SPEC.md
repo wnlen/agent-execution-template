@@ -1,14 +1,14 @@
-# AI Execution Template Specification
+# Agent Execution Template Specification
 
 Current protocol: v0.8
 
 ## 1. 项目名称
 
-**AI Execution Template**
+**Agent Execution Template**
 
 ## 2. 一句话定位
 
-**AI Execution Template 是一个 30 秒可安装、可升级、保护用户项目现场的 AI Coding Agent 执行协议模板。**
+**Agent Execution Template 是一个 30 秒可安装、可升级、保护用户项目现场的 AI Coding Agent 执行协议模板。**
 
 它把 AI 编程从“聊天式执行”变成：
 
@@ -22,26 +22,29 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/ai-execution-template@0.8.3
-中文安装: npx @wnlen/ai-execution-template init
-英文安装: npx @wnlen/ai-execution-template init --lang en
+Package: @wnlen/agent-execution-template@0.8.17
+中文安装: npx -y @wnlen/agent-execution-template init
+英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
 
 当前 v0.8 已经具备：
 
 - npm `bin` 入口；
-- `init` / `update` / `doctor` 三个命令；
+- `init` / `next` / `refresh` / `improve-context` / `update` / `reconcile` / `strategy` / `doctor` 命令；
 - `init --lang zh|en` 双语安装入口，默认中文；
 - `template/project` 双区结构；
 - 保护 `ai/project/**` 不被升级覆盖；
 - 模板版本文件 `ai/template/VERSION`；
 - 引导模式：通过 `ai/template/bootstrap.md` 从受控范围内的项目文档、manifest 和必要代码生成 `project.md` / refs 草稿；
+- 上下文整合模式：通过 `ai/template/reconcile.md` 将 `ai/project/inbox/` 或 `docs/**` 中的新权威资料合并进既有上下文；
+- 项目方向层：通过 `final-shape.md`、`module-map.md`、`roadmap.md` 保存北极星、模块地图和路线图；
+- 策略修订门禁：通过 `strategy_update` proposal 和 `apply_strategy_update` 防止普通执行任务直接改项目宪法；
 - 自测脚本 `npm test`；
 - `result.json` / `result.md` / `metrics.json` 执行结果记录。
 
 ## 4. 解决的问题
 
-AI Execution Template 主要解决九类问题：
+Agent Execution Template 主要解决十类问题：
 
 1. 每次都要重复向 AI 解释项目背景。
 2. 任务边界容易漂移，AI 做多、改多、跑多。
@@ -52,6 +55,7 @@ AI Execution Template 主要解决九类问题：
 7. 用户不知道模板是否安装完整。
 8. 便宜模型和强模型没有明确分工规则。
 9. 直接影响执行精度的 `project.md` / `task.md` 仍然依赖人手写。
+10. AI 能稳定执行任务，但缺少判断任务为什么值得做、项目下一步往哪里生长的方向层。
 
 最终目标是：
 
@@ -61,7 +65,7 @@ AI Execution Template 主要解决九类问题：
 
 ## 5. 非目标
 
-AI Execution Template 不是：
+Agent Execution Template 不是：
 
 - AI IDE；
 - Agent 平台；
@@ -82,29 +86,35 @@ AI Coding Agent 在项目里工作的文件协议和安全边界。
 在任意项目根目录执行：
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 默认安装中文模板。英文模板使用：
 
 ```bash
-npx @wnlen/ai-execution-template init --lang en
+npx -y @wnlen/agent-execution-template init --lang en
 ```
 
 然后让 AI Agent 先整理项目上下文：
 
 ```text
-严格执行 ai/template/bootstrap.md，不要总结它。
+开始初始化这个项目
 ```
 
-人类检查并确认生成的项目上下文：
+AI 会在聊天里给出项目上下文摘要、需要确认的问题和建议下一步，对应文件是：
 
 ```text
 ai/project/project.md
 ai/project/refs/*
 ```
 
-之后用一句话描述当前任务，AI 生成并等待确认：
+之后人类回复修正意见，或说：
+
+```text
+继续推进这个项目
+```
+
+AI 会根据当前现场判断下一步，必要时生成并等待确认：
 
 ```text
 ai/project/task.md
@@ -113,8 +123,22 @@ ai/project/task.md
 确认后启动 AI Agent 执行：
 
 ```text
-严格执行 ai/template/prompt.md，执行已确认的任务。
+继续推进这个项目
 ```
+
+如果后续出现更权威的新资料，先放入：
+
+```text
+ai/project/inbox/
+```
+
+再执行上下文整合：
+
+```text
+整合 ai/project/inbox/ 里的新资料
+```
+
+整合会先输出计划，等人类确认后再更新 `project.md`、`runtime.md` 和 `refs/*`。
 
 执行完成后查看：
 
@@ -127,19 +151,25 @@ ai/project/metrics.json
 检查安装状态：
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template doctor
 ```
 
 升级模板协议：
 
 ```bash
-npx @wnlen/ai-execution-template update
+npx -y @wnlen/agent-execution-template update
 ```
 
 `update` 默认沿用已安装语言，也可以显式指定：
 
 ```bash
-npx @wnlen/ai-execution-template update --lang en
+npx -y @wnlen/agent-execution-template update --lang en
+```
+
+查看方向修订入口：
+
+```bash
+npx -y @wnlen/agent-execution-template strategy
 ```
 
 ## 7. 安装后的目录结构
@@ -151,7 +181,9 @@ ai/
   template/
     VERSION
     bootstrap.md
+    execution-policy.md
     prompt.md
+    reconcile.md
     protocol.md
     rules/
       core.md
@@ -167,7 +199,15 @@ ai/
     result.json
     result.md
     metrics.json
+    inbox/
+      ideas/
+      raw/
+    proposals/
+      final-shape-updates/
     refs/
+      final-shape.md
+      module-map.md
+      roadmap.md
     archive/
 ```
 
@@ -204,7 +244,9 @@ project 是现场。
 ```text
 ai/template/VERSION
 ai/template/bootstrap.md
+ai/template/execution-policy.md
 ai/template/prompt.md
+ai/template/reconcile.md
 ai/template/protocol.md
 ai/template/rules/core.md
 ai/template/rules/output.md
@@ -232,7 +274,16 @@ ai/project/task.md
 ai/project/result.json
 ai/project/result.md
 ai/project/metrics.json
+ai/project/inbox/
+ai/project/inbox/ideas/
+ai/project/inbox/processed/
+ai/project/inbox/raw/
+ai/project/proposals/final-shape-updates/
+ai/project/proposals/final-shape-updates/_template.md
 ai/project/refs/
+ai/project/refs/final-shape.md
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
 ai/project/archive/
 ```
 
@@ -241,7 +292,7 @@ ai/project/archive/
 ### 9.1 `init`
 
 ```bash
-npx @wnlen/ai-execution-template init
+npx -y @wnlen/agent-execution-template init
 ```
 
 作用：
@@ -262,7 +313,7 @@ init 可以安装模板协议，但不能覆盖用户现场。
 ### 9.2 `update`
 
 ```bash
-npx @wnlen/ai-execution-template update
+npx -y @wnlen/agent-execution-template update
 ```
 
 作用：
@@ -278,10 +329,55 @@ npx @wnlen/ai-execution-template update
 update 只升级协议，不碰现场。
 ```
 
-### 9.3 `doctor`
+### 9.3 `next`
 
 ```bash
-npx @wnlen/ai-execution-template doctor
+npx -y @wnlen/agent-execution-template next
+```
+
+作用：
+
+- 当前项目尚未安装时，提示先运行 `init`；
+- `ai/project/inbox/` 有待吸收资料时，提示上下文整合入口；
+- `ai/project/inbox/ideas/` 有待评估灵感时，提示方向修订提案入口；
+- 存在待确认方向提案时，提示人类审查和确认；
+- 没有待处理输入时，提示继续推进项目。
+
+安全原则：
+
+```text
+next 只判断和提示下一步，不修改项目文件。
+```
+
+### 9.4 `refresh`
+
+```bash
+npx -y @wnlen/agent-execution-template refresh
+```
+
+作用：
+
+- 将旧 `ai/project/**` 改名备份为 `ai/project.backup.<timestamp>`；
+- 生成新的 `ai/project/**`；
+- 将旧上下文复制到 `ai/project/inbox/raw/old-project/`；
+- 输出下一句要交给 AI 的整理指令。
+
+安全原则：
+
+```text
+refresh 可以重建项目上下文，但必须先备份旧现场。
+```
+
+`improve-context` 是 `refresh` 的用户语义别名：
+
+```bash
+npx -y @wnlen/agent-execution-template improve-context
+```
+
+### 9.5 `doctor`
+
+```bash
+npx -y @wnlen/agent-execution-template doctor
 ```
 
 作用：
@@ -294,16 +390,21 @@ npx @wnlen/ai-execution-template doctor
 示例输出：
 
 ```text
-AI Execution Template 检查
+Agent Execution Template 检查
 
-模板版本: 0.8.3
+模板版本: 0.8.17
+模板语言: zh
 
+[通过] ai/template/LANG
 [通过] ai/template/VERSION
 [通过] ai/template/bootstrap.md
+[通过] ai/template/execution-policy.md
 [通过] ai/template/prompt.md
+[通过] ai/template/reconcile.md
 [通过] ai/template/protocol.md
 [通过] ai/template/rules/core.md
 [通过] ai/template/rules/output.md
+[通过] ai/project/inbox/.gitkeep
 [通过] ai/project/project.md
 [通过] ai/project/runtime.md
 [通过] ai/project/task.md
@@ -314,19 +415,59 @@ AI Execution Template 检查
 [通过] 已就绪
 ```
 
+### 9.5 `strategy`
+
+```bash
+npx -y @wnlen/agent-execution-template strategy
+```
+
+作用：
+
+- 打印方向修订的最短操作说明；
+- 指示用户把新方向灵感放到 `ai/project/inbox/ideas/`；
+- 指示 AI 生成 `strategy_update` 提案；
+- 提醒人类确认后再执行 `apply_strategy_update`。
+
+### 9.6 `reconcile`
+
+```bash
+npx -y @wnlen/agent-execution-template reconcile
+```
+
+作用：
+
+- 打印上下文整合的最短操作说明；
+- 指示用户把新的业务、产品、架构或流程资料放到 `ai/project/inbox/`；
+- 指示 AI 先输出整合计划，等待确认后再更新长期上下文。
+
 ## 10. 启动入口
 
-项目上下文启动入口是：
+面向用户的项目上下文启动入口是：
 
 ```text
-ai/template/bootstrap.md
+开始初始化这个项目
 ```
 
-任务执行启动入口是：
+面向用户的任务执行入口是：
 
 ```text
-ai/template/prompt.md
+继续推进这个项目
 ```
+
+面向用户的上下文整合入口是：
+
+```text
+整合 ai/project/inbox/ 里的新资料
+```
+
+面向用户的方向修订入口可以是：
+
+```text
+把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
+```
+
+内部协议入口分别由 `ai/template/bootstrap.md`、`ai/template/prompt.md` 和
+`ai/template/reconcile.md` 承载，用户不需要记忆这些文件名。
 
 执行入口固定要求 AI Agent 先读：
 
@@ -351,7 +492,7 @@ ai/project/metrics.json
 当前协议的执行闭环是：
 
 ```text
-项目引导 -> 项目确认 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
+项目引导 -> 项目确认 -> 方向修订提案可选 -> 任务草稿 -> 任务确认 -> 计划 -> 执行 -> 复核 -> 结果
 ```
 
 更具体地说：
@@ -375,6 +516,17 @@ ai/project/metrics.json
 → 尽可能验证
 → 写回 result / metrics
 → 必要时建议 runtime 更新
+```
+
+如果当前目标会改变项目最终形态、模块边界或路线图，必须先进入策略修订：
+
+```text
+灵感进入 ai/project/inbox/ideas/
+→ strategy_update 读取 final-shape / module-map / roadmap / decisions / constraints
+→ 输出 ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
+→ 人类确认
+→ apply_strategy_update 合并进正式方向文件
+→ 再生成或执行具体 task.md
 ```
 
 ## 12. Bootstrap 与人类参与边界
@@ -440,6 +592,17 @@ AI 负责：
 人类少输入，AI 多整理；但 scope、risk、permission、acceptance 不乱猜。
 ```
 
+引导模式不仅要生成项目身份，也要在有证据时初始化方向层：
+
+```text
+ai/project/refs/final-shape.md
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
+```
+
+如果现有资料不足以判断最终形态、模块地图或路线图，必须写 `Unknown` 或保留占位，
+不能为了填满文档而编造愿景。
+
 ## 13. 任务文件 `task.md`
 
 `ai/project/task.md` 是当前任务契约。
@@ -450,6 +613,7 @@ AI 负责：
 - 任务类型；
 - 优先级；
 - 风险等级；
+- 执行策略；
 - 模型分工策略；
 - refs 要求；
 - 修改权限；
@@ -460,6 +624,23 @@ AI 负责：
 - 验收标准；
 - stop conditions。
 
+任务类型允许包含：
+
+```text
+bugfix
+feature
+refactor
+docs
+config
+test
+research
+strategy_update
+apply_strategy_update
+```
+
+其中 `strategy_update` 只生成方向修订提案，不写代码；`apply_strategy_update`
+只应用已确认提案，不顺手扩展新方向。
+
 原则：
 
 ```text
@@ -468,7 +649,46 @@ AI 负责：
 权限不允许，不越界修改。
 ```
 
-## 14. 模型分工协议
+## 14. 执行授权策略
+
+执行策略入口写在：
+
+```text
+ai/project/task.md.execution_policy
+ai/template/execution-policy.md
+```
+
+默认模式是 `auto`。AI 每次执行前先做任务分解和风险判断，再决定使用
+`normal` 还是 `bounded_continuous`，不依赖用户口令。
+
+执行前规划：
+
+- AI 根据用户目标、项目上下文和仓库事实推断目标、范围、验收、权限和验证方式；
+- 先列 L1 任务清单，并给每个 L1 标注 Green / Yellow / Red；
+- L1 少于 2 个时使用 `normal`；
+- L1 为 2 个或更多时自动使用 `bounded_continuous`；
+- 任一 L1 为 Red 时停止等待人类确认；Green 和 Yellow 不阻塞启动。
+
+`bounded_continuous` 规则集中在 `ai/template/execution-policy.md`。核心要求：
+
+- 按 L1 -> L2 -> L3 执行，执行 L1 前规划 L2，执行 L2 前按需规划 L3；
+- 默认最多 3 层，只有当 L3 仍过大、不可验证或不可回退时才动态增加 L4；
+- 每个任务节点必须有风险评级、预期改动范围、验收方式和证据要求；
+- L1 清单必须用待办列表展示，每完成一个 L1 就打勾并划掉；
+- 执行前和执行中必须把任务树写回 `ai/project/task.md.execution_policy.task_tree`；
+- 默认按 `vertical_slice` 推进，每轮都要产生可检查增量；
+- 每个 Checkpoint 必须包含证据：已改文件、已运行命令、验证结果或无法验证原因；
+- Green 可自动继续；
+- Yellow 做局部低风险修正后继续；
+- Red 必须停止等待人类确认；
+- 目标、范围、验收和权限由 AI 推断，但不能越过项目规则、显式用户限制、
+  `permission.modify.denied`、安全边界或破坏性操作限制；
+- 需要扩大权限、运行未允许命令、访问网络、执行破坏性操作、改变产品方向或核心架构时，
+  当前节点必须标为 Red。
+
+它不适用于方向未定且无法推断、验收无法定义或高风险架构取舍任务；这些应直接评为 Red。
+
+## 15. 模型分工协议
 
 模型分工写在：
 
@@ -496,7 +716,7 @@ Default cheap. Escalate for judgment. Record why.
 - 写明需要的 strong model role；
 - 记录到 `ai/project/metrics.json`。
 
-## 15. 风险门禁
+## 16. 风险门禁
 
 任务涉及以下内容时必须谨慎：
 
@@ -510,7 +730,7 @@ Default cheap. Escalate for judgment. Record why.
 
 如果风险高且 `task.md` 未明确授权，AI 必须停止并写 blocked 结果。
 
-## 16. refs 延迟加载
+## 17. refs 延迟加载
 
 `ai/project/refs/` 存放按需读取的详细资料。
 
@@ -519,6 +739,9 @@ Default cheap. Escalate for judgment. Record why.
 推荐路由：
 
 ```text
+最终形态 / 北极星 / 任务价值判断 -> ai/project/refs/final-shape.md
+当前模块结构 / 边界 / 依赖方向     -> ai/project/refs/module-map.md
+阶段目标 / 近期路线 / 暂缓事项     -> ai/project/refs/roadmap.md
 架构 / API / 模块边界       -> ai/project/refs/architecture.md
 历史决策                    -> ai/project/refs/decisions.md
 安全 / 兼容 / 性能 / 数据    -> ai/project/refs/constraints.md
@@ -527,7 +750,114 @@ Default cheap. Escalate for judgment. Record why.
 
 每次读取 ref 都必须在 `result.json.refs_read` 中记录原因。
 
-## 17. 输出结果
+## 17.1 inbox 待吸收资料
+
+`ai/project/inbox/` 存放尚未整合进项目上下文的新资料。
+已完成整合的资料统一移动到 `ai/project/inbox/processed/`，用于追溯并避免重复处理。
+
+典型内容：
+
+```text
+ai/project/inbox/business-context.md
+ai/project/inbox/product-workflows.md
+ai/project/inbox/domain-model.md
+ai/project/inbox/raw/interview-notes.md
+ai/project/inbox/processed/business-context.md
+```
+
+当 inbox 中的资料需要吸收时，执行：
+
+```text
+整合 ai/project/inbox/ 里的新资料
+```
+
+AI 必须先输出整合计划，等人类确认后，才更新 `project.md`、`runtime.md` 和 `refs/*`。
+应用整合完成后，AI 必须把本次已处理的 `ai/project/inbox/*.md`
+移动到 `ai/project/inbox/processed/`。`processed/` 中的资料默认不再触发
+`reconcile` 或 `next` 的待处理资料判断。
+即使用户口语上说“整合整个 inbox”，默认也只处理 `ai/project/inbox/*.md`
+和 `ai/project/inbox/raw/*.md`；`ai/project/inbox/ideas/**` 不参与上下文整合。
+
+如果新资料会改变 `final-shape.md`、`module-map.md` 或 `roadmap.md` 的方向性内容，
+上下文整合只能建议创建 `strategy_update` 提案，不能直接改这些文件。
+
+## 17.2 项目北极星与策略修订
+
+`ai/project/refs/final-shape.md` 是项目北极星说明书，也可以理解为
+Product Constitution / Final Shape Spec。它负责保存：
+
+- 项目一句话定位；
+- 解决的本质问题；
+- 目标用户和核心痛点；
+- 最终产品形态；
+- 当前阶段不做什么；
+- 核心模块边界；
+- 长期护城河；
+- 判断任务是否值得做的标准；
+- 判断项目是否跑偏的标准。
+
+配套文件：
+
+```text
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
+ai/project/inbox/ideas/
+ai/project/proposals/final-shape-updates/
+ai/project/proposals/final-shape-updates/_template.md
+```
+
+门禁规则：
+
+```text
+灵感不能直接改宪法。
+AI 不能在普通执行任务里顺手改宪法。
+普通执行任务不能直接改北极星、模块地图或路线图。
+```
+
+正确流程：
+
+```text
+idea -> proposal -> review -> human confirm -> update
+```
+
+`strategy_update` 必须输出到：
+
+```text
+ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
+```
+
+并以：
+
+```text
+ai/project/proposals/final-shape-updates/_template.md
+```
+
+作为结构模板。
+
+提案必须包含：
+
+1. 新灵感摘要
+2. 与当前 final-shape 的一致点
+3. 冲突点
+4. 应该吸收的部分
+5. 应该拒绝的部分
+6. 对模块地图的影响
+7. 对路线图的影响
+8. 建议修改 diff
+9. 风险
+10. 是否推荐合并
+
+只有人类确认后，`apply_strategy_update` 才能修改：
+
+```text
+ai/project/refs/final-shape.md
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
+ai/project/refs/decisions.md
+ai/project/refs/constraints.md
+```
+
+## 18. 输出结果
 
 每次执行必须写：
 
@@ -537,7 +867,7 @@ ai/project/result.md
 ai/project/metrics.json
 ```
 
-### 17.1 `result.json`
+### 18.1 `result.json`
 
 机器可读结果，是当前最新权威执行记录。
 
@@ -555,7 +885,7 @@ ai/project/metrics.json
 - next；
 - runtime update proposal。
 
-### 17.2 `result.md`
+### 18.2 `result.md`
 
 人类可读摘要。
 
@@ -567,7 +897,7 @@ ai/project/metrics.json
 - 有什么问题；
 - 下一步。
 
-### 17.3 `metrics.json`
+### 18.3 `metrics.json`
 
 执行经济性和模型分工记录。
 
@@ -582,7 +912,7 @@ ai/project/metrics.json
 - human fix required；
 - reuse potential。
 
-## 18. 状态规则
+## 19. 状态规则
 
 允许状态：
 
@@ -600,7 +930,7 @@ blocked
 - 任务不可执行，使用 `blocked`；
 - 执行失败且无法完成，使用 `failed`。
 
-## 19. runtime 治理
+## 20. runtime 治理
 
 `ai/project/runtime.md` 只存当前仍然有效的执行上下文。
 
@@ -619,7 +949,7 @@ ai/project/result.json.runtime_update
 
 再由单独任务决定是否更新 runtime。
 
-## 20. 同步规则
+## 21. 同步规则
 
 从模板仓库导入真实项目：
 
@@ -637,7 +967,7 @@ ai/project/result.json.runtime_update
 
 这是整个项目的安全底线。
 
-## 21. npm 包结构
+## 22. npm 包结构
 
 模板仓库内部结构：
 
@@ -649,7 +979,7 @@ template/
     project/
 
 bin/
-  ai-execution-template.js
+  agent-execution-template.js
 
 test/
   selftest.js
@@ -664,10 +994,10 @@ LICENSE
 - `template/zh/ai/**` 是中文 npm 包安装源；
 - `template/en/ai/**` 是英文 npm 包安装源；
 - 根目录 `ai/**` 是本仓库 dogfood 工作区；
-- `bin/ai-execution-template.js` 是 CLI；
+- `bin/agent-execution-template.js` 是 CLI；
 - `test/selftest.js` 是本地自测。
 
-## 22. 自测与发布检查
+## 23. 自测与发布检查
 
 本地自测：
 
@@ -678,7 +1008,7 @@ npm test
 doctor：
 
 ```bash
-node bin/ai-execution-template.js doctor
+node bin/agent-execution-template.js doctor
 ```
 
 JSON 解析检查：
@@ -703,7 +1033,7 @@ node -e "for (const f of process.argv.slice(1)) JSON.parse(require('fs').readFil
 npm 打包检查：
 
 ```bash
-npm_config_cache=/tmp/npm-cache-ai-execution-template npm pack --dry-run
+npm_config_cache=/tmp/npm-cache-agent-execution-template npm pack --dry-run
 ```
 
 diff 检查：
@@ -712,7 +1042,7 @@ diff 检查：
 git diff --check
 ```
 
-## 23. 当前能力边界
+## 24. 当前能力边界
 
 当前项目已经能做到：
 
@@ -733,9 +1063,9 @@ git diff --check
 - IDE 插件；
 - 发布流水线。
 
-## 24. 最终判断
+## 25. 最终判断
 
-AI Execution Template v0.8 已经从一个 prompt/template 原型，升级为：
+Agent Execution Template v0.8 已经从一个 prompt/template 原型，升级为：
 
 ```text
 低摩擦、可安装、可升级、保护用户现场的 AI 执行协议 npm 包雏形。

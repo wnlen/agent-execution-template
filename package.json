@@ -1,9 +1,9 @@
 {
-  "name": "@wnlen/ai-execution-template",
-  "version": "0.8.3",
+  "name": "@wnlen/agent-execution-template",
+  "version": "0.8.17",
   "description": "Low-friction AI execution protocol template for coding agents.",
   "bin": {
-    "ai-execution-template": "bin/ai-execution-template.js"
+    "agent-execution-template": "bin/agent-execution-template.js"
   },
   "files": [
     "bin",
@@ -13,7 +13,7 @@
     "README.md"
   ],
   "scripts": {
-    "doctor": "node bin/ai-execution-template.js doctor",
+    "doctor": "node bin/agent-execution-template.js doctor",
     "test": "node test/selftest.js"
   },
   "keywords": [
@@ -25,11 +25,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wnlen/ai-execution-template.git"
+    "url": "git+https://github.com/wnlen/agent-execution-template.git"
   },
   "bugs": {
-    "url": "https://github.com/wnlen/ai-execution-template/issues"
+    "url": "https://github.com/wnlen/agent-execution-template/issues"
   },
-  "homepage": "https://github.com/wnlen/ai-execution-template#readme",
+  "homepage": "https://github.com/wnlen/agent-execution-template#readme",
   "license": "MIT"
 }

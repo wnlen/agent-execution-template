@@ -8,6 +8,7 @@ Before editing code, check that `ai/project/task.md` clearly defines:
 - Scope
 - Acceptance
 - Permission
+- Execution policy
 
 If readiness fails, do not edit code. Write blocked results to:
 
@@ -24,21 +25,27 @@ execution.
 Bootstrap Mode may write only project context files:
 
 - `ai/project/project.md`
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
 - `ai/project/refs/architecture.md`
 - `ai/project/refs/commands.md`
 - `ai/project/refs/constraints.md`
 - `ai/project/refs/decisions.md`
 
 Bootstrap Mode may write `ai/project/task.md` only if the human also provides
-a current task goal.
+a current task goal. In that case, draft only the task contract and do not
+enter implementation.
 
 Bootstrap Mode must not edit source code, tests, configuration, dependency
 files, generated files, runtime files, result files, or metrics files.
 
 After writing bootstrap drafts, stop with the Post-Bootstrap Handoff from
-`ai/template/bootstrap.md`. Do not continue into task drafting or
-implementation in the same run unless the human explicitly confirms the
-project context and provides a task.
+`ai/template/bootstrap.md`. The handoff must include a confirmable in-chat
+summary and recommended next step, not only file paths to inspect. If the human
+already provided a current task goal, bootstrap may also draft
+`ai/project/task.md` in the same run, but it must still stop for confirmation
+and must not enter implementation.
 
 ## Bootstrap Read Scope
 
@@ -73,6 +80,94 @@ Task Draft Mode may write only:
 Task Draft Mode must end with the Task Draft Handoff from
 `ai/template/prompt.md`.
 
+## Context Reconcile Gate
+
+If the user provides new authoritative business, product, architecture, or
+process material and wants it merged into existing context, or says
+"Reconcile the new material in ai/project/inbox/", follow
+`ai/template/reconcile.md`. Do not re-bootstrap and do not overwrite the whole
+context set.
+
+New material should usually live in:
+
+- `ai/project/inbox/*.md`
+- `ai/project/inbox/raw/*.md`
+- `docs/**`
+
+Processed material is moved to `ai/project/inbox/processed/` and should not
+trigger context reconciliation again by default.
+
+Context reconciliation must produce a plan first and wait for human
+confirmation before updating files.
+
+By default, context reconciliation may update only:
+
+- `ai/project/project.md`
+- `ai/project/runtime.md`
+- `ai/project/refs/*.md`
+
+If new material would change directional content in the North Star, module map,
+or roadmap, Context Reconcile Mode may only recommend a `strategy_update`. It
+must not directly modify:
+
+- `ai/project/refs/final-shape.md`
+- `ai/project/refs/module-map.md`
+- `ai/project/refs/roadmap.md`
+
+Do not modify current task, results, metrics, archives, source, tests, config,
+or dependency files unless the human explicitly authorizes it.
+
+## Bounded Continuous Execution Gate
+
+Before every execution, the AI must read `ai/template/execution-policy.md`,
+decompose the task, and judge risk instead of waiting for the human to
+explicitly say "enable continuous execution".
+
+Hard gates:
+
+- `execution_policy.task_tree` must record the L1 checklist and execution state.
+- Every task node must have Green / Yellow / Red risk.
+- Every checkpoint must include evidence; a purely subjective Green is not valid.
+- Red must stop for human confirmation.
+- Any product direction, core architecture, data structure, security, payment,
+  account, permission, large deletion, core rewrite, or high-cost option choice
+  must stop.
+- Any need to expand scope, permission, commands, network access, or acceptance
+  must stop.
+
+The AI infers goal, scope, acceptance, and permissions, but must not cross
+project rules, explicit human limits, `permission.modify.denied`, security
+boundaries, or destructive-action limits.
+
+## Strategy Update Gate
+
+If the user asks to update the North Star, final shape, product constitution,
+module map, roadmap, or project direction, or if
+`ai/project/inbox/ideas/` contains non-`.gitkeep` new ideas, execute
+`strategy_update`.
+
+`strategy_update` may only:
+
+- read official direction docs, decisions, constraints, and idea inputs;
+- use `ai/project/proposals/final-shape-updates/_template.md` as its structural
+  template;
+- create `ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md`;
+- set the new proposal status to `proposed`;
+- stop for human confirmation.
+
+It must not directly modify official direction docs, source, tests, config, or
+dependency files.
+
+Only after the human explicitly confirms a proposal may
+`apply_strategy_update` run. During application:
+
+- the confirmed proposal should move from `proposed` to `accepted`, or already
+  be `accepted`;
+- after merge, update the proposal to `applied` and fill `applied_at`;
+- if the human rejects the proposal, keep the file and set `status` to
+  `rejected`;
+- apply only confirmed content, without opportunistic expansion.
+
 ## Risk Gate
 
 Before editing code or running commands, check whether the task involves:
@@ -92,6 +187,9 @@ write blocked results.
 
 Read refs only when needed or required by `ai/project/task.md`:
 
+- Final shape / North Star / task-worthiness -> `ai/project/refs/final-shape.md`
+- Current module structure / boundaries / dependency direction -> `ai/project/refs/module-map.md`
+- Stage goals / near-term roadmap / deferred work -> `ai/project/refs/roadmap.md`
 - Architecture / API / module boundary -> `ai/project/refs/architecture.md`
 - Historical decision -> `ai/project/refs/decisions.md`
 - Security / compatibility / performance / data / deployment -> `ai/project/refs/constraints.md`

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "AI Execution Template 指标 Schema",
+  "title": "Agent Execution Template 指标 Schema",
   "type": "object",
   "required": [
     "protocol_version",

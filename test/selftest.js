@@ -6,7 +6,7 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 
 const repoRoot = path.resolve(__dirname, "..");
-const cli = path.join(repoRoot, "bin", "ai-execution-template.js");
+const cli = path.join(repoRoot, "bin", "agent-execution-template.js");
 
 function assert(condition, message) {
   if (!condition) {
@@ -45,72 +45,306 @@ function createTempProject(name) {
 }
 
 function testInitUpdateDoctor() {
-  const cwd = createTempProject("ai-execution-template-selftest");
+  const cwd = createTempProject("agent-execution-template-selftest");
 
   run(["init"], cwd);
   assert(read(cwd, "ai/template/LANG") === "zh\n", "init should default to zh template");
   assert(exists(cwd, "ai/template/VERSION"), "init should create template VERSION");
   assert(exists(cwd, "ai/template/bootstrap.md"), "init should create template bootstrap prompt");
+  assert(exists(cwd, "ai/template/execution-policy.md"), "init should create execution policy prompt");
   assert(exists(cwd, "ai/template/prompt.md"), "init should create template prompt");
+  assert(exists(cwd, "ai/template/reconcile.md"), "init should create template reconcile prompt");
+  assert(exists(cwd, "ai/project/inbox/.gitkeep"), "init should create inbox directory");
   assert(exists(cwd, "ai/project/project.md"), "init should create project.md");
   assert(exists(cwd, "ai/project/task.md"), "init should create task.md");
+  assert(exists(cwd, "ai/project/refs/final-shape.md"), "init should create project North Star");
+  assert(exists(cwd, "ai/project/refs/module-map.md"), "init should create module map");
+  assert(exists(cwd, "ai/project/refs/roadmap.md"), "init should create roadmap");
+  assert(exists(cwd, "ai/project/inbox/ideas/.gitkeep"), "init should create ideas inbox");
+  assert(exists(cwd, "ai/project/inbox/processed/.gitkeep"), "init should create processed inbox");
+  assert(exists(cwd, "ai/project/proposals/final-shape-updates/.gitkeep"), "init should create strategy proposal directory");
+  assert(exists(cwd, "ai/project/proposals/final-shape-updates/_template.md"), "init should create strategy proposal template");
   assert(read(cwd, "ai/template/bootstrap.md").includes("确认维度"), "init should install bootstrap prompt");
   assert(read(cwd, "ai/template/bootstrap.md").includes("不要总结这个文件"), "bootstrap prompt should prevent summary-only behavior");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("ai/project/refs/final-shape.md"), "bootstrap prompt should initialize the North Star");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("ai/project/refs/module-map.md"), "bootstrap prompt should initialize module map");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("ai/project/refs/roadmap.md"), "bootstrap prompt should initialize roadmap");
   assert(read(cwd, "ai/template/bootstrap.md").includes("引导后交接"), "bootstrap prompt should include handoff");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("我建议下一步做"), "bootstrap prompt should recommend next steps");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("不要让人类主动去文件管理器里寻找问题"), "bootstrap prompt should not offload file inspection to humans");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("任务草稿摘要"), "bootstrap prompt should support task draft summary when a goal is provided");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("ai/project/inbox/processed/raw/file.md"), "bootstrap prompt should archive absorbed raw inbox material");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("已吸收资料"), "bootstrap handoff should audit absorbed material");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("未吸收资料"), "bootstrap handoff should audit unabsorbed material");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("冲突处理"), "bootstrap handoff should audit conflict handling");
   assert(read(cwd, "ai/template/prompt.md").includes("任务草稿交接"), "execution prompt should include task handoff");
+  assert(read(cwd, "ai/template/prompt.md").includes("ai/template/execution-policy.md"), "execution prompt should read execution policy");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("风险分级"), "execution policy should include risk rubric");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("execution_policy.task_tree"), "execution policy should require task tree persistence");
+  assert(read(cwd, "ai/template/prompt.md").includes("默认也只处理 `ai/project/inbox/*.md`"), "execution prompt should narrow inbox reconciliation");
+  assert(read(cwd, "ai/template/protocol.md").includes("`bounded_continuous`"), "protocol should include bounded continuous execution");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("垂直切片"), "protocol should require vertical-slice progress for continuous execution");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("L1 为 2 个或更多，自动启用"), "protocol should auto-enable continuous execution from L1 count");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("每个 Checkpoint 必须包含"), "protocol should require evidence-backed checkpoints");
+  assert(read(cwd, "ai/template/rules/core.md").includes("边界内连续执行门"), "core rules should include bounded continuous execution gate");
+  assert(read(cwd, "ai/template/rules/core.md").includes("需要扩大范围、权限、命令、网络或验收时"), "core rules should stop continuous execution before boundary expansion");
+  assert(read(cwd, "ai/project/task.md").includes("execution_policy:"), "task template should include execution policy");
+  assert(read(cwd, "ai/project/task.md").includes("readiness:"), "task template should include readiness state");
+  assert(read(cwd, "ai/project/task.md").includes("activation_rule: \"auto_enable_when_l1_count_gte_2\""), "task template should define automatic activation rule");
+  assert(read(cwd, "ai/project/task.md").includes("risk_gate:"), "task template should define risk gate");
+  assert(read(cwd, "ai/project/task.md").includes("status: \"pending | running | done | blocked\""), "task template should define task tree node status");
+  assert(read(cwd, "ai/project/task.md").includes("progress_unit: \"vertical_slice\""), "task template should define continuous progress unit");
+  assert(read(cwd, "ai/template/prompt.md").includes("开始初始化这个项目"), "execution prompt should route natural bootstrap entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料"), "execution prompt should route bootstrap with inbox material");
+  assert(read(cwd, "ai/template/prompt.md").includes("不要重新 bootstrap"), "execution prompt should reconcile inbox material when project context already exists");
+  assert(read(cwd, "ai/template/prompt.md").includes("整合 ai/project/inbox/ 里的新资料"), "execution prompt should route natural reconcile entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("继续推进这个项目"), "execution prompt should route natural continue entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("strategy_update"), "execution prompt should route strategy updates");
+  assert(read(cwd, "ai/template/reconcile.md").includes("上下文整合"), "init should install reconcile prompt");
+  assert(read(cwd, "ai/template/reconcile.md").includes("整合计划"), "reconcile prompt should require a plan first");
+  assert(read(cwd, "ai/template/reconcile.md").includes("不要递归读取 `processed/**` 或 `ideas/**`"), "reconcile prompt should exclude processed and ideas recursively");
+  assert(read(cwd, "ai/template/reconcile.md").includes("ai/project/inbox/processed/raw/file.md"), "reconcile prompt should archive absorbed raw inbox material");
+  assert(read(cwd, "ai/template/reconcile.md").includes("未吸收资料"), "reconcile handoff should audit unabsorbed material");
+  assert(read(cwd, "ai/template/reconcile.md").includes("冲突处理"), "reconcile handoff should audit conflict handling");
   assert(read(cwd, "ai/template/protocol.md").includes("引导读取范围"), "init should install bootstrap protocol");
+  assert(read(cwd, "ai/template/protocol.md").includes("推荐下一步最值得做的任务"), "protocol should require recommended next steps");
+  assert(read(cwd, "ai/template/protocol.md").includes("上下文整合模式"), "protocol should include context reconcile mode");
+  assert(read(cwd, "ai/template/protocol.md").includes("策略修订模式"), "protocol should include strategy update mode");
+  assert(read(cwd, "ai/template/rules/core.md").includes("策略修订门"), "core rules should include strategy update gate");
+  assert(read(cwd, "ai/template/rules/core.md").includes("ai/project/refs/final-shape.md"), "core rules should route direction refs");
+  assert(read(cwd, "ai/project/proposals/final-shape-updates/_template.md").includes("`accepted`"), "proposal template should describe accepted status");
   const initOutput = run(["init"], cwd);
-  assert(initOutput.includes("严格执行 ai/template/bootstrap.md，不要总结它。"), "init output should provide compact bootstrap prompt");
+  assert(initOutput.includes("开始初始化这个项目"), "init output should provide compact natural bootstrap prompt");
+  assert(initOutput.includes("[初始化]"), "init output should distinguish pre-bootstrap guidance");
+  assert(initOutput.includes("开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料"), "init output should explain bootstrap with existing material");
+  assert(initOutput.includes("整合 ai/project/inbox/ 里的新资料"), "init output should provide compact natural reconcile prompt");
+  assert(initOutput.includes("优化上下文"), "init output should expose project context refresh in user language");
+  assert(initOutput.includes("把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案"), "init output should provide natural strategy prompt");
+  assert(initOutput.includes("agent-execution-template next"), "init output should tell users how to recover the next step");
   assert(initOutput.includes("文件:"), "init output should summarize file changes");
   assert(!initOutput.includes("[已更新]"), "init output should hide detailed file changes by default");
   assert(!initOutput.includes("Read ai/template/bootstrap.md"), "init output should not use weak Read bootstrap command");
   assert(run(["init", "--verbose"], cwd).includes("[已更新] ai/template/VERSION"), "init --verbose should show detailed file changes");
+  const reconcileOutput = run(["reconcile"], cwd);
+  assert(reconcileOutput.includes("Agent Execution Template 上下文整合"), "reconcile should use installed Chinese language");
+  assert(reconcileOutput.includes("整合 ai/project/inbox/ 里的新资料"), "reconcile should print natural Chinese prompt");
+  const strategyOutput = run(["strategy"], cwd);
+  assert(strategyOutput.includes("Agent Execution Template 方向修订"), "strategy should use installed Chinese language");
+  assert(strategyOutput.includes("ai/project/inbox/ideas/"), "strategy should point to ideas inbox");
+  assert(strategyOutput.includes("方向修订提案"), "strategy should print natural Chinese strategy prompt");
 
   write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
   run(["update"], cwd);
   assert(read(cwd, "ai/project/project.md") === "USER PROJECT MARKER\n", "update must not overwrite project.md");
 
-  run(["doctor"], cwd);
+  const doctorOutput = run(["doctor"], cwd);
+  assert(doctorOutput.includes("ai/project/result.json JSON"), "doctor should validate result JSON");
+  assert(doctorOutput.includes("ai/project/metrics.json JSON"), "doctor should validate metrics JSON");
+  assert(doctorOutput.includes("ai/project/task.md front matter"), "doctor should validate task front matter");
 }
 
 function testEnglishInitUpdateDoctor() {
-  const cwd = createTempProject("ai-execution-template-en");
+  const cwd = createTempProject("agent-execution-template-en");
 
   const initOutput = run(["init", "--lang", "en"], cwd);
   assert(read(cwd, "ai/template/LANG") === "en\n", "init --lang en should install English template");
+  assert(exists(cwd, "ai/template/execution-policy.md"), "English init should create execution policy prompt");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Confirmation Dimensions"), "English init should install English bootstrap prompt");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Do not summarize this file"), "English bootstrap prompt should prevent summary-only behavior");
-  assert(initOutput.includes("Execute ai/template/bootstrap.md exactly. Do not summarize."), "English init output should provide English bootstrap prompt");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("ai/project/refs/final-shape.md"), "English bootstrap prompt should initialize the North Star");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("ai/project/refs/module-map.md"), "English bootstrap prompt should initialize module map");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("ai/project/refs/roadmap.md"), "English bootstrap prompt should initialize roadmap");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Recommended next step"), "English bootstrap prompt should recommend next steps");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Do not make the human hunt through files"), "English bootstrap prompt should not offload file inspection to humans");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("ai/project/inbox/processed/raw/file.md"), "English bootstrap prompt should archive absorbed raw inbox material");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Absorbed material"), "English bootstrap handoff should audit absorbed material");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Unabsorbed material"), "English bootstrap handoff should audit unabsorbed material");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Conflict handling"), "English bootstrap handoff should audit conflict handling");
+  assert(read(cwd, "ai/template/prompt.md").includes("Start initializing this project"), "English execution prompt should route natural bootstrap entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("ai/template/execution-policy.md"), "English execution prompt should read execution policy");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("Risk Rubric"), "English execution policy should include risk rubric");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("execution_policy.task_tree"), "English execution policy should require task tree persistence");
+  assert(read(cwd, "ai/template/prompt.md").includes("default to only `ai/project/inbox/*.md`"), "English execution prompt should narrow inbox reconciliation");
+  assert(read(cwd, "ai/template/protocol.md").includes("`bounded_continuous`"), "English protocol should include bounded continuous execution");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("vertical"), "English protocol should require vertical-slice progress for continuous execution");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("Automatically use `bounded_continuous`"), "English protocol should auto-enable continuous execution from L1 count");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("Every checkpoint must include"), "English protocol should require evidence-backed checkpoints");
+  assert(read(cwd, "ai/template/rules/core.md").includes("Bounded Continuous Execution Gate"), "English core rules should include bounded continuous execution gate");
+  assert(read(cwd, "ai/template/rules/core.md").includes("expand scope, permission, commands, network access, or acceptance"), "English core rules should stop continuous execution before boundary expansion");
+  assert(read(cwd, "ai/project/task.md").includes("execution_policy:"), "English task template should include execution policy");
+  assert(read(cwd, "ai/project/task.md").includes("readiness:"), "English task template should include readiness state");
+  assert(read(cwd, "ai/project/task.md").includes("activation_rule: \"auto_enable_when_l1_count_gte_2\""), "English task template should define automatic activation rule");
+  assert(read(cwd, "ai/project/task.md").includes("risk_gate:"), "English task template should define risk gate");
+  assert(read(cwd, "ai/project/task.md").includes("status: \"pending | running | done | blocked\""), "English task template should define task tree node status");
+  assert(read(cwd, "ai/project/task.md").includes("progress_unit: \"vertical_slice\""), "English task template should define continuous progress unit");
+  assert(read(cwd, "ai/template/prompt.md").includes("Start initializing this project and absorb the material in ai/project/inbox/"), "English execution prompt should route bootstrap with inbox material");
+  assert(read(cwd, "ai/template/prompt.md").includes("instead of bootstrapping again"), "English execution prompt should reconcile inbox material when project context already exists");
+  assert(read(cwd, "ai/template/prompt.md").includes("Reconcile the new material in ai/project/inbox/"), "English execution prompt should route natural reconcile entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("Continue this project"), "English execution prompt should route natural continue entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("strategy_update"), "English execution prompt should route strategy updates");
+  assert(exists(cwd, "ai/project/refs/final-shape.md"), "English init should create project North Star");
+  assert(exists(cwd, "ai/project/refs/module-map.md"), "English init should create module map");
+  assert(exists(cwd, "ai/project/refs/roadmap.md"), "English init should create roadmap");
+  assert(exists(cwd, "ai/project/proposals/final-shape-updates/_template.md"), "English init should create strategy proposal template");
+  assert(read(cwd, "ai/template/rules/core.md").includes("Strategy Update Gate"), "English core rules should include strategy update gate");
+  assert(read(cwd, "ai/project/proposals/final-shape-updates/_template.md").includes("`accepted`"), "English proposal template should describe accepted status");
+  assert(read(cwd, "ai/template/reconcile.md").includes("Context Reconcile"), "English init should install English reconcile prompt");
+  assert(read(cwd, "ai/template/reconcile.md").includes("reconciliation plan"), "English reconcile prompt should require a plan first");
+  assert(read(cwd, "ai/template/reconcile.md").includes("do not recursively\nread `processed/**` or `ideas/**`"), "English reconcile prompt should exclude processed and ideas recursively");
+  assert(read(cwd, "ai/template/reconcile.md").includes("ai/project/inbox/processed/raw/file.md"), "English reconcile prompt should archive absorbed raw inbox material");
+  assert(read(cwd, "ai/template/reconcile.md").includes("Unabsorbed material"), "English reconcile handoff should audit unabsorbed material");
+  assert(read(cwd, "ai/template/reconcile.md").includes("Conflict handling"), "English reconcile handoff should audit conflict handling");
+  assert(initOutput.includes("Start initializing this project"), "English init output should provide English bootstrap prompt");
+  assert(initOutput.includes("[Initialize]"), "English init output should distinguish pre-bootstrap guidance");
+  assert(initOutput.includes("Start initializing this project and absorb the material in ai/project/inbox/"), "English init output should explain bootstrap with existing material");
+  assert(initOutput.includes("Reconcile the new material in ai/project/inbox/"), "English init output should provide English reconcile prompt");
+  assert(initOutput.includes("Improve context"), "English init output should expose context refresh in user language");
+  assert(initOutput.includes("Generate a direction amendment proposal from ai/project/inbox/ideas/"), "English init output should provide natural strategy prompt");
+  assert(initOutput.includes("agent-execution-template next"), "English init output should tell users how to recover the next step");
   assert(initOutput.includes("Files:"), "English init output should summarize file changes");
   assert(!initOutput.includes("[UPDATED]"), "English init output should hide detailed file changes by default");
   assert(run(["init", "--lang=en", "--verbose"], cwd).includes("[UPDATED] ai/template/VERSION"), "English init --verbose should show detailed file changes");
 
   write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
   const updateOutput = run(["update"], cwd);
-  assert(updateOutput.includes("AI Execution Template update"), "update should use installed English language");
+  assert(updateOutput.includes("Agent Execution Template update"), "update should use installed English language");
   assert(read(cwd, "ai/project/project.md") === "USER PROJECT MARKER\n", "English update must not overwrite project.md");
 
   const doctorOutput = run(["doctor"], cwd);
   assert(doctorOutput.includes("Template language: en"), "doctor should show installed English language");
+  assert(doctorOutput.includes("ai/project/result.json JSON"), "English doctor should validate result JSON");
+  assert(doctorOutput.includes("ai/project/task.md front matter"), "English doctor should validate task front matter");
   assert(doctorOutput.includes("[OK] Ready to run"), "doctor should use installed English language");
+  const reconcileOutput = run(["reconcile"], cwd);
+  assert(reconcileOutput.includes("Agent Execution Template Context Reconcile"), "reconcile should use installed English language");
+  assert(reconcileOutput.includes("Reconcile the new material in ai/project/inbox/"), "reconcile should print natural English prompt");
+  const strategyOutput = run(["strategy"], cwd);
+  assert(strategyOutput.includes("Agent Execution Template Strategy Update"), "strategy should use installed English language");
+  assert(strategyOutput.includes("ai/project/inbox/ideas/"), "strategy should point to ideas inbox");
+  assert(strategyOutput.includes("direction amendment proposal"), "strategy should print natural English strategy prompt");
+  assert(run(["reconcile", "--lang", "zh"], cwd).includes("整合 ai/project/inbox/ 里的新资料"), "reconcile --lang zh should override installed language");
+  assert(run(["strategy", "--lang", "zh"], cwd).includes("方向修订提案"), "strategy --lang zh should override installed language");
 }
 
 function testDoctorFailureAndWarning() {
-  const missingCwd = createTempProject("ai-execution-template-missing");
+  const missingCwd = createTempProject("agent-execution-template-missing");
   run(["init"], missingCwd);
   fs.unlinkSync(path.join(missingCwd, "ai/project/runtime.md"));
   run(["doctor"], missingCwd, 1);
 
-  const warnCwd = createTempProject("ai-execution-template-warn");
+  const warnCwd = createTempProject("agent-execution-template-warn");
   run(["init"], warnCwd);
   write(warnCwd, "ai/project/runtime.md", "");
   run(["doctor"], warnCwd);
+
+  const invalidJsonCwd = createTempProject("agent-execution-template-invalid-json");
+  run(["init"], invalidJsonCwd);
+  write(invalidJsonCwd, "ai/project/result.json", "{invalid\n");
+  const invalidJsonOutput = run(["doctor"], invalidJsonCwd, 1);
+  assert(invalidJsonOutput.includes("JSON 无效"), "doctor should fail invalid result JSON");
+
+  const taskWarnCwd = createTempProject("agent-execution-template-task-frontmatter");
+  run(["init"], taskWarnCwd);
+  write(taskWarnCwd, "ai/project/task.md", "# Task only\n");
+  const taskWarnOutput = run(["doctor"], taskWarnCwd);
+  assert(taskWarnOutput.includes("任务 front matter 缺少关键字段"), "doctor should warn incomplete task front matter");
+
+  const taskPolicyWarnCwd = createTempProject("agent-execution-template-task-policy");
+  run(["init"], taskPolicyWarnCwd);
+  write(taskPolicyWarnCwd, "ai/project/task.md", `---
+task_id: ""
+type: "feature"
+priority: "P2"
+risk_level: "low"
+readiness: "ready_to_execute"
+execution_policy:
+  mode: "auto"
+model_policy: {}
+refs: {}
+permission: {}
+---
+# Task
+`);
+  const taskPolicyWarnOutput = run(["doctor"], taskPolicyWarnCwd);
+  assert(taskPolicyWarnOutput.includes("任务 front matter 缺少关键字段"), "doctor should warn when execution policy fields are incomplete");
+}
+
+function testRefreshBacksUpAndImportsOldProject() {
+  const cwd = createTempProject("agent-execution-template-refresh");
+  run(["init"], cwd);
+  write(cwd, "ai/project/project.md", "OLD PROJECT CONTEXT\n");
+
+  const output = run(["refresh"], cwd);
+  const backups = fs.readdirSync(path.join(cwd, "ai"))
+    .filter((entry) => entry.startsWith("project.backup."));
+
+  assert(backups.length === 1, "refresh should back up the old project directory");
+  assert(read(cwd, "ai/project/project.md") !== "OLD PROJECT CONTEXT\n", "refresh should create a fresh project directory");
+  assert(
+    read(cwd, "ai/project/inbox/raw/old-project/project.md") === "OLD PROJECT CONTEXT\n",
+    "refresh should import old project context into the new inbox"
+  );
+  assert(output.includes("Agent Execution Template 项目上下文重整"), "refresh should print a refresh summary");
+  assert(output.includes("基于旧上下文重新生成更精良的 ai/project/"), "refresh should print the next agent prompt");
+
+  const improveOutput = run(["improve-context"], cwd);
+  assert(improveOutput.includes("Agent Execution Template 上下文总结优化"), "improve-context should use user-facing context improvement language");
+  assert(improveOutput.includes("基于旧上下文重新生成更精良的 ai/project/"), "improve-context should reuse refresh behavior");
+}
+
+function testNextCommandRoutesByProjectState() {
+  const missingCwd = createTempProject("agent-execution-template-next-missing");
+  const missingOutput = run(["next"], missingCwd);
+  assert(missingOutput.includes("agent-execution-template init"), "next should tell uninitialized projects to install first");
+
+  const cwd = createTempProject("agent-execution-template-next");
+  run(["init"], cwd);
+  assert(run(["next"], cwd).includes("开始初始化这个项目"), "next should bootstrap a freshly installed project");
+
+  write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
+  assert(run(["next"], cwd).includes("执行前先拆 L1 任务"), "next should continue with automatic execution guidance when no intake is waiting");
+
+  write(cwd, "ai/project/inbox/product.md", "# Product material\n");
+  assert(run(["next"], cwd).includes("整合 ai/project/inbox/ 里的新资料"), "next should route material inbox to reconcile");
+  fs.unlinkSync(path.join(cwd, "ai/project/inbox/product.md"));
+
+  write(cwd, "ai/project/inbox/processed/product.md", "# Processed material\n");
+  assert(run(["next"], cwd).includes("执行前先拆 L1 任务"), "next should ignore processed inbox material");
+  fs.unlinkSync(path.join(cwd, "ai/project/inbox/processed/product.md"));
+
+  write(cwd, "ai/project/inbox/ideas/new-direction.md", "# Direction idea\n");
+  assert(run(["next"], cwd).includes("方向修订提案"), "next should route ideas inbox to strategy update");
+  fs.unlinkSync(path.join(cwd, "ai/project/inbox/ideas/new-direction.md"));
+
+  write(cwd, "ai/project/proposals/final-shape-updates/proposal.md", "---\nstatus: \"applied\"\n---\n");
+  assert(run(["next"], cwd).includes("执行前先拆 L1 任务"), "next should ignore already applied proposals");
+
+  write(cwd, "ai/project/proposals/final-shape-updates/proposal.md", "---\nstatus: \"proposed\"\n---\n");
+  assert(run(["next"], cwd).includes("已有方向修订提案"), "next should route existing proposals to human review");
+}
+
+function testPermissionErrorIsActionable() {
+  const cwd = createTempProject("agent-execution-template-permission");
+  const inbox = path.join(cwd, "ai/project/inbox");
+  fs.mkdirSync(inbox, { recursive: true });
+  fs.chmodSync(inbox, 0o555);
+  try {
+    const output = run(["init"], cwd, 1);
+    assert(output.includes("无法写入目标路径"), "permission failures should explain the blocked target");
+    assert(output.includes("sudo chown -R"), "permission failures should include an ownership repair command");
+    assert(!output.includes("node:fs"), "permission failures should not expose the raw Node stack");
+  } finally {
+    fs.chmodSync(inbox, 0o755);
+  }
 }
 
 function main() {
   testInitUpdateDoctor();
   testEnglishInitUpdateDoctor();
   testDoctorFailureAndWarning();
+  testRefreshBacksUpAndImportsOldProject();
+  testNextCommandRoutesByProjectState();
+  testPermissionErrorIsActionable();
   console.log("selftest ok");
 }
 

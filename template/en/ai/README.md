@@ -11,6 +11,8 @@ project is the field workspace
 
 - `template/prompt.md`: AI startup prompt.
 - `template/bootstrap.md`: project discovery and context bootstrap prompt.
+- `template/execution-policy.md`: automatic continuous execution, task tree, risk rubric, and checkpoint rules.
+- `template/reconcile.md`: merge new authoritative material into existing project context.
 - `template/VERSION`: installed template version.
 - `template/protocol.md`: bootstrap flow, execution flow, model division, sync rules.
 - `template/rules/core.md`: bootstrap scope, readiness, risk, refs, permissions, runtime governance.
@@ -22,18 +24,83 @@ project is the field workspace
 - `project/result.json`: latest authoritative execution result.
 - `project/result.md`: latest human-readable execution summary.
 - `project/metrics.json`: latest model, token, time, success, and reuse signals.
+- `project/refs/final-shape.md`: project North Star / final shape.
+- `project/refs/module-map.md`: current module map.
+- `project/refs/roadmap.md`: staged roadmap.
 - `project/refs/`: detailed references loaded only when needed.
+- `project/inbox/ideas/`: product, business, architecture, or direction ideas waiting for evaluation.
+- `project/inbox/processed/`: new material already absorbed into context, kept for traceability.
+- `project/inbox/raw/`: raw long-form inputs, interviews, notes, or fragments.
+- `project/inbox/`: new material waiting to be absorbed, such as authoritative business docs.
+- `project/proposals/final-shape-updates/`: North Star and roadmap amendment proposals.
+- `project/proposals/final-shape-updates/_template.md`: direction amendment proposal template.
 - `project/archive/`: historical tasks/results, not read by default.
 
 ## Normal Use
 
-1. Ask the AI tool: `Execute ai/template/bootstrap.md exactly. Do not summarize.`
-2. Review and confirm `project/project.md` and relevant `project/refs/*`.
-3. Reply with corrections or confirmation, plus the current task as a short goal.
-4. Review and confirm the generated `project/task.md`.
-5. Run execution with: `Follow ai/template/prompt.md and execute the confirmed task.`
-6. Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
-7. Archive old task/result files if needed.
+When first connecting a project, tell the AI tool:
+
+```text
+Start initializing this project
+```
+
+Common entries later:
+
+- Continue work: `Continue this project`
+- Absorb new material: put it in `project/inbox/`, then say `Reconcile the new material in ai/project/inbox/`
+- Resummarize and improve project context: run `npx -y @wnlen/agent-execution-template refresh`
+- Evaluate a new direction or idea: put it in `project/inbox/ideas/`, then say `Generate a direction amendment proposal from ai/project/inbox/ideas/`
+- Recover the next step: run `npx -y @wnlen/agent-execution-template next`
+
+Rule of thumb:
+
+- Material = confirmed facts, docs, workflows, APIs, or business rules.
+- Direction = undecided ideas, product strategy, architecture changes, or roadmap changes.
+
+Review `project/result.json`, `project/result.md`, and `project/metrics.json` after execution.
+Archive old task/result files if needed.
+
+## Context Reconcile
+
+When more complete or more authoritative material appears, put it in:
+
+```text
+ai/project/inbox/
+```
+
+Then ask the AI tool:
+
+```text
+Reconcile the new material in ai/project/inbox/
+```
+
+The workflow produces a reconciliation plan first and updates `project.md`,
+`runtime.md`, and `refs/*` only after confirmation. After reconciliation,
+processed material is moved to `ai/project/inbox/processed/`.
+
+By default, only `ai/project/inbox/*.md` and `ai/project/inbox/raw/*.md` are
+absorbed. `processed/**` is trace history and is not reconciled again;
+`ideas/**` goes through the direction amendment proposal flow.
+
+## Direction Amendments
+
+The North Star, module map, and roadmap belong to the project direction layer:
+
+```text
+ai/project/refs/final-shape.md
+ai/project/refs/module-map.md
+ai/project/refs/roadmap.md
+```
+
+Routine execution tasks must not edit these files directly. Put new ideas in:
+
+```text
+ai/project/inbox/ideas/
+```
+
+Then have the AI produce a `strategy_update` proposal. After human
+confirmation, use `apply_strategy_update` to merge it into the official
+direction documents.
 
 ## Sync Rules
 

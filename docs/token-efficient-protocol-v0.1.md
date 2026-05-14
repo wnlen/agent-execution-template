@@ -1,6 +1,6 @@
 # Token 高效 AI 执行协议 v0.1
 
-这个 profile 建立在 AI Execution Template 文件协议 v0.8 之上。
+这个 profile 建立在 Agent Execution Template 文件协议 v0.8 之上。
 目标不是孤立地最小化 token 使用量，而是在减少人类交互频率和输入量的同时，
 用单位模型成本产出更多可接受的工作。
 
