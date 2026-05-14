@@ -22,7 +22,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/agent-execution-template@0.8.17
+Package: @wnlen/agent-execution-template@0.8.19
 中文安装: npx -y @wnlen/agent-execution-template init
 英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
@@ -392,7 +392,7 @@ npx -y @wnlen/agent-execution-template doctor
 ```text
 Agent Execution Template 检查
 
-模板版本: 0.8.17
+模板版本: 0.8.19
 模板语言: zh
 
 [通过] ai/template/LANG
@@ -664,7 +664,10 @@ ai/template/execution-policy.md
 执行前规划：
 
 - AI 根据用户目标、项目上下文和仓库事实推断目标、范围、验收、权限和验证方式；
+- 只有 `ai/project/task.md.readiness = ready_to_execute` 时才进入执行；本轮新建或重写
+  `task.md` 时必须停在确认交接；
 - 先列 L1 任务清单，并给每个 L1 标注 Green / Yellow / Red；
+- L1 必须是可独立验收的垂直切片，不是机械步骤清单；
 - L1 少于 2 个时使用 `normal`；
 - L1 为 2 个或更多时自动使用 `bounded_continuous`；
 - 任一 L1 为 Red 时停止等待人类确认；Green 和 Yellow 不阻塞启动。
@@ -675,16 +678,20 @@ ai/template/execution-policy.md
 - 默认最多 3 层，只有当 L3 仍过大、不可验证或不可回退时才动态增加 L4；
 - 每个任务节点必须有风险评级、预期改动范围、验收方式和证据要求；
 - L1 清单必须用待办列表展示，每完成一个 L1 就打勾并划掉；
-- 执行前和执行中必须把任务树写回 `ai/project/task.md.execution_policy.task_tree`；
+- `task_tree` 写回应集中在执行前、L1 开始/完成、Red、blocked、范围变化和最终收尾；
 - 默认按 `vertical_slice` 推进，每轮都要产生可检查增量；
+- Checkpoint 只在风险从 Green 变 Yellow/Red、即将扩大范围或权限、完成 L1 垂直切片、
+  验证失败后准备继续或最终收尾时输出；
 - 每个 Checkpoint 必须包含证据：已改文件、已运行命令、验证结果或无法验证原因；
 - Green 可自动继续；
-- Yellow 做局部低风险修正后继续；
+- Yellow 只允许当前 L1/L2 内的局部低风险修正，不能改变公共接口、数据模型、权限、
+  安全、架构方向或验收标准；
 - Red 必须停止等待人类确认；
+- 用户可见输出默认只展示 L1、风险结论、证据、Red 确认和最终结果，不展示内部协议细节；
 - 目标、范围、验收和权限由 AI 推断，但不能越过项目规则、显式用户限制、
   `permission.modify.denied`、安全边界或破坏性操作限制；
-- 需要扩大权限、运行未允许命令、访问网络、执行破坏性操作、改变产品方向或核心架构时，
-  当前节点必须标为 Red。
+- 需要扩大权限、运行未允许命令、访问网络、执行破坏性操作、改变产品方向、核心架构、
+  公共 API、持久化数据结构、安全边界、支付、账号或权限时，当前节点必须标为 Red。
 
 它不适用于方向未定且无法推断、验收无法定义或高风险架构取舍任务；这些应直接评为 Red。
 

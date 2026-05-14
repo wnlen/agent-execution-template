@@ -19,6 +19,8 @@ const REQUIRED_FILES = [
   "ai/template/protocol.md",
   "ai/template/rules/core.md",
   "ai/template/rules/output.md",
+  "ai/template/schemas/result.schema.json",
+  "ai/template/schemas/metrics.schema.json",
   "ai/project/inbox/.gitkeep",
   "ai/project/project.md",
   "ai/project/runtime.md",
@@ -37,11 +39,6 @@ const RECOMMENDED_FILES = [
   "ai/project/refs/final-shape.md",
   "ai/project/refs/module-map.md",
   "ai/project/refs/roadmap.md"
-];
-
-const JSON_HEALTH_FILES = [
-  "ai/project/result.json",
-  "ai/project/metrics.json"
 ];
 
 const TASK_HEALTH_PATTERNS = [
@@ -132,6 +129,7 @@ const TEXT = {
     fail: "失败",
     empty: "为空",
     invalidJson: "JSON 无效",
+    invalidSchema: "不符合协议 schema",
     taskFrontMatterIncomplete: "任务 front matter 缺少关键字段",
     versionMismatch: "模板版本与包版本不一致",
     runInit: "请运行 npx -y @wnlen/agent-execution-template init",
@@ -155,6 +153,10 @@ const TEXT = {
     nextReviewProposal: "已有方向修订提案。先审查提案；确认后对 AI 说:",
     nextContinuePrompt: "继续推进这个项目。执行前先拆 L1 任务；若 L1 >= 2，自动启用边界内连续执行；只有 Red 风险停下来确认。",
     repairHint: "缺失的 project 推荐文件可通过重新运行 init 安全补齐；已有 ai/project/** 不会被覆盖。",
+    sourceCheckoutNotice: `维护者提示: 当前目录看起来是 @wnlen/agent-execution-template 源码仓库。
+  源码仓库内调试请使用: node bin/agent-execution-template.js <command>
+  用户项目中安装才使用: npx -y @wnlen/agent-execution-template <command>
+  不要把维护者本地初始化产生的 ai/project/** 当成产品改动提交。`,
     permissionDenied: "无法写入目标路径",
     permissionHint: `请检查 ai/** 的归属和权限。常见修复:
   sudo chown -R "$(id -un):$(id -gn)" ai
@@ -237,6 +239,7 @@ Usage:
     fail: "FAIL",
     empty: "is empty",
     invalidJson: "contains invalid JSON",
+    invalidSchema: "does not match protocol schema",
     taskFrontMatterIncomplete: "task front matter is missing required fields",
     versionMismatch: "template version does not match package version",
     runInit: "Run npx -y @wnlen/agent-execution-template init",
@@ -260,6 +263,10 @@ Usage:
     nextReviewProposal: "A direction amendment proposal exists. Review it first; after confirmation, tell the AI:",
     nextContinuePrompt: "Continue this project. Before execution, decompose L1 tasks; if L1 >= 2, automatically use bounded continuous execution; only Red risk stops for confirmation.",
     repairHint: "Missing recommended project files can be safely added by running init again; existing ai/project/** files are not overwritten.",
+    sourceCheckoutNotice: `Maintainer note: this directory looks like the @wnlen/agent-execution-template source checkout.
+  In the source repository, test with: node bin/agent-execution-template.js <command>
+  In user projects, install with: npx -y @wnlen/agent-execution-template <command>
+  Do not commit maintainer-local ai/project/** bootstrap content as product changes.`,
     permissionDenied: "Cannot write target path",
     permissionHint: `Check ownership and permissions under ai/**. Common fix:
   sudo chown -R "$(id -un):$(id -gn)" ai
@@ -291,11 +298,40 @@ function readPackageVersion() {
   }
 }
 
+function readTargetPackageName() {
+  const packageFile = path.join(process.cwd(), "package.json");
+  if (!fs.existsSync(packageFile)) return null;
+  try {
+    const pkg = JSON.parse(fs.readFileSync(packageFile, "utf8"));
+    return pkg.name || null;
+  } catch {
+    return null;
+  }
+}
+
 function readInstalledLang() {
   const langFile = path.join(TARGET_AI, "template", "LANG");
   if (!fs.existsSync(langFile)) return DEFAULT_LANG;
   const lang = fs.readFileSync(langFile, "utf8").trim();
   return SUPPORTED_LANGS.has(lang) ? lang : DEFAULT_LANG;
+}
+
+function isSourceCheckout() {
+  return process.cwd() === PACKAGE_ROOT &&
+    readTargetPackageName() === "@wnlen/agent-execution-template";
+}
+
+function commandHint(command) {
+  if (isSourceCheckout()) {
+    return `node bin/agent-execution-template.js ${command}`;
+  }
+  return `npx -y @wnlen/agent-execution-template ${command}`;
+}
+
+function printSourceCheckoutNotice(lang) {
+  if (isSourceCheckout()) {
+    console.log(`${getText(lang).sourceCheckoutNotice}\n`);
+  }
 }
 
 function parseLang(args, fallback = DEFAULT_LANG) {
@@ -487,12 +523,14 @@ function init({ lang = DEFAULT_LANG, verbose = false, quiet = false } = {}) {
     .map((change) => ({ ...change, path: path.join("ai/project", change.path) })));
 
   if (!quiet) {
+    const sourceNotice = isSourceCheckout() ? `${text.sourceCheckoutNotice}\n\n` : "";
     console.log(`${text.ready}
 
 ${text.initGuide}
 
+${sourceNotice}
 ${text.files}: ${summarizeChanges(changes, lang)}
-${text.check}: npx -y @wnlen/agent-execution-template doctor
+${text.check}: ${commandHint("doctor")}
 `);
 
     if (verbose) {
@@ -546,12 +584,13 @@ function next({ lang = readInstalledLang() } = {}) {
   }
 
   console.log(`${text.nextTitle}\n`);
+  printSourceCheckoutNotice(lang);
 
   const templatePath = path.join(TARGET_AI, "template");
   const projectPath = path.join(TARGET_AI, "project");
   if (!fs.existsSync(templatePath) || !fs.existsSync(projectPath)) {
     console.log(`${text.nextRunInit}
-  npx -y @wnlen/agent-execution-template init
+  ${commandHint("init")}
 `);
     return;
   }
@@ -661,6 +700,117 @@ function isPermissionError(error) {
   return error && (error.code === "EACCES" || error.code === "EPERM");
 }
 
+function parseJsonFile(file) {
+  return JSON.parse(fs.readFileSync(file, "utf8"));
+}
+
+function valueMatchesType(value, type) {
+  if (type === "array") return Array.isArray(value);
+  if (type === "integer") return Number.isInteger(value);
+  if (type === "number") return typeof value === "number" && Number.isFinite(value);
+  if (type === "object") return value !== null && typeof value === "object" && !Array.isArray(value);
+  return typeof value === type;
+}
+
+function valuesEqual(left, right) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function validateJsonSchema(value, schema, location = "$") {
+  const errors = [];
+
+  if (schema.const !== undefined && !valuesEqual(value, schema.const)) {
+    errors.push(`${location} must be ${JSON.stringify(schema.const)}`);
+  }
+
+  if (schema.enum && !schema.enum.some((candidate) => valuesEqual(value, candidate))) {
+    errors.push(`${location} must be one of ${schema.enum.map((item) => JSON.stringify(item)).join(", ")}`);
+  }
+
+  if (schema.type && !valueMatchesType(value, schema.type)) {
+    errors.push(`${location} must be ${schema.type}`);
+    return errors;
+  }
+
+  if (schema.minimum !== undefined && typeof value === "number" && value < schema.minimum) {
+    errors.push(`${location} must be >= ${schema.minimum}`);
+  }
+
+  if (schema.minLength !== undefined && typeof value === "string" && value.length < schema.minLength) {
+    errors.push(`${location} must have length >= ${schema.minLength}`);
+  }
+
+  if (schema.required && valueMatchesType(value, "object")) {
+    for (const key of schema.required) {
+      if (!Object.prototype.hasOwnProperty.call(value, key)) {
+        errors.push(`${location}.${key} is required`);
+      }
+    }
+  }
+
+  if (schema.properties && valueMatchesType(value, "object")) {
+    for (const [key, childSchema] of Object.entries(schema.properties)) {
+      if (Object.prototype.hasOwnProperty.call(value, key)) {
+        errors.push(...validateJsonSchema(value[key], childSchema, `${location}.${key}`));
+      }
+    }
+  }
+
+  if (schema.items && Array.isArray(value)) {
+    value.forEach((item, index) => {
+      errors.push(...validateJsonSchema(item, schema.items, `${location}[${index}]`));
+    });
+  }
+
+  if (schema.allOf) {
+    for (const childSchema of schema.allOf) {
+      if (childSchema.if) {
+        if (validateJsonSchema(value, childSchema.if, location).length === 0 && childSchema.then) {
+          errors.push(...validateJsonSchema(value, childSchema.then, location));
+        }
+      } else {
+        errors.push(...validateJsonSchema(value, childSchema, location));
+      }
+    }
+  }
+
+  return errors;
+}
+
+function printSchemaValidation(file, schemaFile, text) {
+  const fullPath = path.join(process.cwd(), file);
+  const schemaPath = path.join(process.cwd(), schemaFile);
+  if (!fs.existsSync(fullPath) || !fs.existsSync(schemaPath)) {
+    return 0;
+  }
+
+  let value;
+  try {
+    value = parseJsonFile(fullPath);
+    console.log(`[${text.pass}] ${file} JSON`);
+  } catch {
+    console.log(`[${text.fail}] ${file} ${text.invalidJson}`);
+    return 1;
+  }
+
+  let schema;
+  try {
+    schema = parseJsonFile(schemaPath);
+  } catch {
+    console.log(`[${text.fail}] ${schemaFile} ${text.invalidJson}`);
+    return 1;
+  }
+
+  const errors = validateJsonSchema(value, schema);
+  if (errors.length > 0) {
+    console.log(`[${text.fail}] ${file} ${text.invalidSchema}: ${errors.slice(0, 3).join("; ")}`);
+    return 1;
+  }
+
+  console.log(`[${text.pass}] ${file} schema`);
+  return 0;
+}
+
 function printFatal(error, lang) {
   const text = getText(lang);
   if (isPermissionError(error)) {
@@ -678,6 +828,7 @@ function doctor() {
   const lang = readInstalledLang();
   const text = getText(lang);
   console.log(`${text.doctorTitle}\n`);
+  printSourceCheckoutNotice(lang);
   console.log(`${text.templateVersion}: ${readVersion(path.join(TARGET_AI, "template")) || text.unknown}`);
   console.log(`${text.templateLang}: ${lang}\n`);
 
@@ -715,18 +866,12 @@ function doctor() {
     console.log(`[${text.pass}] ${file}`);
   }
 
-  for (const file of JSON_HEALTH_FILES) {
-    const fullPath = path.join(process.cwd(), file);
-    if (!fs.existsSync(fullPath)) {
-      continue;
-    }
-    try {
-      JSON.parse(fs.readFileSync(fullPath, "utf8"));
-      console.log(`[${text.pass}] ${file} JSON`);
-    } catch {
-      console.log(`[${text.fail}] ${file} ${text.invalidJson}`);
-      missing += 1;
-    }
+  const schemaChecks = [
+    ["ai/project/result.json", "ai/template/schemas/result.schema.json"],
+    ["ai/project/metrics.json", "ai/template/schemas/metrics.schema.json"]
+  ];
+  for (const [file, schemaFile] of schemaChecks) {
+    missing += printSchemaValidation(file, schemaFile, text);
   }
 
   const taskPath = path.join(process.cwd(), "ai/project/task.md");
@@ -748,7 +893,7 @@ function doctor() {
   }
 
   if (missing > 0) {
-    console.log(`\n[${text.fail}] ${text.runInit}`);
+    console.log(`\n[${text.fail}] ${commandHint("init")}`);
     process.exitCode = 1;
   } else if (warnings > 0) {
     console.log(`\n[${text.pass}] ${text.readyWithWarnings}`);

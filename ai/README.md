@@ -11,6 +11,7 @@ project 是现场工作区
 
 - `template/prompt.md`：AI 启动提示。
 - `template/bootstrap.md`：项目发现和上下文引导提示。
+- `template/execution-policy.md`：自动连续执行、任务树、风险分级和 Checkpoint 规则。
 - `template/reconcile.md`：把新的权威资料合并进现有项目上下文。
 - `template/VERSION`：已安装模板版本。
 - `template/protocol.md`：引导流程、执行流程、模型分工、同步规则。
@@ -111,22 +112,5 @@ ai/project/inbox/ideas/
 - 只回流 `ai/template/**`。
 - 永远不要回流 `ai/project/**`。
 
-## 引导规则
-
-- 人类提供意图、硬约束和最终验收。
-- Agent 从现有文档、清单、引用和项目文件中起草 `project/project.md` 和相关 `project/refs/*`。
-- 人类提供当前任务目标后，Agent 起草 `project/task.md`。
-- 人类在执行前检查并确认项目和任务草稿。
-- 引导只能写项目上下文文件；当提供当前任务时，也可以写 `project/task.md`。
-- 引导不得编辑源码、测试、配置、依赖文件、生成文件、运行时文件、结果文件或指标文件。
-- 最多问 3 个澄清问题。
-- 只在答案会改变范围、风险、权限或验收时提问。
-- 重复出现的假设应变成 `project/runtime.md` 更新建议。
-
-## 模型分工协议
-
-- 模型策略位于 `project/task.md.model_policy`。
-- 常规执行默认使用 `cheap`。
-- 中等实现复杂度使用 `standard`。
-- 只有规划、风险判断、架构复核、失败复盘或验收判断才使用 `strong`。
-- 在 `project/metrics.json` 中记录实际档位、触发条件、角色和升级原因。
+详细执行规则见 `template/protocol.md`、`template/bootstrap.md`、
+`template/execution-policy.md` 和 `template/rules/`。

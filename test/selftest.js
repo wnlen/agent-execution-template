@@ -54,6 +54,8 @@ function testInitUpdateDoctor() {
   assert(exists(cwd, "ai/template/execution-policy.md"), "init should create execution policy prompt");
   assert(exists(cwd, "ai/template/prompt.md"), "init should create template prompt");
   assert(exists(cwd, "ai/template/reconcile.md"), "init should create template reconcile prompt");
+  assert(exists(cwd, "ai/template/schemas/result.schema.json"), "init should create result schema");
+  assert(exists(cwd, "ai/template/schemas/metrics.schema.json"), "init should create metrics schema");
   assert(exists(cwd, "ai/project/inbox/.gitkeep"), "init should create inbox directory");
   assert(exists(cwd, "ai/project/project.md"), "init should create project.md");
   assert(exists(cwd, "ai/project/task.md"), "init should create task.md");
@@ -81,16 +83,29 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/template/prompt.md").includes("ai/template/execution-policy.md"), "execution prompt should read execution policy");
   assert(read(cwd, "ai/template/execution-policy.md").includes("风险分级"), "execution policy should include risk rubric");
   assert(read(cwd, "ai/template/execution-policy.md").includes("execution_policy.task_tree"), "execution policy should require task tree persistence");
-  assert(read(cwd, "ai/template/prompt.md").includes("默认也只处理 `ai/project/inbox/*.md`"), "execution prompt should narrow inbox reconciliation");
+  assert(read(cwd, "ai/template/prompt.md").includes("也默认只处理 `ai/project/inbox/*.md`"), "execution prompt should narrow inbox reconciliation");
   assert(read(cwd, "ai/template/protocol.md").includes("`bounded_continuous`"), "protocol should include bounded continuous execution");
   assert(read(cwd, "ai/template/execution-policy.md").includes("垂直切片"), "protocol should require vertical-slice progress for continuous execution");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("可独立验收的垂直切片"), "execution policy should define L1 granularity");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("不能边写草稿边执行"), "execution policy should block execution from draft tasks");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("不要为每个微小 L3 操作写回"), "execution policy should limit task tree write-back churn");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("公共接口、数据模型、权限、安全"), "execution policy should constrain Yellow corrections");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("用户可见输出"), "execution policy should define user-visible output rules");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("用户可见的计划"), "execution policy should keep user-visible planning in the installed language");
+  assert(read(cwd, "ai/template/rules/output.md").includes("默认使用 `ai/template/LANG`"), "output rules should keep human-readable results in the installed language");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("不要默认展示完整 L2/L3/L4"), "execution policy should avoid exposing full subtask trees by default");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("不要展示内部协议字段"), "execution policy should hide internal protocol details by default");
   assert(read(cwd, "ai/template/execution-policy.md").includes("L1 为 2 个或更多，自动启用"), "protocol should auto-enable continuous execution from L1 count");
   assert(read(cwd, "ai/template/execution-policy.md").includes("每个 Checkpoint 必须包含"), "protocol should require evidence-backed checkpoints");
   assert(read(cwd, "ai/template/rules/core.md").includes("边界内连续执行门"), "core rules should include bounded continuous execution gate");
+  assert(read(cwd, "ai/template/rules/core.md").includes("readiness = ready_to_execute"), "core rules should require ready task before execution");
+  assert(read(cwd, "ai/template/rules/core.md").includes("不是机械步骤清单"), "core rules should reject mechanical L1 task lists");
   assert(read(cwd, "ai/template/rules/core.md").includes("需要扩大范围、权限、命令、网络或验收时"), "core rules should stop continuous execution before boundary expansion");
   assert(read(cwd, "ai/project/task.md").includes("execution_policy:"), "task template should include execution policy");
   assert(read(cwd, "ai/project/task.md").includes("readiness:"), "task template should include readiness state");
   assert(read(cwd, "ai/project/task.md").includes("activation_rule: \"auto_enable_when_l1_count_gte_2\""), "task template should define automatic activation rule");
+  assert(read(cwd, "ai/project/task.md").includes("l1_granularity: \"independently_acceptable_vertical_slice\""), "task template should define L1 granularity");
+  assert(read(cwd, "ai/project/task.md").includes("write_back_policy: \"l1_start_done_red_blocked_scope_change_final\""), "task template should define task tree write-back policy");
   assert(read(cwd, "ai/project/task.md").includes("risk_gate:"), "task template should define risk gate");
   assert(read(cwd, "ai/project/task.md").includes("status: \"pending | running | done | blocked\""), "task template should define task tree node status");
   assert(read(cwd, "ai/project/task.md").includes("progress_unit: \"vertical_slice\""), "task template should define continuous progress unit");
@@ -99,10 +114,12 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/template/prompt.md").includes("不要重新 bootstrap"), "execution prompt should reconcile inbox material when project context already exists");
   assert(read(cwd, "ai/template/prompt.md").includes("整合 ai/project/inbox/ 里的新资料"), "execution prompt should route natural reconcile entry");
   assert(read(cwd, "ai/template/prompt.md").includes("继续推进这个项目"), "execution prompt should route natural continue entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("草稿不能直接执行"), "execution prompt should stop after drafting a task");
+  assert(read(cwd, "ai/template/prompt.md").includes("用户可见输出"), "execution prompt should reference user-visible output rules");
   assert(read(cwd, "ai/template/prompt.md").includes("strategy_update"), "execution prompt should route strategy updates");
   assert(read(cwd, "ai/template/reconcile.md").includes("上下文整合"), "init should install reconcile prompt");
   assert(read(cwd, "ai/template/reconcile.md").includes("整合计划"), "reconcile prompt should require a plan first");
-  assert(read(cwd, "ai/template/reconcile.md").includes("不要递归读取 `processed/**` 或 `ideas/**`"), "reconcile prompt should exclude processed and ideas recursively");
+  assert(read(cwd, "ai/template/reconcile.md").includes("不要递归读取") && read(cwd, "ai/template/reconcile.md").includes("`processed/**` 或 `ideas/**`"), "reconcile prompt should exclude processed and ideas recursively");
   assert(read(cwd, "ai/template/reconcile.md").includes("ai/project/inbox/processed/raw/file.md"), "reconcile prompt should archive absorbed raw inbox material");
   assert(read(cwd, "ai/template/reconcile.md").includes("未吸收资料"), "reconcile handoff should audit unabsorbed material");
   assert(read(cwd, "ai/template/reconcile.md").includes("冲突处理"), "reconcile handoff should audit conflict handling");
@@ -122,6 +139,7 @@ function testInitUpdateDoctor() {
   assert(initOutput.includes("把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案"), "init output should provide natural strategy prompt");
   assert(initOutput.includes("agent-execution-template next"), "init output should tell users how to recover the next step");
   assert(initOutput.includes("文件:"), "init output should summarize file changes");
+  assert(!initOutput.includes("维护者提示"), "init output should not show source checkout guidance in user projects");
   assert(!initOutput.includes("[已更新]"), "init output should hide detailed file changes by default");
   assert(!initOutput.includes("Read ai/template/bootstrap.md"), "init output should not use weak Read bootstrap command");
   assert(run(["init", "--verbose"], cwd).includes("[已更新] ai/template/VERSION"), "init --verbose should show detailed file changes");
@@ -139,7 +157,9 @@ function testInitUpdateDoctor() {
 
   const doctorOutput = run(["doctor"], cwd);
   assert(doctorOutput.includes("ai/project/result.json JSON"), "doctor should validate result JSON");
+  assert(doctorOutput.includes("ai/project/result.json schema"), "doctor should validate result schema");
   assert(doctorOutput.includes("ai/project/metrics.json JSON"), "doctor should validate metrics JSON");
+  assert(doctorOutput.includes("ai/project/metrics.json schema"), "doctor should validate metrics schema");
   assert(doctorOutput.includes("ai/project/task.md front matter"), "doctor should validate task front matter");
 }
 
@@ -149,6 +169,8 @@ function testEnglishInitUpdateDoctor() {
   const initOutput = run(["init", "--lang", "en"], cwd);
   assert(read(cwd, "ai/template/LANG") === "en\n", "init --lang en should install English template");
   assert(exists(cwd, "ai/template/execution-policy.md"), "English init should create execution policy prompt");
+  assert(exists(cwd, "ai/template/schemas/result.schema.json"), "English init should create result schema");
+  assert(exists(cwd, "ai/template/schemas/metrics.schema.json"), "English init should create metrics schema");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Confirmation Dimensions"), "English init should install English bootstrap prompt");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Do not summarize this file"), "English bootstrap prompt should prevent summary-only behavior");
   assert(read(cwd, "ai/template/bootstrap.md").includes("ai/project/refs/final-shape.md"), "English bootstrap prompt should initialize the North Star");
@@ -167,13 +189,26 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/prompt.md").includes("default to only `ai/project/inbox/*.md`"), "English execution prompt should narrow inbox reconciliation");
   assert(read(cwd, "ai/template/protocol.md").includes("`bounded_continuous`"), "English protocol should include bounded continuous execution");
   assert(read(cwd, "ai/template/execution-policy.md").includes("vertical"), "English protocol should require vertical-slice progress for continuous execution");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("independently acceptable vertical slice"), "English execution policy should define L1 granularity");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("executing from a draft"), "English execution policy should block execution from draft tasks");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("every tiny L3 operation"), "English execution policy should limit task tree write-back churn");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("public interfaces, data models, permissions"), "English execution policy should constrain Yellow corrections");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("User-Visible Output"), "English execution policy should define user-visible output rules");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("user-visible plans"), "English execution policy should keep user-visible planning in the installed language");
+  assert(read(cwd, "ai/template/rules/output.md").includes("installed language from `ai/template/LANG`"), "English output rules should keep human-readable results in the installed language");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("do not show full L2/L3/L4 by default"), "English execution policy should avoid exposing full subtask trees by default");
+  assert(read(cwd, "ai/template/execution-policy.md").includes("do not show internal protocol fields"), "English execution policy should hide internal protocol details by default");
   assert(read(cwd, "ai/template/execution-policy.md").includes("Automatically use `bounded_continuous`"), "English protocol should auto-enable continuous execution from L1 count");
   assert(read(cwd, "ai/template/execution-policy.md").includes("Every checkpoint must include"), "English protocol should require evidence-backed checkpoints");
   assert(read(cwd, "ai/template/rules/core.md").includes("Bounded Continuous Execution Gate"), "English core rules should include bounded continuous execution gate");
+  assert(read(cwd, "ai/template/rules/core.md").includes("readiness = ready_to_execute"), "English core rules should require ready task before execution");
+  assert(read(cwd, "ai/template/rules/core.md").includes("not a mechanical step"), "English core rules should reject mechanical L1 task lists");
   assert(read(cwd, "ai/template/rules/core.md").includes("expand scope, permission, commands, network access, or acceptance"), "English core rules should stop continuous execution before boundary expansion");
   assert(read(cwd, "ai/project/task.md").includes("execution_policy:"), "English task template should include execution policy");
   assert(read(cwd, "ai/project/task.md").includes("readiness:"), "English task template should include readiness state");
   assert(read(cwd, "ai/project/task.md").includes("activation_rule: \"auto_enable_when_l1_count_gte_2\""), "English task template should define automatic activation rule");
+  assert(read(cwd, "ai/project/task.md").includes("l1_granularity: \"independently_acceptable_vertical_slice\""), "English task template should define L1 granularity");
+  assert(read(cwd, "ai/project/task.md").includes("write_back_policy: \"l1_start_done_red_blocked_scope_change_final\""), "English task template should define task tree write-back policy");
   assert(read(cwd, "ai/project/task.md").includes("risk_gate:"), "English task template should define risk gate");
   assert(read(cwd, "ai/project/task.md").includes("status: \"pending | running | done | blocked\""), "English task template should define task tree node status");
   assert(read(cwd, "ai/project/task.md").includes("progress_unit: \"vertical_slice\""), "English task template should define continuous progress unit");
@@ -181,6 +216,8 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/prompt.md").includes("instead of bootstrapping again"), "English execution prompt should reconcile inbox material when project context already exists");
   assert(read(cwd, "ai/template/prompt.md").includes("Reconcile the new material in ai/project/inbox/"), "English execution prompt should route natural reconcile entry");
   assert(read(cwd, "ai/template/prompt.md").includes("Continue this project"), "English execution prompt should route natural continue entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("do not execute while the\n   task is still a draft"), "English execution prompt should stop after drafting a task");
+  assert(read(cwd, "ai/template/prompt.md").includes("User-Visible Output"), "English execution prompt should reference user-visible output rules");
   assert(read(cwd, "ai/template/prompt.md").includes("strategy_update"), "English execution prompt should route strategy updates");
   assert(exists(cwd, "ai/project/refs/final-shape.md"), "English init should create project North Star");
   assert(exists(cwd, "ai/project/refs/module-map.md"), "English init should create module map");
@@ -202,6 +239,7 @@ function testEnglishInitUpdateDoctor() {
   assert(initOutput.includes("Generate a direction amendment proposal from ai/project/inbox/ideas/"), "English init output should provide natural strategy prompt");
   assert(initOutput.includes("agent-execution-template next"), "English init output should tell users how to recover the next step");
   assert(initOutput.includes("Files:"), "English init output should summarize file changes");
+  assert(!initOutput.includes("Maintainer note"), "English init output should not show source checkout guidance in user projects");
   assert(!initOutput.includes("[UPDATED]"), "English init output should hide detailed file changes by default");
   assert(run(["init", "--lang=en", "--verbose"], cwd).includes("[UPDATED] ai/template/VERSION"), "English init --verbose should show detailed file changes");
 
@@ -213,6 +251,7 @@ function testEnglishInitUpdateDoctor() {
   const doctorOutput = run(["doctor"], cwd);
   assert(doctorOutput.includes("Template language: en"), "doctor should show installed English language");
   assert(doctorOutput.includes("ai/project/result.json JSON"), "English doctor should validate result JSON");
+  assert(doctorOutput.includes("ai/project/result.json schema"), "English doctor should validate result schema");
   assert(doctorOutput.includes("ai/project/task.md front matter"), "English doctor should validate task front matter");
   assert(doctorOutput.includes("[OK] Ready to run"), "doctor should use installed English language");
   const reconcileOutput = run(["reconcile"], cwd);
@@ -242,6 +281,60 @@ function testDoctorFailureAndWarning() {
   write(invalidJsonCwd, "ai/project/result.json", "{invalid\n");
   const invalidJsonOutput = run(["doctor"], invalidJsonCwd, 1);
   assert(invalidJsonOutput.includes("JSON 无效"), "doctor should fail invalid result JSON");
+
+  const invalidResultSchemaCwd = createTempProject("agent-execution-template-invalid-result-schema");
+  run(["init"], invalidResultSchemaCwd);
+  write(invalidResultSchemaCwd, "ai/project/result.json", JSON.stringify({
+    protocol_version: "0.8",
+    status: "success",
+    scope_followed: true,
+    files_read: [],
+    refs_read: [],
+    files_changed: [],
+    commands_run: [],
+    verification: {
+      level: "none",
+      passed: false,
+      evidence: []
+    },
+    assumptions: [],
+    issues: [],
+    next: [],
+    runtime_update: {
+      required: false,
+      changes: [],
+      reason: ""
+    }
+  }, null, 2));
+  const invalidResultSchemaOutput = run(["doctor"], invalidResultSchemaCwd, 1);
+  assert(invalidResultSchemaOutput.includes("不符合协议 schema"), "doctor should fail result schema violations");
+  assert(invalidResultSchemaOutput.includes("$.verification.passed must be true"), "doctor should enforce success verification");
+
+  const invalidMetricsSchemaCwd = createTempProject("agent-execution-template-invalid-metrics-schema");
+  run(["init"], invalidMetricsSchemaCwd);
+  write(invalidMetricsSchemaCwd, "ai/project/metrics.json", JSON.stringify({
+    protocol_version: "0.8",
+    task_id: "",
+    task_type: "",
+    model: "",
+    model_tier: "cheap",
+    escalated: true,
+    escalation_reason: "",
+    model_policy_followed: true,
+    escalation_trigger_hit: "",
+    strong_model_role: "",
+    input_tokens_estimated: 0,
+    output_tokens_estimated: 0,
+    duration_minutes: 0,
+    success: false,
+    human_fix_required: false,
+    failure_reason: "",
+    reuse_potential: "low",
+    notes: []
+  }, null, 2));
+  const invalidMetricsSchemaOutput = run(["doctor"], invalidMetricsSchemaCwd, 1);
+  assert(invalidMetricsSchemaOutput.includes("不符合协议 schema"), "doctor should fail metrics schema violations");
+  assert(invalidMetricsSchemaOutput.includes("$.escalation_reason must have length >= 1"), "doctor should enforce escalated metrics details");
 
   const taskWarnCwd = createTempProject("agent-execution-template-task-frontmatter");
   run(["init"], taskWarnCwd);
@@ -338,6 +431,16 @@ function testPermissionErrorIsActionable() {
   }
 }
 
+function testSourceCheckoutNotice() {
+  const doctorOutput = run(["doctor"], repoRoot);
+  assert(doctorOutput.includes("维护者提示"), "doctor should warn when run in the package source checkout");
+  assert(doctorOutput.includes("node bin/agent-execution-template.js <command>"), "source checkout notice should show local node command");
+  assert(doctorOutput.includes("不要把维护者本地初始化产生的 ai/project/** 当成产品改动提交"), "source checkout notice should warn against committing local bootstrap context");
+
+  const nextOutput = run(["next"], repoRoot);
+  assert(nextOutput.includes("维护者提示"), "next should warn when run in the package source checkout");
+}
+
 function main() {
   testInitUpdateDoctor();
   testEnglishInitUpdateDoctor();
@@ -345,6 +448,7 @@ function main() {
   testRefreshBacksUpAndImportsOldProject();
   testNextCommandRoutesByProjectState();
   testPermissionErrorIsActionable();
+  testSourceCheckoutNotice();
   console.log("selftest ok");
 }
 

@@ -2,7 +2,7 @@
 
 ## 就绪门
 
-编辑代码前，检查 `ai/project/task.md` 是否清楚定义：
+编辑前，确认 `ai/project/task.md` 已清楚定义：
 
 - 目标
 - 范围
@@ -18,8 +18,8 @@
 
 ## 引导门
 
-如果 `ai/project/project.md` 为空、只有占位内容、不完整，或用户要求整理项目上下文，
-先执行 `ai/template/bootstrap.md`，再进入执行。
+若 `ai/project/project.md` 为空、占位、不完整，或用户要求整理上下文，先执行
+`ai/template/bootstrap.md`。
 
 引导模式只能写项目上下文文件：
 
@@ -32,14 +32,13 @@
 - `ai/project/refs/constraints.md`
 - `ai/project/refs/decisions.md`
 
-只有在人类同时提供当前任务目标时，引导模式才可以写 `ai/project/task.md`。
-此时只能起草任务契约，不能进入实现。
+只有人类同时提供当前任务目标时，引导模式才可写 `ai/project/task.md`；只能起草，不实现。
 
-引导模式不得编辑源码、测试、配置、依赖文件、生成文件、运行时文件、结果文件或指标文件。
+引导模式不得编辑源码、测试、配置、依赖、生成文件、运行时、结果或指标文件。
 
 写完引导草稿后，使用 `ai/template/bootstrap.md` 中的“引导后交接”停止。
 交接必须在聊天里给出可确认摘要和推荐下一步，不要只让人类打开文件检查。
-如果人类已经提供当前任务目标，可以同轮起草 `ai/project/task.md`，但仍必须停止等待确认，不能进入实现。
+若人类已提供任务目标，可同轮起草 `task.md`，但仍必须停止确认，不能实现。
 
 ## 引导读取范围
 
@@ -60,9 +59,8 @@
 
 ## 任务草稿门
 
-如果项目上下文已确认，但 `ai/project/task.md` 为空、只有占位内容、不完整，
-或人类提供了新的任务目标，根据已确认的项目上下文起草 `ai/project/task.md`，
-并在实现前停止等待人类确认。
+项目上下文已确认但 `task.md` 为空、占位、不完整，或人类提供新任务目标时，
+按已确认上下文起草 `task.md`，实现前停止确认。
 
 任务草稿模式只能写：
 
@@ -72,8 +70,8 @@
 
 ## 上下文整合门
 
-如果用户提供新的权威业务、产品、架构或流程资料，并希望合并到既有上下文，
-或说“整合 ai/project/inbox/ 里的新资料”，执行 `ai/template/reconcile.md`，
+用户提供新权威业务、产品、架构或流程资料并希望合并，或说
+“整合 ai/project/inbox/ 里的新资料”时，执行 `ai/template/reconcile.md`。
 不要重新 bootstrap，也不要全量覆盖。
 
 新资料优先放在：
@@ -84,7 +82,7 @@
 
 已整合资料统一移动到 `ai/project/inbox/processed/`，默认不再触发上下文整合。
 
-上下文整合必须先输出整合计划，等待人类确认后才更新文件。
+上下文整合必须先给计划，等确认后再更新文件。
 
 上下文整合默认只能更新：
 
@@ -92,8 +90,7 @@
 - `ai/project/runtime.md`
 - `ai/project/refs/*.md`
 
-如果新资料会改变北极星、模块地图或路线图的方向性内容，只能建议创建
-`strategy_update` 提案，不能在上下文整合中直接修改：
+新资料若改变北极星、模块地图或路线图，只能建议创建 `strategy_update`，不能直接改：
 
 - `ai/project/refs/final-shape.md`
 - `ai/project/refs/module-map.md`
@@ -103,27 +100,32 @@
 
 ## 边界内连续执行门
 
-每次执行前，AI 必须读取 `ai/template/execution-policy.md`，先做任务分解和风险判断，
-而不是等待用户显式说“启用连续执行”。
+每次执行前，AI 必须读取 `ai/template/execution-policy.md`，先分解任务并判断风险，
+不等用户说“启用连续执行”。
 
 硬门禁：
 
+- 只有 `task.md.readiness = ready_to_execute` 才能执行；本轮新建或重写 `task.md` 时必须停下确认。
+- L1 必须是可独立验收的垂直切片，不是机械步骤清单。
 - `execution_policy.task_tree` 必须记录 L1 清单和执行状态。
 - 每个任务节点必须有 Green / Yellow / Red 风险评级。
+- Yellow 只允许当前 L1/L2 内的局部低风险修正，不能改变公共接口、数据模型、
+  权限、安全、架构方向或验收标准。
 - 每个 Checkpoint 必须包含证据；不接受只有主观判断的 Green。
 - Red 必须停止等待人类确认。
-- 任何方向、核心架构、数据结构、安全、支付、账号、权限、大量删除、
-  核心重写或高成本方案取舍，都必须停止。
+- 涉及方向、核心架构、公共 API、持久化数据、安全、支付、账号、权限、大量删除、
+  核心重写或高成本取舍时，必须停止。
 - 需要扩大范围、权限、命令、网络或验收时，必须停止。
+- `task_tree` 写回应集中在 L1 开始/完成、Red、blocked、范围变化和最终收尾，
+  不要为每个微小 L3 操作写回。
 
 目标、范围、验收和权限由 AI 推断，但不能越过项目规则、显式用户限制、
 `permission.modify.denied`、安全边界或破坏性操作限制。
 
 ## 策略修订门
 
-如果用户要求更新项目北极星、最终形态、产品宪法、模块地图、路线图或项目方向，
-或 `ai/project/inbox/ideas/` 中存在 `.gitkeep` 之外的新灵感，执行
-`strategy_update`。
+用户要求更新北极星、最终形态、产品宪法、模块地图、路线图或项目方向，或
+`ai/project/inbox/ideas/` 有新灵感时，执行 `strategy_update`。
 
 `strategy_update` 只能：
 

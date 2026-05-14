@@ -11,6 +11,8 @@ execution_policy:
   max_depth: 3
   allow_depth_4_when_needed: true
   progress_unit: "vertical_slice"
+  l1_granularity: "independently_acceptable_vertical_slice"
+  write_back_policy: "l1_start_done_red_blocked_scope_change_final"
   task_tree:
     - id: "L1-1"
       title: ""
@@ -86,6 +88,9 @@ permissions, and acceptance from the human goal, project context, and repository
 facts. If inference would cross permission or safety boundaries, or acceptance
 cannot be defined, set `readiness` to `blocked` or mark the relevant task node
 `Red` and wait for human confirmation.
+If this run creates or rewrites the task contract, keep
+`readiness = draft_for_confirmation` by default and stop at the handoff. Enter
+execution only when an existing task is explicitly `ready_to_execute`.
 
 ## Goal
 
@@ -143,26 +148,36 @@ fewer than 2 L1 tasks, use `normal`; if it finds 2 or more L1 tasks, use
   before execution.
 - `readiness = blocked` means the task cannot execute and must produce a
   blocked result.
+- If this run creates or rewrites `ai/project/task.md`, stop at the confirmation
+  handoff; do not execute while the task is still a draft.
 - Before execution, write the L1 checklist to `execution_policy.task_tree`.
 - Before execution, list the L1 task checklist; mark each L1 complete with a
   checked and struck-through item.
+- Each L1 must be an independently acceptable vertical slice. Do not split a
+  single mechanical step into L1 tasks, and do not merge multiple independently
+  acceptable user-visible outcomes into one L1.
 - Before executing an L1, plan the naturally derived L2 tasks; if an L2 still
   needs decomposition, plan L3 tasks.
 - Default to at most 3 levels; add L4 dynamically only when leaving it out
   would make L3 too large or unverifiable.
 - The AI assigns Green / Yellow / Red risk to every task node.
 - Only Red stops for human confirmation; Green continues automatically, and
-  Yellow continues after local low-risk correction.
+  Yellow only permits local low-risk correction inside the current L1/L2. It
+  must not change public interfaces, data models, permissions, security,
+  architecture direction, or acceptance.
 - `progress_unit` defaults to `vertical_slice`: each work loop should produce
   a reviewable increment.
 - `checkpoint_budget` is the maximum checkpoint budget, not a required count;
   do not report just to spend the budget.
-- Emit a checkpoint only when `checkpoint_triggers` fire, risk rises, or final
-  review is about to start.
+- Emit checkpoints only when risk changes from Green to Yellow/Red, scope or
+  permission is about to expand, an L1 vertical slice is complete, verification
+  failed but execution is about to continue, or final wrap-up is about to start.
 - Every checkpoint must include evidence: changed files, commands run,
   verification results, or why verification was not possible.
-- During execution, update `task_tree` node status: `pending`, `running`,
-  `done`, or `blocked`.
+- `task_tree` write-back frequency: write the L1 checklist before execution;
+  update an L1 when it starts or completes; write back immediately on Red,
+  blocked, scope change, or final wrap-up; do not write back every tiny L3
+  operation.
 - After completion, run one final review; only re-check Yellow, Red, failed
   verification, or high-impact modules.
 - Continuous execution does not change model policy; escalate through
@@ -192,7 +207,8 @@ Stop and write `ai/project/result.json`, `ai/project/result.md`, and `ai/project
 - Required command cannot be run.
 - Risk level is high without explicit authorization.
 - A Red checkpoint appears during continuous execution.
-- The task would change product direction, core architecture, data structures,
-  security boundaries, payment, accounts, or permissions.
-- The task would delete many files, rewrite a core module, or require choosing
-  between multiple high-cost options.
+- The task would change product direction, core architecture, public API,
+  persistent data structures, security boundaries, payment, accounts, or
+  permissions.
+- The task would delete files beyond the current L1's directly related files,
+  rewrite a core module, or require choosing between multiple high-cost options.

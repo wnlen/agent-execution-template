@@ -1,16 +1,13 @@
 # AI 上下文整合
 
 不要总结这个文件。
-执行下面的上下文整合流程。
-
-你正在把新的权威资料吸收到现有 Agent Execution Template 项目上下文中。
-这不是重新引导，也不是全量覆盖。
+按下面流程把新权威资料吸收到现有项目上下文。不是重新引导，也不是全量覆盖。
 
 目标：合并新资料中的长期有效事实，修正过期或不准确的旧上下文，保留仍然正确的既有内容。
 
 ## 适用场景
 
-当项目已经使用一段时间后，出现更完整、更权威的业务、产品、架构或流程资料时，使用本流程。
+当出现更完整、更权威的业务、产品、架构或流程资料时，使用本流程。
 
 新资料默认放在：
 
@@ -18,10 +15,10 @@
 - `ai/project/inbox/raw/*.md`
 - `docs/**`
 
-`ai/project/inbox/` 是待吸收资料区。资料被整合确认后，统一移动到
-`ai/project/inbox/processed/`，用于追溯并避免后续重复整合。
-即使用户说“整合整个 inbox”，默认也只处理 `ai/project/inbox/*.md`
-和 `ai/project/inbox/raw/*.md`；不要递归读取 `processed/**` 或 `ideas/**`。
+`ai/project/inbox/` 是待吸收区。资料确认整合后移到 `ai/project/inbox/processed/`，
+用于追溯并避免重复整合。即使用户说“整合整个 inbox”，也默认只处理
+`ai/project/inbox/*.md` 和 `ai/project/inbox/raw/*.md`；不要递归读取
+`processed/**` 或 `ideas/**`。
 
 ## 先读
 
@@ -33,13 +30,13 @@
 6. 人类指定的新资料；未指定时，只读取 `ai/project/inbox/*.md`
    和 `ai/project/inbox/raw/*.md`
 
-不要默认读取 `ai/project/inbox/processed/**`、`ai/project/inbox/ideas/**`、
-`ai/project/archive/**`、源码、测试、配置或依赖文件，除非人类明确要求用它们核对事实。
+不要默认读取 `processed/**`、`ideas/**`、`archive/**`、源码、测试、配置或依赖；
+除非人类明确要求用它们核对事实。
 
 ## 整合原则
 
-- 不要直接覆盖整套文件。
-- 保留仍然正确的既有上下文。
+- 不整套覆盖。
+- 保留仍正确的既有上下文。
 - 将新资料拆分进合适位置：
   - 项目身份、用户、稳定约定 -> `ai/project/project.md`
   - 当前仍有效的执行上下文 -> `ai/project/runtime.md`
@@ -50,10 +47,9 @@
   - 命令 -> `ai/project/refs/commands.md`
   - 约束 -> `ai/project/refs/constraints.md`
   - 持久决策 -> `ai/project/refs/decisions.md`
-- 不要把 `refs/*` 写成原文堆砌；只吸收结构化、长期有效、可复用的内容。
-- 如果新资料会改变北极星、模块地图或路线图的方向性内容，只能建议创建
-  `strategy_update` 提案，不要在上下文整合中直接修改这些方向文件。
-- `task.md`、`result.json`、`result.md`、`metrics.json` 通常不参与业务上下文整合，除非人类明确要求吸收其中仍长期有效的事实。
+- `refs/*` 不堆原文；只吸收结构化、长期有效、可复用的内容。
+- 新资料若改变北极星、模块地图或路线图，只建议创建 `strategy_update`，不要直接改方向文件。
+- `task.md`、`result.json`、`result.md`、`metrics.json` 通常不参与整合；除非人类明确要求吸收其中的长期事实。
 
 ## 两阶段流程
 
@@ -70,13 +66,11 @@
 5. 需要人类确认的问题，最多 3 个
 6. 预计会更新的文件
 
-如果没有需要确认的问题，明确写“无需额外确认”。
-
-阶段 1 结束时必须停止，等待人类确认。
+无问题时写“无需额外确认”。阶段 1 结束必须停止，等待确认。
 
 ### 阶段 2：应用整合
 
-只有在人类明确确认整合计划后，才更新文件。
+只有人类确认整合计划后才更新文件。
 
 允许更新：
 
@@ -97,15 +91,14 @@
 - `ai/project/metrics.json`
 - `ai/project/archive/**`
 
-应用整合完成后，必须把本次已整合的 `ai/project/inbox/*.md` 和
-`ai/project/inbox/raw/*.md` 资料移动到 `ai/project/inbox/processed/`。保留相对路径：
-`ai/project/inbox/raw/file.md` 移动到 `ai/project/inbox/processed/raw/file.md`。
-如果文件名冲突，保留原文件名并添加日期或序号。不要移动
-`ai/project/inbox/ideas/**`；方向灵感应继续走 `strategy_update`。
+整合完成后，把本次已整合的 `ai/project/inbox/*.md` 和 `ai/project/inbox/raw/*.md`
+移到 `ai/project/inbox/processed/`，保留相对路径：`ai/project/inbox/raw/file.md` ->
+`ai/project/inbox/processed/raw/file.md`。文件名冲突时加日期或序号。不要移动 `ideas/**`；
+方向灵感继续走 `strategy_update`。
 
 ## 最终交接
 
-应用整合后，最终回复必须包含：
+应用后，最终回复包含：
 
 ```text
 上下文整合已完成。
@@ -142,4 +135,4 @@
 - 修正：<你要改的地方>
 ```
 
-不要让人类自己去文件管理器里寻找变化；文件路径只作为可追溯记录。
+不要让人类自己找变化；文件路径只作追溯。
