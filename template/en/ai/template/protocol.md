@@ -54,11 +54,15 @@ Before task execution, read `ai/template/execution-policy.md`.
 The default execution policy is `auto`: the AI first decomposes L1 tasks and
 judges Green / Yellow / Red risk, then chooses `normal` or `bounded_continuous`.
 Use `normal` when there are fewer than 2 L1 tasks; automatically use
-`bounded_continuous` when there are 2 or more L1 tasks. Only Red stops for
-human confirmation.
+`bounded_continuous` when there are 2 or more L1 tasks. Each L1 must be an
+independently acceptable vertical slice. Execution is allowed only for an
+existing task with `readiness = ready_to_execute`; if this run creates or
+rewrites the task contract, stop at the confirmation handoff. Only Red stops for
+human confirmation, and Yellow only permits local low-risk correction inside the
+current L1/L2.
 
-Task tree, risk rubric, checkpoint evidence, and `task_tree` status update
-rules are defined in `ai/template/execution-policy.md`.
+Task tree, risk rubric, checkpoint evidence, and `task_tree` write-back rules
+are defined in `ai/template/execution-policy.md`.
 
 ## Bootstrap Mode
 

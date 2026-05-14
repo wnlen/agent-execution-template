@@ -125,15 +125,24 @@ explicitly say "enable continuous execution".
 
 Hard gates:
 
+- Execute only when `ai/project/task.md.readiness = ready_to_execute`; if this
+  run creates or rewrites `task.md`, stop at the confirmation handoff.
+- L1 must be an independently acceptable vertical slice, not a mechanical step
+  checklist.
 - `execution_policy.task_tree` must record the L1 checklist and execution state.
 - Every task node must have Green / Yellow / Red risk.
+- Yellow only permits local low-risk correction inside the current L1/L2. It
+  must not change public interfaces, data models, permissions, security,
+  architecture direction, or acceptance.
 - Every checkpoint must include evidence; a purely subjective Green is not valid.
 - Red must stop for human confirmation.
-- Any product direction, core architecture, data structure, security, payment,
-  account, permission, large deletion, core rewrite, or high-cost option choice
-  must stop.
+- Any product direction, core architecture, public API, persistent data
+  structure, security, payment, account, permission, large deletion, core
+  rewrite, or high-cost option choice must stop.
 - Any need to expand scope, permission, commands, network access, or acceptance
   must stop.
+- `task_tree` write-back should happen at L1 start/done, Red, blocked, scope
+  change, and final wrap-up; do not write back every tiny L3 operation.
 
 The AI infers goal, scope, acceptance, and permissions, but must not cross
 project rules, explicit human limits, `permission.modify.denied`, security

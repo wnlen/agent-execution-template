@@ -11,6 +11,8 @@ execution_policy:
   max_depth: 3
   allow_depth_4_when_needed: true
   progress_unit: "vertical_slice"
+  l1_granularity: "independently_acceptable_vertical_slice"
+  write_back_policy: "l1_start_done_red_blocked_scope_change_final"
   task_tree:
     - id: "L1-1"
       title: ""
@@ -83,6 +85,8 @@ permission:
 优先使用安全假设，少问额外问题。AI 应基于用户目标、项目上下文和仓库事实推断
 范围、风险、权限和验收；如果推断会越过权限、安全边界或验收无法定义，将
 `readiness` 标为 `blocked` 或将相关任务节点标为 `Red`，等待人类确认。
+如果本轮新建或重写了任务契约，默认保持 `draft_for_confirmation` 并停下来交接；
+只有已有任务明确处于 `ready_to_execute` 时，才进入执行。
 
 ## 目标
 
@@ -132,17 +136,23 @@ permission:
 - `readiness = ready_to_execute` 表示没有 Red 预检项，可以执行。
 - `readiness = draft_for_confirmation` 表示需要人类确认后才能执行。
 - `readiness = blocked` 表示当前任务不可执行，必须写 blocked 结果。
+- 本轮如果新建或重写 `ai/project/task.md`，必须停在确认交接；不能在任务仍是草稿时执行。
 - 执行前必须把 L1 任务清单写入 `execution_policy.task_tree`。
 - 执行前必须列出 L1 任务清单；每个 L1 用待办列表表示，完成后打勾并划掉。
+- L1 必须是可独立验收的垂直切片；不要把单个机械步骤拆成 L1，也不要把多个
+  可独立验收的用户可见结果合并成一个 L1。
 - 执行某个 L1 前，AI 先规划自然衍生出的 L2；如果 L2 仍需拆分，再规划 L3。
 - 默认最多 3 层；只有当不拆 L4 会导致 L3 过大或不可验证时，才允许动态增加 L4。
 - 每个任务节点都由 AI 自己生成 Green / Yellow / Red 风险评级。
-- 只有 Red 停下来让人类确认；Green 自动继续，Yellow 先做局部低风险修正后继续。
+- 只有 Red 停下来让人类确认；Green 自动继续，Yellow 只允许当前 L1/L2 内的局部
+  低风险修正，不能改变公共接口、数据模型、权限、安全、架构方向或验收标准。
 - `progress_unit` 默认是 `vertical_slice`：每轮推进都应该产生可检查的工作增量。
 - `checkpoint_budget` 是最多可用检查点预算，不是必须用完的次数；不要为了消耗预算而汇报。
-- 只有在触发 `checkpoint_triggers`、风险升高或准备收尾时才输出 Checkpoint。
+- 只有在风险从 Green 变 Yellow/Red、即将扩大范围或权限、完成 L1 垂直切片、
+  验证失败后准备继续、准备最终收尾时才输出 Checkpoint。
 - 每个 Checkpoint 必须包含证据：已改文件、已运行命令、验证结果或无法验证的原因。
-- 执行中必须更新 `task_tree` 节点状态：`pending`、`running`、`done` 或 `blocked`。
+- `task_tree` 写回频率：执行前写入 L1 清单；开始或完成 L1 时更新该 L1 状态；
+  出现 Red、blocked、范围变化或最终收尾时立即写回；不要为每个微小 L3 操作写回。
 - 完成后只做一次总复盘；只对 Yellow、Red、失败验证或高影响模块做二次抽检。
 - 连续执行不改变模型策略；涉及判断、架构、失败复盘或验收争议时仍按 `model_policy` 升级。
 
@@ -170,5 +180,5 @@ permission:
 - 必需命令无法运行。
 - 风险等级高但没有明确授权。
 - 连续执行中出现 Red 检查点。
-- 需要改变产品方向、核心架构、数据结构、安全边界、支付、账号或权限。
-- 需要删除大量文件、重写核心模块，或在多个高成本方案之间取舍。
+- 需要改变产品方向、核心架构、公共 API、持久化数据结构、安全边界、支付、账号或权限。
+- 需要删除超过当前 L1 直接相关的文件、重写核心模块，或在多个高成本方案之间取舍。

@@ -47,9 +47,12 @@ ai/project/task.md             = 当前执行契约
 
 执行策略默认是 `auto`：AI 先拆 L1 任务并判断 Green / Yellow / Red，再决定使用
 `normal` 或 `bounded_continuous`。L1 少于 2 个使用 `normal`；L1 为 2 个或更多
-自动启用 `bounded_continuous`。只有 Red 停止等待人类确认。
+自动启用 `bounded_continuous`。L1 必须是可独立验收的垂直切片。只有
+`readiness = ready_to_execute` 的既有任务才能执行；本轮新建或重写任务契约时先
+停在确认交接。只有 Red 停止等待人类确认，Yellow 只允许当前 L1/L2 内的局部
+低风险修正。
 
-任务树、风险分级、Checkpoint 证据和 `task_tree` 状态更新规则由
+任务树、风险分级、Checkpoint 证据和 `task_tree` 写回规则由
 `ai/template/execution-policy.md` 定义。
 
 ## 引导模式

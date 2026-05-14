@@ -161,7 +161,8 @@ The user can still give a natural-language goal, for example:
 Build the settings page with profile editing, notification toggles, and export entrypoint
 ```
 
-Before execution, the AI decomposes L1 tasks:
+Before execution, the AI decomposes L1 tasks. Each L1 must be an independently
+acceptable vertical slice, not a mechanical step checklist:
 
 ```text
 - [ ] L1-1 Profile editing Green
@@ -171,12 +172,19 @@ Before execution, the AI decomposes L1 tasks:
 
 Because there are two or more L1 tasks, the protocol automatically uses bounded
 continuous execution. Before each L1, the AI plans naturally derived L2/L3 work.
-After completing an L1, it checks and strikes the item, then writes status back
-to `execution_policy.task_tree` in `ai/project/task.md`.
+After completing an L1, it checks and strikes the item. `task_tree` is written
+back only at L1 start/done, Red/blocked, scope changes, or final wrap-up, so tiny
+steps do not churn files.
 
 Only Red risk stops for confirmation. Green continues automatically, and Yellow
-continues after local low-risk correction. Every checkpoint must include
-evidence: changed files, commands run, and verification results.
+only permits local low-risk correction inside the current L1/L2; it must not
+change public interfaces, data models, permissions, security, architecture
+direction, or acceptance. By default, users see L1, risk conclusions, evidence,
+Red confirmations, and final results; internal protocol details are not shown.
+
+If the AI just created or rewrote `ai/project/task.md` in the current run, it
+must stop for confirmation. Execution is allowed only when an existing task is
+explicitly `ready_to_execute`.
 
 ## Installed Layout
 

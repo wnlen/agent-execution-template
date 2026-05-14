@@ -55,10 +55,10 @@
 4. 执行前列出 L1 任务清单并标注 Green / Yellow / Red，同时写入
    `execution_policy.task_tree`。L1 少于 2 个时使用 `normal`；L1 为 2 个或更多时
    自动使用 `bounded_continuous`。
-5. 如果没有 Red 预检项，将 `readiness` 设为 `ready_to_execute`；如果需要人类确认，
-   设为 `draft_for_confirmation`；如果不可执行，设为 `blocked`。
-6. 只有出现 Red 预检项时才停止等待人类确认。若用户要求的是执行或继续，且预检
-   只有 Green / Yellow，可以直接进入执行模式。
+5. 本轮如果新建或重写了 `ai/project/task.md`，将 `readiness` 设为
+   `draft_for_confirmation` 并停止交接；不要在任务仍是草稿时直接执行。
+6. 只有已有任务明确处于 `ready_to_execute`，且没有 Red 预检项时，才能进入执行模式；
+   如果不可执行，设为 `blocked`。
 7. 不要在任务草稿模式中修改源码或业务文件。
 
 任务草稿模式必须以下面结构结束：
@@ -110,10 +110,13 @@
 
 然后按 `ai/template/execution-policy.md` 做执行前规划：列出 L1 清单，给每个 L1
 标注 Green / Yellow / Red，并写入 `execution_policy.task_tree`。根据 L1 数量自动选择
-`normal` 或 `bounded_continuous`。执行 L1 前规划 L2，执行 L2 前按需规划 L3；
-默认最多 3 层，必要时允许 L4。每完成一个 L1，在清单中打勾并划掉，并更新
-`task_tree` 节点状态。只有 Red 停止等待人类确认；Green 自动继续，Yellow 做局部
-低风险修正后继续。最后把结果写入：
+`normal` 或 `bounded_continuous`。只有 `readiness = ready_to_execute` 才能执行；
+如果本轮新建或重写任务契约，先停在确认交接。L1 必须是可独立验收的垂直切片。
+执行 L1 前规划 L2，执行 L2 前按需规划 L3；默认最多 3 层，必要时允许 L4。
+每完成一个 L1，在清单中打勾并划掉；开始或完成 L1、出现 Red/blocked、范围变化
+或最终收尾时写回 `task_tree`。只有 Red 停止等待人类确认；Green 自动继续，Yellow
+只做当前 L1/L2 内的局部低风险修正。用户可见输出遵守
+`ai/template/execution-policy.md` 的“用户可见输出”规则。最后把结果写入：
 
 - `ai/project/result.json`
 - `ai/project/result.md`
