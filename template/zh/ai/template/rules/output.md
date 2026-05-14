@@ -25,7 +25,9 @@
 
 ## 结果 Markdown
 
-`ai/project/result.md` 是给人看的摘要。保持简短：
+`ai/project/result.md` 是给人看的摘要。保持简短，并默认使用 `ai/template/LANG`
+指定的安装语言。中文模板下，标题和说明默认用中文；代码、命令、文件路径和协议字段
+保留原文。
 
 ```md
 ## 状态

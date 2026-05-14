@@ -1,16 +1,16 @@
 # 协议
 
-Agent Execution Template v0.8 将可复用协议和项目专属执行上下文分开。
+Agent Execution Template v0.8 分离可复用协议和项目现场。
 
 ```text
 ai/template/ = 可复用执行协议
 ai/project/  = 当前项目执行工作区
 ```
 
-`template` 是协议，`project` 是现场工作区。
+`template` 是协议，`project` 是现场。
 
-项目现场不仅保存当前任务，也保存方向层。方向层用于回答“为什么做、往哪里长”，
-执行层用于回答“这次做什么、如何验收”。
+项目现场同时保存任务和方向层。方向层回答“为什么做、往哪里长”，执行层回答
+“这次做什么、如何验收”。
 
 ```text
 ai/project/refs/final-shape.md = 项目北极星说明书
@@ -26,15 +26,14 @@ ai/project/task.md             = 当前执行契约
 ```
 
 1. 项目发现时，执行 `ai/template/bootstrap.md`；不要总结它。
-2. 引导结束时使用“引导后交接”，在聊天里给出可确认摘要和推荐下一步，
-   不要只要求人类打开文件检查。
+2. 引导结束用“引导后交接”，在聊天里给可确认摘要和推荐下一步，不只要求人类打开文件。
 3. 任务执行时，执行 `ai/template/prompt.md`；不要总结它。
-4. 当出现新的权威资料时，放入 `ai/project/inbox/`，执行 `ai/template/reconcile.md`；
-   不要总结它。整合必须先出计划，等确认后再更新上下文。
-5. 当出现会改变项目最终形态、模块边界或路线图的灵感时，先放入
-   `ai/project/inbox/ideas/`，再创建 `strategy_update` 任务生成提案。
-6. 只有人类确认提案后，才能创建 `apply_strategy_update` 任务修改
-   `final-shape.md`、`module-map.md` 或 `roadmap.md`。
+4. 新权威资料放入 `ai/project/inbox/`，执行 `ai/template/reconcile.md`；不要总结它。
+   整合先出计划，确认后更新上下文。
+5. 会改变最终形态、模块边界或路线图的灵感先放入 `ai/project/inbox/ideas/`，
+   再用 `strategy_update` 生成提案。
+6. 人类确认提案后，才可用 `apply_strategy_update` 修改 `final-shape.md`、
+   `module-map.md` 或 `roadmap.md`。
 7. 如果 `ai/project/task.md` 缺失或不完整，根据当前目标和已确认的项目上下文起草它，
    然后用“任务草稿交接”停止。
 8. 任务确认后，检查就绪度、风险、模型策略、引用、权限和验收。
@@ -45,12 +44,10 @@ ai/project/task.md             = 当前执行契约
 
 任务执行前必须读取 `ai/template/execution-policy.md`。
 
-执行策略默认是 `auto`：AI 先拆 L1 任务并判断 Green / Yellow / Red，再决定使用
-`normal` 或 `bounded_continuous`。L1 少于 2 个使用 `normal`；L1 为 2 个或更多
-自动启用 `bounded_continuous`。L1 必须是可独立验收的垂直切片。只有
-`readiness = ready_to_execute` 的既有任务才能执行；本轮新建或重写任务契约时先
-停在确认交接。只有 Red 停止等待人类确认，Yellow 只允许当前 L1/L2 内的局部
-低风险修正。
+默认 `auto`：AI 先拆 L1 并判断 Green / Yellow / Red，再选择 `normal` 或
+`bounded_continuous`。L1 < 2 用 `normal`；L1 >= 2 自动启用 `bounded_continuous`。
+L1 必须是可独立验收的垂直切片。只有既有任务 `readiness = ready_to_execute` 才能执行；
+本轮新建或重写任务契约时先停下确认。Red 停止确认，Yellow 只允许当前 L1/L2 内的局部低风险修正。
 
 任务树、风险分级、Checkpoint 证据和 `task_tree` 写回规则由
 `ai/template/execution-policy.md` 定义。
@@ -62,17 +59,16 @@ ai/project/task.md             = 当前执行契约
 - `ai/project/project.md`
 - `ai/project/refs/*.md`
 
-当 `ai/project/project.md` 为空、只有占位内容、过期、不完整，或用户要求整理项目上下文时，
-使用引导模式。
+当 `project.md` 为空、占位、过期、不完整，或用户要求整理上下文时，使用引导模式。
 
 引导模式必须：
 
 - 先只读取批准的引导来源；
 - 将稳定项目事实总结到 `ai/project/project.md`；
-- 当能推断持久架构、命令、约束或决策事实时，更新聚焦的引用文件；
+- 能推断持久架构、命令、约束或决策事实时，更新聚焦引用文件；
 - 只有在人类同时提供当前任务时，才创建 `ai/project/task.md`，且只起草任务契约；
 - 将未知事实标记为 `Unknown`，不要猜测；
-- 只有答案会改变范围、风险、权限或验收时，最多问 3 个问题；
+- 只有答案会改变范围、风险、权限或验收时，才问问题，最多 3 个；
 - 写完项目上下文草稿后停止；如果已提供当前任务，也可以同时写任务草稿后停止；
 - 永远不要编辑源码、业务、配置、依赖或生成文件。
 
@@ -102,12 +98,12 @@ ai/project/task.md             = 当前执行契约
 5. 浅层仓库结构：
    - 只查看源码、测试、配置和文档目录。
 
-如果文档和清单缺失或不足，可以有限读取代码进行推断：
+文档和清单不足时，可有限读取代码推断：
 
 - 先检查顶层目录和文件名；
 - 检查可能的入口目录，例如 `src/`、`app/`、`lib/`、`packages/`、
   `services/`、`cmd/`、`internal/`、`server/`、`client/`、`test/`、`tests/`；
-- 只读取足够识别项目目的、模块边界、命令和约束的路由、模块、配置和测试文件；
+- 只读取足够识别目的、模块边界、命令和约束的路由、模块、配置和测试文件；
 - 除非人类明确授权，不要读取整个代码库。
 
 默认不要读取：
@@ -118,7 +114,7 @@ ai/project/task.md             = 当前执行契约
 - `.env*` 等密钥或环境文件；
 - 归档或历史目录，除非用户明确引用。
 
-如果仓库很大，先读取根目录文档和清单文件，再询问是否扩展读取范围。
+仓库很大时，先读根文档和清单，再询问是否扩展读取范围。
 
 ### 引导输出
 
@@ -160,8 +156,8 @@ ai/project/task.md             = 当前执行契约
 
 - `ai/project/task.md`
 
-当项目上下文已确认，但 `ai/project/task.md` 为空、只有占位内容、不完整，
-或人类提供了新的任务目标且引导模式尚未起草任务时，使用任务草稿模式。
+项目上下文已确认但 `task.md` 为空、占位、不完整，或人类提供新任务且引导尚未起草时，
+使用任务草稿模式。
 
 任务草稿模式应该：
 
@@ -175,7 +171,7 @@ ai/project/task.md             = 当前执行契约
 
 ## 上下文整合模式
 
-上下文整合模式吸收新的权威资料，并修正现有长期上下文。
+上下文整合模式吸收新权威资料，修正长期上下文。
 
 新资料优先放入：
 
@@ -184,21 +180,20 @@ ai/project/task.md             = 当前执行契约
 
 已整合资料统一移动到 `ai/project/inbox/processed/`，默认不再作为待吸收资料读取。
 
-用户可以直接说“整合 ai/project/inbox/ 里的新资料”。使用上下文整合模式时，
-执行 `ai/template/reconcile.md`。
+用户可直接说“整合 ai/project/inbox/ 里的新资料”。整合时执行 `ai/template/reconcile.md`。
 
 上下文整合模式必须：
 
 - 读取现有 `ai/project/project.md`、`ai/project/runtime.md` 和 `ai/project/refs/*.md`；
 - 读取人类指定的新资料；未指定时读取 `ai/project/inbox/*.md`；
 - 先输出整合计划，不修改文件；
-- 等人类确认后，才更新 `ai/project/project.md`、`ai/project/runtime.md` 和 `ai/project/refs/*.md`；
+- 人类确认后，才更新 `ai/project/project.md`、`ai/project/runtime.md` 和 `ai/project/refs/*.md`；
 - 应用整合后，把本次已处理的 `ai/project/inbox/*.md` 移动到 `ai/project/inbox/processed/`；
 - 不要默认修改 `task.md`、`result.*`、`metrics.json`、源码、测试、配置或依赖文件；
 - 不要把新资料整段塞进 refs，而是吸收长期有效、结构化、可复用的事实。
 
-如果新资料会改变 `final-shape.md`、`module-map.md` 或 `roadmap.md` 的方向性内容，
-上下文整合只能提出 `strategy_update` 建议，不能直接修改这些文件。
+新资料若改变 `final-shape.md`、`module-map.md` 或 `roadmap.md` 的方向性内容，
+整合只能建议 `strategy_update`，不能直接修改。
 
 ## 策略修订模式
 

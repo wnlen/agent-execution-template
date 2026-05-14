@@ -19,6 +19,8 @@ const REQUIRED_FILES = [
   "ai/template/protocol.md",
   "ai/template/rules/core.md",
   "ai/template/rules/output.md",
+  "ai/template/schemas/result.schema.json",
+  "ai/template/schemas/metrics.schema.json",
   "ai/project/inbox/.gitkeep",
   "ai/project/project.md",
   "ai/project/runtime.md",
@@ -37,11 +39,6 @@ const RECOMMENDED_FILES = [
   "ai/project/refs/final-shape.md",
   "ai/project/refs/module-map.md",
   "ai/project/refs/roadmap.md"
-];
-
-const JSON_HEALTH_FILES = [
-  "ai/project/result.json",
-  "ai/project/metrics.json"
 ];
 
 const TASK_HEALTH_PATTERNS = [
@@ -132,6 +129,7 @@ const TEXT = {
     fail: "失败",
     empty: "为空",
     invalidJson: "JSON 无效",
+    invalidSchema: "不符合协议 schema",
     taskFrontMatterIncomplete: "任务 front matter 缺少关键字段",
     versionMismatch: "模板版本与包版本不一致",
     runInit: "请运行 npx -y @wnlen/agent-execution-template init",
@@ -241,6 +239,7 @@ Usage:
     fail: "FAIL",
     empty: "is empty",
     invalidJson: "contains invalid JSON",
+    invalidSchema: "does not match protocol schema",
     taskFrontMatterIncomplete: "task front matter is missing required fields",
     versionMismatch: "template version does not match package version",
     runInit: "Run npx -y @wnlen/agent-execution-template init",
@@ -701,6 +700,117 @@ function isPermissionError(error) {
   return error && (error.code === "EACCES" || error.code === "EPERM");
 }
 
+function parseJsonFile(file) {
+  return JSON.parse(fs.readFileSync(file, "utf8"));
+}
+
+function valueMatchesType(value, type) {
+  if (type === "array") return Array.isArray(value);
+  if (type === "integer") return Number.isInteger(value);
+  if (type === "number") return typeof value === "number" && Number.isFinite(value);
+  if (type === "object") return value !== null && typeof value === "object" && !Array.isArray(value);
+  return typeof value === type;
+}
+
+function valuesEqual(left, right) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function validateJsonSchema(value, schema, location = "$") {
+  const errors = [];
+
+  if (schema.const !== undefined && !valuesEqual(value, schema.const)) {
+    errors.push(`${location} must be ${JSON.stringify(schema.const)}`);
+  }
+
+  if (schema.enum && !schema.enum.some((candidate) => valuesEqual(value, candidate))) {
+    errors.push(`${location} must be one of ${schema.enum.map((item) => JSON.stringify(item)).join(", ")}`);
+  }
+
+  if (schema.type && !valueMatchesType(value, schema.type)) {
+    errors.push(`${location} must be ${schema.type}`);
+    return errors;
+  }
+
+  if (schema.minimum !== undefined && typeof value === "number" && value < schema.minimum) {
+    errors.push(`${location} must be >= ${schema.minimum}`);
+  }
+
+  if (schema.minLength !== undefined && typeof value === "string" && value.length < schema.minLength) {
+    errors.push(`${location} must have length >= ${schema.minLength}`);
+  }
+
+  if (schema.required && valueMatchesType(value, "object")) {
+    for (const key of schema.required) {
+      if (!Object.prototype.hasOwnProperty.call(value, key)) {
+        errors.push(`${location}.${key} is required`);
+      }
+    }
+  }
+
+  if (schema.properties && valueMatchesType(value, "object")) {
+    for (const [key, childSchema] of Object.entries(schema.properties)) {
+      if (Object.prototype.hasOwnProperty.call(value, key)) {
+        errors.push(...validateJsonSchema(value[key], childSchema, `${location}.${key}`));
+      }
+    }
+  }
+
+  if (schema.items && Array.isArray(value)) {
+    value.forEach((item, index) => {
+      errors.push(...validateJsonSchema(item, schema.items, `${location}[${index}]`));
+    });
+  }
+
+  if (schema.allOf) {
+    for (const childSchema of schema.allOf) {
+      if (childSchema.if) {
+        if (validateJsonSchema(value, childSchema.if, location).length === 0 && childSchema.then) {
+          errors.push(...validateJsonSchema(value, childSchema.then, location));
+        }
+      } else {
+        errors.push(...validateJsonSchema(value, childSchema, location));
+      }
+    }
+  }
+
+  return errors;
+}
+
+function printSchemaValidation(file, schemaFile, text) {
+  const fullPath = path.join(process.cwd(), file);
+  const schemaPath = path.join(process.cwd(), schemaFile);
+  if (!fs.existsSync(fullPath) || !fs.existsSync(schemaPath)) {
+    return 0;
+  }
+
+  let value;
+  try {
+    value = parseJsonFile(fullPath);
+    console.log(`[${text.pass}] ${file} JSON`);
+  } catch {
+    console.log(`[${text.fail}] ${file} ${text.invalidJson}`);
+    return 1;
+  }
+
+  let schema;
+  try {
+    schema = parseJsonFile(schemaPath);
+  } catch {
+    console.log(`[${text.fail}] ${schemaFile} ${text.invalidJson}`);
+    return 1;
+  }
+
+  const errors = validateJsonSchema(value, schema);
+  if (errors.length > 0) {
+    console.log(`[${text.fail}] ${file} ${text.invalidSchema}: ${errors.slice(0, 3).join("; ")}`);
+    return 1;
+  }
+
+  console.log(`[${text.pass}] ${file} schema`);
+  return 0;
+}
+
 function printFatal(error, lang) {
   const text = getText(lang);
   if (isPermissionError(error)) {
@@ -756,18 +866,12 @@ function doctor() {
     console.log(`[${text.pass}] ${file}`);
   }
 
-  for (const file of JSON_HEALTH_FILES) {
-    const fullPath = path.join(process.cwd(), file);
-    if (!fs.existsSync(fullPath)) {
-      continue;
-    }
-    try {
-      JSON.parse(fs.readFileSync(fullPath, "utf8"));
-      console.log(`[${text.pass}] ${file} JSON`);
-    } catch {
-      console.log(`[${text.fail}] ${file} ${text.invalidJson}`);
-      missing += 1;
-    }
+  const schemaChecks = [
+    ["ai/project/result.json", "ai/template/schemas/result.schema.json"],
+    ["ai/project/metrics.json", "ai/template/schemas/metrics.schema.json"]
+  ];
+  for (const [file, schemaFile] of schemaChecks) {
+    missing += printSchemaValidation(file, schemaFile, text);
   }
 
   const taskPath = path.join(process.cwd(), "ai/project/task.md");

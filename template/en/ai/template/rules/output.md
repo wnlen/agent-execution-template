@@ -25,7 +25,10 @@ verification, assumptions, issues, next steps, and runtime update proposals.
 
 ## Result Markdown
 
-`ai/project/result.md` is the human-readable summary. Keep it short:
+`ai/project/result.md` is the human-readable summary. Keep it short and use the
+installed language from `ai/template/LANG` by default. In the English template,
+headings and prose should default to English; preserve code, commands, file
+paths, and protocol field names as written.
 
 ```md
 ## Status

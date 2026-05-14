@@ -121,6 +121,11 @@ verification was not possible. A purely subjective Green is not valid.
 
 ## User-Visible Output
 
+- Use the installed template language by default. When `ai/template/LANG` is
+  `en`, user-visible plans, L1 checklists, checkpoints, task draft handoffs,
+  blocked explanations, and final results should default to English. Use another
+  language only when the human explicitly asks, or when preserving code,
+  commands, file paths, or protocol field names.
 - Show the L1 checklist by default; do not show full L2/L3/L4 by default.
 - Show risk conclusions and necessary reasons; do not output long internal reasoning.
 - Show evidence; do not show internal protocol fields, full YAML,

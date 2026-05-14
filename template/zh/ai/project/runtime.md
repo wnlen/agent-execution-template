@@ -3,15 +3,15 @@
 ## 当前状态
 
 - 阶段：方向层与执行层一致性收口
-- 重点：保持文件协议可安装、可升级、可审计，并让项目方向治理与任务执行约束一致。
+- 重点：保持协议可安装、可升级、可审计，并让方向治理与执行约束一致。
 - 阻塞：无
 - 已知风险：
   - 超出当前任务范围
-  - 询问人类那些 Agent 可以安全推断的细节
+  - 询问可安全推断的细节
   - 用历史过程笔记污染运行时上下文
   - 没有验证证据就标记成功
   - 在明确权限之外运行命令
-  - 只优化 token 节省，而忽略成本可接受前提下的输出质量
+  - 只省 token，忽略可接受成本下的质量
   - 方向层已升级但规则、runtime 或 doctor 仍停留在旧语义
 
 ## 硬规则
@@ -36,8 +36,8 @@
 
 ## 项目约束
 
-- 引导读取集从 `ai/template/bootstrap.md`、`ai/template/protocol.md`、`ai/template/rules/core.md`、根目录文档、清单、文档、引用开始；当文档不足时，进行有限源码结构检查。
-- 执行读取集是 `ai/template/prompt.md`、`ai/template/protocol.md`、`ai/template/rules/core.md`、`ai/project/project.md`、`ai/project/runtime.md` 和 `ai/project/task.md`。
+- 引导读取集：`bootstrap.md`、`protocol.md`、`rules/core.md`、根文档、清单、项目文档、引用；文档不足时有限检查源码结构。
+- 执行读取集：`prompt.md`、`protocol.md`、`rules/core.md`、`project.md`、`runtime.md`、`task.md`。
 - `ai/project/refs/` 文件只在任务要求或任务类型触发时加载。
 - `ai/project/refs/final-shape.md`、`module-map.md`、`roadmap.md` 属于方向层正式文档。
 - 方向层正式文档不能被普通 reconcile 或普通执行任务直接修改。
@@ -53,9 +53,9 @@
 ## 当前上下文
 
 这个项目是协议 / 模板，不是复杂 Agent 框架。
-当前产品定位是：面向 AI Coding Agent 的项目方向治理 + 可审计任务执行协议。
-当前产品目标是减少人类交互频率和输入量，同时让任务随时间变得更精确，并减少长期方向漂移。
-允许增加少量服务于协议采用和治理闭环的 CLI；不要引入 UI、云同步或多 Agent 编排。
+定位：面向 AI Coding Agent 的项目方向治理 + 可审计任务执行协议。
+目标：减少人类交互和输入量，让任务随时间更精确，并降低长期方向漂移。
+允许增加少量服务协议采用和治理闭环的 CLI；不要引入 UI、云同步或多 Agent 编排。
 
 ## 引用路由
 
@@ -69,6 +69,6 @@
 
 ## 运行时更新治理
 
-除非 `ai/project/task.md` 明确允许，AI 不得直接更新这个文件。
-如果任务产生长期有效上下文，将建议写入 `ai/project/result.json.runtime_update`。
-通过单独任务应用运行时更新，该任务唯一允许目标是 `ai/project/runtime.md`。
+除非 `task.md` 明确允许，AI 不得直接更新本文件。
+任务产生长期上下文时，写入 `result.json.runtime_update` 建议。
+运行时更新应由单独任务应用，唯一目标是 `ai/project/runtime.md`。
