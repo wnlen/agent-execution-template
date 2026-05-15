@@ -1,7 +1,7 @@
 {
   "protocol_version": "0.8",
-  "task_id": "20260516-slash-command-routing",
-  "task_type": "feature",
+  "task_id": "20260516-release-slash-command-routing",
+  "task_type": "release",
   "model": "GPT-5",
   "model_tier": "cheap",
   "escalated": false,
@@ -17,7 +17,7 @@
   "failure_reason": "",
   "reuse_potential": "high",
   "notes": [
-    "AI 工作流触发入口已改为 slash command。",
-    "普通问答保持只读，不进入执行工作流。"
+    "slash command 触发模型已发布。",
+    "0.8.24 已提交、推送并发布到 npm。"
   ]
 }
