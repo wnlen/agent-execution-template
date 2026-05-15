@@ -3,6 +3,22 @@
 Do not summarize this file.
 During task execution, use this file to choose `normal` or `bounded_continuous`.
 
+## Task Contract Shapes
+
+`ai/project/task.md` has two valid shapes:
+
+- Compact task contract: for single-L1, Green, low-risk tasks. Write only the
+  goal, scope, acceptance, permissions, verification commands, and minimal
+  `execution_policy.task_tree`; do not expand internal control fields such as
+  `checkpoint_budget` or `model_policy`.
+- Expanded task contract: for multi-L1, Yellow/Red, cross-module, continuously
+  executed, highly uncertain, or high-risk tasks. Expand checkpoint, model
+  policy, risk gate, and fuller task-tree fields only when needed.
+
+Prefer compact by default. Upgrade to expanded only when complexity, risk, or
+auditability makes the extra structure worthwhile. The complete execution rules
+live in this file and do not need to be repeated in every task draft.
+
 ## Default Policy
 
 The default execution policy is `auto`: before each execution, the AI first
@@ -25,6 +41,8 @@ Pre-execution planning must:
 - Stop for human confirmation first if any L1 is Red; Green and Yellow do not
   block startup.
 - Write the task tree to `execution_policy.task_tree` in `ai/project/task.md`.
+  Simple tasks should write only minimal L1 nodes; complex tasks can add
+  `scope`, `acceptance`, `evidence`, `children`, and related fields.
 
 ## Task Tree
 
@@ -48,7 +66,16 @@ Execute the task tree in L1 -> L2 -> L3 order.
 - During execution, use `pending`, `running`, `done`, or `blocked` for node
   status.
 
-Recommended node shape:
+Minimal node shape:
+
+```yaml
+id: "L1-1"
+title: ""
+risk: "Green | Yellow | Red"
+status: "pending | running | done | blocked"
+```
+
+Recommended node shape for complex tasks:
 
 ```yaml
 id: "L1-1"

@@ -45,9 +45,13 @@
 1. 读取已确认的 `ai/project/project.md` 和相关 `ai/project/refs/*.md`。
 2. 根据用户目标、项目上下文和仓库事实推断目标、范围、验收、权限、验证方式和初始风险；
    不要求用户逐项提供。
-3. 起草 `ai/project/task.md`，并将 `execution_policy.mode` 设为 `auto`。
+3. 起草 `ai/project/task.md`。单 L1、Green、低风险任务默认使用 compact task contract：
+   只写目标、范围、验收、权限、验证命令和最小 `execution_policy.task_tree`。
+   多 L1、Yellow/Red、跨模块、连续执行或高不确定任务才使用 expanded task contract。
 4. 执行前列出 L1 清单并标注 Green / Yellow / Red，写入 `execution_policy.task_tree`。
-   L1 < 2 用 `normal`；L1 >= 2 自动用 `bounded_continuous`。
+   L1 < 2 用 `normal`；L1 >= 2 自动用 `bounded_continuous`。完整默认规则由
+   `ai/template/execution-policy.md` 承载，不要把 `checkpoint_budget`、`model_policy`
+   等内部控制字段机械复制到简单任务草稿里。
 5. 本轮新建或重写 `task.md` 时，将 `readiness` 设为 `draft_for_confirmation` 并停止；
    草稿不能直接执行。
 6. 只有既有任务为 `ready_to_execute` 且无 Red 预检项，才进入执行；否则设为 `blocked`。

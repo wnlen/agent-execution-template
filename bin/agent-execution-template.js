@@ -52,11 +52,7 @@ const TASK_HEALTH_PATTERNS = [
   /^readiness:\s*/m,
   /^execution_policy:/m,
   /^\s+mode:\s*/m,
-  /^\s+activation_rule:\s*/m,
   /^\s+task_tree:/m,
-  /^\s+risk_gate:/m,
-  /^\s+evidence_required:\s*/m,
-  /^model_policy:/m,
   /^refs:/m,
   /^permission:/m
 ];
@@ -78,32 +74,23 @@ const TEXT = {
     unknown: "未知",
     sourceMissing: "找不到模板来源",
     ready: "Agent Execution Template 协议已安装。项目上下文尚未初始化。",
-    initGuide: `[下一步：让 AI 初始化项目上下文]
-已安装根目录 AI 兼容入口: AGENTS.md / CLAUDE.md
+    initGuide: `下一步，把这句话发给你的 AI coding 工具:
 
-1. 无额外资料
-   对 AI 说: 开始初始化这个项目
-2. 有已确定资料
-   先放到: ai/project/inbox/
-   对 AI 说: 开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料
+  开始初始化这个项目
 
-[后续]
-1. 继续推进
-   对 AI 说: 继续推进这个项目
-2. 吸收新资料
-   先放到: ai/project/inbox/
-   对 AI 说: 整合 ai/project/inbox/ 里的新资料
-3. 优化上下文
-   运行命令: npx -y @wnlen/agent-execution-template refresh
-4. 评估方向
-   先放到: ai/project/inbox/ideas/
-   对 AI 说: 把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
-5. 查看下一步
-   运行命令: npx -y @wnlen/agent-execution-template next
+如果你已经有确定资料:
+  1. 放到 ai/project/inbox/
+  2. 对 AI 说: 开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料
 
-[区分标准]
-  资料 = 已确定的事实、文档、流程、接口、业务规则
-  方向 = 还没决定的新想法、产品策略、架构调整、路线变化`,
+资料路径:
+  - 已确定资料: ai/project/inbox/
+  - 未决定的新想法: ai/project/inbox/ideas/
+
+忘了下一步时运行:
+  npx -y @wnlen/agent-execution-template next
+
+已完成:
+  - 根目录 AI 入口: AGENTS.md / CLAUDE.md`,
     start: "开始:",
     startPrompt: "开始初始化这个项目",
     then: "然后:",
@@ -112,8 +99,8 @@ const TEXT = {
     confirmTask: "需要吸收新资料时，先放入 ai/project/inbox/，然后说:",
     executePrompt: "整合 ai/project/inbox/ 里的新资料",
     strategyHint: "需要修订方向时，先放入 ai/project/inbox/ideas/，然后生成 strategy_update 提案。",
-    files: "文件",
-    check: "检查",
+    files: "文件已就绪",
+    check: "检查安装",
     details: "详情:",
     refreshTitle: "Agent Execution Template 项目上下文重整",
     improveContextTitle: "Agent Execution Template 上下文总结优化",
@@ -192,32 +179,23 @@ Usage:
     unknown: "unknown",
     sourceMissing: "Template source not found",
     ready: "Agent Execution Template protocol installed. Project context is not initialized yet.",
-    initGuide: `[Next: ask the AI to initialize project context]
-Installed root AI compatibility entrypoints: AGENTS.md / CLAUDE.md
+    initGuide: `Next, send this to your AI coding tool:
 
-1. Without extra material
-   Tell the AI: Start initializing this project
-2. With confirmed material
-   Put it in: ai/project/inbox/
-   Tell the AI: Start initializing this project and absorb the material in ai/project/inbox/
+  Start initializing this project
 
-[Follow-up]
-1. Continue work
-   Tell the AI: Continue this project
-2. Absorb new material
-   Put it in: ai/project/inbox/
-   Tell the AI: Reconcile the new material in ai/project/inbox/
-3. Improve context
-   Run: npx -y @wnlen/agent-execution-template refresh
-4. Evaluate direction
-   Put it in: ai/project/inbox/ideas/
-   Tell the AI: Generate a direction amendment proposal from ai/project/inbox/ideas/
-5. Show next step
-   Run: npx -y @wnlen/agent-execution-template next
+If you already have confirmed material:
+  1. Put it in ai/project/inbox/
+  2. Tell the AI: Start initializing this project and absorb the material in ai/project/inbox/
 
-[Rule of thumb]
-  Material = confirmed facts, docs, workflows, APIs, or business rules
-  Direction = undecided ideas, product strategy, architecture changes, or roadmap changes`,
+Material paths:
+  - Confirmed material: ai/project/inbox/
+  - Undecided ideas: ai/project/inbox/ideas/
+
+If you forget the next step, run:
+  npx -y @wnlen/agent-execution-template next
+
+Completed:
+  - Root AI entrypoints: AGENTS.md / CLAUDE.md`,
     start: "Start:",
     startPrompt: "Start initializing this project",
     then: "Then:",
@@ -226,8 +204,8 @@ Installed root AI compatibility entrypoints: AGENTS.md / CLAUDE.md
     confirmTask: "When you need to absorb new material, put it in ai/project/inbox/, then say:",
     executePrompt: "Reconcile the new material in ai/project/inbox/",
     strategyHint: "When direction changes, put ideas in ai/project/inbox/ideas/ and produce a strategy_update proposal.",
-    files: "Files",
-    check: "Check",
+    files: "Files ready",
+    check: "Check install",
     details: "Details:",
     refreshTitle: "Agent Execution Template project context refresh",
     improveContextTitle: "Agent Execution Template project context improvement",
@@ -604,12 +582,11 @@ function init({ lang = DEFAULT_LANG, verbose = false, quiet = false, manageEntry
   }
 
   if (!quiet) {
-    const sourceNotice = isSourceCheckout() ? `${text.sourceCheckoutNotice}\n\n` : "";
+    const sourceNotice = isSourceCheckout() ? `\n${text.sourceCheckoutNotice}` : "";
     console.log(`${text.ready}
 
-${text.initGuide}
+${text.initGuide}${sourceNotice}
 
-${sourceNotice}
 ${text.files}: ${summarizeChanges(changes, lang)}
 ${text.check}: ${commandHint("doctor")}
 `);

@@ -3,6 +3,19 @@
 不要总结这个文件。
 任务执行时按本文件选择 `normal` 或 `bounded_continuous`。
 
+## 任务契约形态
+
+`ai/project/task.md` 有两种合法形态：
+
+- compact task contract：用于单 L1、Green、低风险任务。只写目标、范围、验收、
+  权限、验证命令和最小 `execution_policy.task_tree`；不要展开
+  `checkpoint_budget`、`model_policy` 等内部控制字段。
+- expanded task contract：用于多 L1、Yellow/Red、跨模块、连续执行、高不确定或
+  高风险任务。需要时可展开 checkpoint、模型策略、风险门和更完整的任务树字段。
+
+默认优先 compact。只有复杂度、风险或审计需要证明它有价值时，才升级到 expanded。
+完整执行规则由本文件承载，不需要在每个任务草稿里重复。
+
 ## 默认策略
 
 默认执行策略是 `auto`：AI 在每次执行前先做任务分解和风险判断，再决定使用
@@ -19,7 +32,8 @@
 - 如果 L1 少于 2 个，使用 `normal`。
 - 如果 L1 为 2 个或更多，自动启用 `bounded_continuous`。
 - 如果任一 L1 为 Red，先停止并让人类确认；Green 和 Yellow 不阻塞启动。
-- 将任务树写入 `ai/project/task.md` 的 `execution_policy.task_tree`。
+- 将任务树写入 `ai/project/task.md` 的 `execution_policy.task_tree`。简单任务只写最小
+  L1 节点；复杂任务再补充 scope、acceptance、evidence、children 等字段。
 
 ## 任务树
 
@@ -37,7 +51,16 @@
   出现 Red、blocked、范围变化或最终收尾时立即写回。不要为每个微小 L3 操作写回。
 - 执行中使用 `pending`、`running`、`done` 或 `blocked` 表示节点状态。
 
-推荐节点结构：
+最小节点结构：
+
+```yaml
+id: "L1-1"
+title: ""
+risk: "Green | Yellow | Red"
+status: "pending | running | done | blocked"
+```
+
+复杂任务推荐节点结构：
 
 ```yaml
 id: "L1-1"

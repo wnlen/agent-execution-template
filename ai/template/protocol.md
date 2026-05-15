@@ -53,6 +53,11 @@ ai/project/task.md             = 当前执行契约
 L1 必须是可独立验收的垂直切片。只有既有任务 `readiness = ready_to_execute` 才能执行；
 本轮新建或重写任务契约时先停下确认。Red 停止确认，Yellow 只允许当前 L1/L2 内的局部低风险修正。
 
+任务契约默认按复杂度分层。单 L1、Green、低风险任务使用 compact task contract，只保留
+目标、范围、验收、权限、验证命令和最小 `execution_policy.task_tree`。多 L1、Yellow/Red、
+跨模块、连续执行或高不确定任务才使用 expanded task contract，按需展开 checkpoint、
+模型策略和更完整的任务树字段。
+
 任务树、风险分级、Checkpoint 证据和 `task_tree` 写回规则由
 `ai/template/execution-policy.md` 定义。
 

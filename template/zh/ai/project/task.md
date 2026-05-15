@@ -7,61 +7,11 @@ readiness: "draft_for_confirmation | ready_to_execute | blocked"
 depends_on_previous_result: false
 execution_policy:
   mode: "auto | normal | bounded_continuous"
-  activation_rule: "auto_enable_when_l1_count_gte_2"
-  max_depth: 3
-  allow_depth_4_when_needed: true
-  progress_unit: "vertical_slice"
-  l1_granularity: "independently_acceptable_vertical_slice"
-  write_back_policy: "l1_start_done_red_blocked_scope_change_final"
   task_tree:
     - id: "L1-1"
       title: ""
       risk: "Green | Yellow | Red"
       status: "pending | running | done | blocked"
-      scope:
-        allowed: []
-        denied: []
-      acceptance: []
-      evidence: []
-      children: []
-  checkpoint_budget:
-    l1: 0
-    l2: 0
-    l3: 0
-    l4: 0
-  checkpoint_triggers:
-    - before_crossing_boundary
-    - after_vertical_slice
-    - before_final_review
-  auto_continue:
-    green: true
-    yellow: "low_risk_only"
-    red: false
-  risk_gate:
-    green: "continue"
-    yellow: "continue_with_local_fix"
-    red: "stop_for_human"
-  evidence_required: true
-model_policy:
-  default_tier: "cheap"
-  allowed_tiers:
-    - cheap
-    - standard
-    - strong
-  escalation_allowed: true
-  escalation_triggers:
-    - ambiguous_goal
-    - ambiguous_acceptance
-    - high_risk_change
-    - architecture_boundary
-    - repeated_failure
-    - verification_dispute
-  strong_model_roles:
-    - planning
-    - risk_judgment
-    - architecture_review
-    - failure_review
-    - acceptance_judgment
 refs:
   required: []
   optional: []
@@ -85,6 +35,11 @@ permission:
 若会越权、触碰安全边界或验收不可定义，将 `readiness` 设为 `blocked` 或把相关节点设为
 `Red`，等待确认。本轮新建或重写任务契约时，默认保持 `draft_for_confirmation` 并停下交接；
 只有既有任务为 `ready_to_execute` 时才执行。
+
+默认使用 compact task contract。单 L1、Green、低风险任务只写目标、范围、验收、
+权限、验证命令和最小 `execution_policy.task_tree`。多 L1、Yellow/Red、跨模块、
+连续执行或高不确定任务才按需展开 checkpoint、模型策略、风险门和更完整任务树字段。
+完整默认规则见 `ai/template/execution-policy.md`。
 
 ## 目标
 
@@ -124,7 +79,7 @@ permission:
 ## 执行策略
 
 默认 `auto`：AI 执行前规划并决定是否连续执行，不等用户口令。L1 < 2 用 `normal`；
-L1 >= 2 自动用 `bounded_continuous`。
+L1 >= 2 自动用 `bounded_continuous`。L1 必须是可独立验收的垂直切片。
 
 `bounded_continuous` 表示边界内连续执行：
 
@@ -143,7 +98,8 @@ L1 >= 2 自动用 `bounded_continuous`。
 - 只有 Red 停下来让人类确认；Green 自动继续，Yellow 只允许当前 L1/L2 内的局部
   低风险修正，不能改变公共接口、数据模型、权限、安全、架构方向或验收标准。
 - `progress_unit` 默认为 `vertical_slice`：每轮都应产生可检查增量。
-- `checkpoint_budget` 是上限，不是必须用完；不要为消耗预算而汇报。
+- compact 任务不要展开 `checkpoint_budget`、`model_policy` 等内部控制字段。
+- expanded 任务可以按需增加 checkpoint 预算、模型策略、风险门和更完整节点字段。
 - 只有在风险从 Green 变 Yellow/Red、即将扩大范围或权限、完成 L1 垂直切片、
   验证失败后准备继续、准备最终收尾时才输出 Checkpoint。
 - 每个 Checkpoint 必须包含证据：已改文件、已运行命令、验证结果或无法验证的原因。

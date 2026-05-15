@@ -181,6 +181,12 @@ acceptable vertical slice, not a mechanical step checklist:
 - [ ] L1-3 Export entrypoint Yellow
 ```
 
+Simple tasks are not buried under a full process form. A single-L1, Green,
+low-risk task uses a compact task contract with only the goal, scope,
+acceptance, permissions, verification commands, and minimal `task_tree`.
+Multi-L1, Yellow/Red, cross-module, continuously executed, or highly uncertain
+tasks use an expanded task contract.
+
 Because there are two or more L1 tasks, the protocol automatically uses bounded
 continuous execution. Before each L1, the AI plans naturally derived L2/L3 work.
 After completing an L1, it checks and strikes the item. `task_tree` is written

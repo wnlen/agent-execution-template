@@ -67,6 +67,13 @@ rewrites the task contract, stop at the confirmation handoff. Only Red stops for
 human confirmation, and Yellow only permits local low-risk correction inside the
 current L1/L2.
 
+Task contracts are layered by complexity. A single-L1, Green, low-risk task uses
+a compact task contract with only the goal, scope, acceptance, permissions,
+verification commands, and minimal `execution_policy.task_tree`. Multi-L1,
+Yellow/Red, cross-module, continuously executed, or highly uncertain tasks use
+an expanded task contract and may include checkpoint, model policy, and fuller
+task-tree fields as needed.
+
 Task tree, risk rubric, checkpoint evidence, and `task_tree` write-back rules
 are defined in `ai/template/execution-policy.md`.
 

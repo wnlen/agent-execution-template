@@ -1,30 +1,167 @@
 {
   "protocol_version": "0.8",
   "status": "blocked",
-  "task_id": "",
-  "task_summary": "尚未执行任务。",
+  "task_id": "20260515-compact-task-contract",
+  "task_summary": "为简单任务引入 compact task contract，并将复杂任务保留为 expanded task contract。",
   "scope_followed": true,
-  "files_read": [],
-  "refs_read": [],
-  "files_changed": [],
-  "commands_run": [],
+  "files_read": [
+    "ai/template/prompt.md",
+    "ai/project/task.md",
+    "ai/project/runtime.md",
+    "ai/template/rules/core.md",
+    "ai/template/protocol.md",
+    "ai/template/execution-policy.md",
+    "ai/project/refs/commands.md",
+    "template/zh/ai/project/task.md",
+    "template/en/ai/project/task.md",
+    "test/selftest.js",
+    "bin/agent-execution-template.js"
+  ],
+  "refs_read": [
+    {
+      "file": "ai/project/refs/commands.md",
+      "reason": "确认允许运行的验证命令。"
+    }
+  ],
+  "files_changed": [
+    {
+      "file": "ai/template/prompt.md",
+      "change_type": "modified",
+      "reason": "任务草稿模式说明 compact / expanded 契约分层。"
+    },
+    {
+      "file": "ai/template/execution-policy.md",
+      "change_type": "modified",
+      "reason": "定义 compact 和 expanded task contract。"
+    },
+    {
+      "file": "ai/template/protocol.md",
+      "change_type": "modified",
+      "reason": "在执行授权模式中说明契约分层。"
+    },
+    {
+      "file": "template/zh/ai/template/prompt.md",
+      "change_type": "modified",
+      "reason": "同步中文模板协议。"
+    },
+    {
+      "file": "template/zh/ai/template/execution-policy.md",
+      "change_type": "modified",
+      "reason": "同步中文模板执行策略。"
+    },
+    {
+      "file": "template/zh/ai/template/protocol.md",
+      "change_type": "modified",
+      "reason": "同步中文模板协议。"
+    },
+    {
+      "file": "template/zh/ai/project/task.md",
+      "change_type": "modified",
+      "reason": "将安装任务模板改为 compact 默认。"
+    },
+    {
+      "file": "template/en/ai/template/prompt.md",
+      "change_type": "modified",
+      "reason": "同步英文模板协议。"
+    },
+    {
+      "file": "template/en/ai/template/execution-policy.md",
+      "change_type": "modified",
+      "reason": "同步英文模板执行策略。"
+    },
+    {
+      "file": "template/en/ai/template/protocol.md",
+      "change_type": "modified",
+      "reason": "同步英文模板协议。"
+    },
+    {
+      "file": "template/en/ai/project/task.md",
+      "change_type": "modified",
+      "reason": "将英文安装任务模板改为 compact 默认。"
+    },
+    {
+      "file": "docs/SPEC.md",
+      "change_type": "modified",
+      "reason": "规格说明契约分层。"
+    },
+    {
+      "file": "README.md",
+      "change_type": "modified",
+      "reason": "英文 README 说明简单任务不会展开完整表单。"
+    },
+    {
+      "file": "README.zh-CN.md",
+      "change_type": "modified",
+      "reason": "中文 README 说明简单任务不会展开完整表单。"
+    },
+    {
+      "file": "test/selftest.js",
+      "change_type": "modified",
+      "reason": "测试 compact 默认、不再要求旧 expanded 字段。"
+    },
+    {
+      "file": "ai/project/task.md",
+      "change_type": "modified",
+      "reason": "记录执行状态和必要范围补充。"
+    },
+    {
+      "file": "ai/project/result.md",
+      "change_type": "modified",
+      "reason": "记录阻塞结果。"
+    },
+    {
+      "file": "ai/project/result.json",
+      "change_type": "modified",
+      "reason": "记录机器可读阻塞结果。"
+    },
+    {
+      "file": "ai/project/metrics.json",
+      "change_type": "modified",
+      "reason": "记录本次阻塞指标。"
+    },
+    {
+      "file": "ai/project/result.md",
+      "change_type": "modified",
+      "reason": "补充提交、推送和 npm 发布被权限阻塞的结果。"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "npm test",
+      "result": "failed",
+      "notes": "selftest 失败：doctor 仍按旧 expanded 字段校验 ai/project/task.md front matter。"
+    },
+    {
+      "command": "npm view @wnlen/agent-execution-template version",
+      "result": "passed",
+      "notes": "registry 当前版本为 0.8.21。"
+    }
+  ],
   "verification": {
-    "level": "none",
+    "level": "test",
     "passed": false,
-    "evidence": []
+    "evidence": [
+      "`npm test` failed with `Error: doctor should validate task front matter`."
+    ]
   },
   "evidence": {
-    "git_diff_summary": "",
+    "git_diff_summary": "协议和安装任务模板已改为 compact 默认；doctor 校验尚未同步。",
     "changed_files_from_git": [],
-    "command_outputs": [],
+    "command_outputs": [
+      "npm test: failed at test/selftest.js assertion `doctor should validate task front matter`.",
+      "npm view @wnlen/agent-execution-template version: 0.8.21"
+    ],
     "unverified_claims": []
   },
-  "assumptions": [],
+  "assumptions": [
+    "允许继续时，应把 doctor 的 task front matter 健康检查同步为 compact 默认、expanded 可选。"
+  ],
   "issues": [
-    "尚未执行当前任务。"
+    "完成该任务需要修改 bin/agent-execution-template.js；当前任务要求代码行为修改前先确认。",
+    "人类要求提交、推送并发布 npm，但当前任务契约明确禁止 git push、npm publish，且未允许 git commit；该请求需要扩大命令和网络权限，按协议必须停止。"
   ],
   "next": [
-    "让 Agent 读取 ai/template/bootstrap.md，确认项目上下文，然后在运行 ai/template/prompt.md 前起草并确认 ai/project/task.md。"
+    "新建或确认发布任务契约，明确允许验证、提交、推送和 npm publish 后再执行。"
   ],
   "runtime_update": {
     "required": false,

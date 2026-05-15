@@ -24,7 +24,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/agent-execution-template@0.8.21
+Package: @wnlen/agent-execution-template@0.8.22
 中文安装: npx -y @wnlen/agent-execution-template init
 英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
@@ -420,7 +420,7 @@ npx -y @wnlen/agent-execution-template doctor
 ```text
 Agent Execution Template 检查
 
-模板版本: 0.8.21
+模板版本: 0.8.22
 模板语言: zh
 
 [通过] ai/template/LANG
@@ -696,6 +696,16 @@ apply_strategy_update
 ai/project/task.md.execution_policy
 ai/template/execution-policy.md
 ```
+
+`ai/project/task.md` 支持两种契约形态：
+
+- compact task contract：用于单 L1、Green、低风险任务，只写目标、范围、验收、权限、
+  验证命令和最小 `execution_policy.task_tree`。
+- expanded task contract：用于多 L1、Yellow/Red、跨模块、连续执行、高不确定或高风险任务，
+  可按需展开 checkpoint、模型策略、风险门和更完整的任务树字段。
+
+默认优先 compact。完整默认策略保存在 `ai/template/execution-policy.md`，简单任务不应把
+`checkpoint_budget`、`model_policy` 等内部控制字段机械复制进 `task.md`。
 
 默认模式是 `auto`。AI 每次执行前先做任务分解和风险判断，再决定使用
 `normal` 还是 `bounded_continuous`，不依赖用户口令。

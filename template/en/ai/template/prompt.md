@@ -67,11 +67,17 @@ In Task Draft Mode:
 2. Infer goal, scope, acceptance, permissions, verification method, and initial
    risk from the user's current goal, project context, and repository facts; do
    not require the human to provide each field upfront.
-3. Draft `ai/project/task.md` and set `execution_policy.mode` to `auto`.
+3. Draft `ai/project/task.md`. For a single-L1, Green, low-risk task, default to
+   a compact task contract: write only the goal, scope, acceptance, permissions,
+   verification commands, and minimal `execution_policy.task_tree`. Use an
+   expanded task contract only for multi-L1, Yellow/Red, cross-module,
+   continuously executed, or highly uncertain tasks.
 4. Before execution, list the L1 checklist, mark each L1 Green / Yellow / Red,
    and write it to `execution_policy.task_tree`. Use `normal` if there are
    fewer than 2 L1 tasks; automatically use `bounded_continuous` if there are 2
-   or more L1 tasks.
+   or more L1 tasks. The complete default rules live in
+   `ai/template/execution-policy.md`; do not mechanically copy internal control
+   fields such as `checkpoint_budget` or `model_policy` into simple task drafts.
 5. If this run creates or rewrites `ai/project/task.md`, set `readiness` to
    `draft_for_confirmation` and stop at the handoff; do not execute while the
    task is still a draft.
