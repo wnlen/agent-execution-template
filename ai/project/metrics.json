@@ -1,7 +1,7 @@
 {
   "protocol_version": "0.8",
-  "task_id": "20260515-compact-task-contract",
-  "task_type": "feature",
+  "task_id": "20260515-release-compact-task-contract",
+  "task_type": "release",
   "model": "GPT-5",
   "model_tier": "cheap",
   "escalated": false,
@@ -12,12 +12,12 @@
   "input_tokens_estimated": 0,
   "output_tokens_estimated": 0,
   "duration_minutes": 0,
-  "success": false,
-  "human_fix_required": true,
-  "failure_reason": "需要确认是否允许扩大命令和网络权限，执行验证、提交、推送和 npm publish；当前任务契约明确禁止 git push、npm publish，且未允许 git commit。",
-  "reuse_potential": "medium",
+  "success": true,
+  "human_fix_required": false,
+  "failure_reason": "",
+  "reuse_potential": "high",
   "notes": [
-    "简单任务 compact 契约需要 doctor 同步接受最小 task front matter。",
-    "npm registry 当前版本为 0.8.21；本地未提交改动不能视为已发布。"
+    "compact task contract 的 doctor 校验已同步。",
+    "0.8.22 已提交、推送并发布到 npm。"
   ]
 }

@@ -15,11 +15,11 @@ execution_policy:
     - id: "L1-2"
       title: "提交并推送 git 变更"
       risk: "Red"
-      status: "running"
+      status: "done"
     - id: "L1-3"
       title: "发布 npm 新版本"
       risk: "Red"
-      status: "pending"
+      status: "done"
 refs:
   required:
     - "ai/project/project.md"
