@@ -24,7 +24,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/agent-execution-template@0.8.22
+Package: @wnlen/agent-execution-template@0.8.23
 中文安装: npx -y @wnlen/agent-execution-template init
 英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
@@ -420,7 +420,7 @@ npx -y @wnlen/agent-execution-template doctor
 ```text
 Agent Execution Template 检查
 
-模板版本: 0.8.22
+模板版本: 0.8.23
 模板语言: zh
 
 [通过] ai/template/LANG

@@ -73,24 +73,31 @@ const TEXT = {
 `,
     unknown: "未知",
     sourceMissing: "找不到模板来源",
-    ready: "Agent Execution Template 协议已安装。项目上下文尚未初始化。",
-    initGuide: `下一步，把这句话发给你的 AI coding 工具:
+    ready: "Agent Execution Template 已安装。",
+    initGuide: `你现在可以这样用:
 
-  开始初始化这个项目
+1. 第一次整理项目上下文
+   【发给 AI】
 
-如果你已经有确定资料:
-  1. 放到 ai/project/inbox/
-  2. 对 AI 说: 开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料
+     开始初始化这个项目
 
-资料路径:
-  - 已确定资料: ai/project/inbox/
-  - 未决定的新想法: ai/project/inbox/ideas/
+2. 已有 README、PRD、架构文档或业务规则
+   先放到 ai/project/inbox/
+   【发给 AI】
 
-忘了下一步时运行:
-  npx -y @wnlen/agent-execution-template next
+     开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料
 
-已完成:
-  - 根目录 AI 入口: AGENTS.md / CLAUDE.md`,
+3. 后续有新资料要合并
+   放到 ai/project/inbox/
+   【发给 AI】
+
+     整合 ai/project/inbox/ 里的新资料
+
+4. 有还没确定的新想法、产品方向或架构调整
+   放到 ai/project/inbox/ideas/
+   【发给 AI】
+
+     把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案`,
     start: "开始:",
     startPrompt: "开始初始化这个项目",
     then: "然后:",
@@ -178,24 +185,31 @@ Usage:
 `,
     unknown: "unknown",
     sourceMissing: "Template source not found",
-    ready: "Agent Execution Template protocol installed. Project context is not initialized yet.",
-    initGuide: `Next, send this to your AI coding tool:
+    ready: "Agent Execution Template installed.",
+    initGuide: `You can use it like this:
 
-  Start initializing this project
+1. Set up project context for the first time
+   [Send to AI]
 
-If you already have confirmed material:
-  1. Put it in ai/project/inbox/
-  2. Tell the AI: Start initializing this project and absorb the material in ai/project/inbox/
+     Start initializing this project
 
-Material paths:
-  - Confirmed material: ai/project/inbox/
-  - Undecided ideas: ai/project/inbox/ideas/
+2. You already have a README, PRD, architecture doc, or business rules
+   Put them in ai/project/inbox/
+   [Send to AI]
 
-If you forget the next step, run:
-  npx -y @wnlen/agent-execution-template next
+     Start initializing this project and absorb the material in ai/project/inbox/
 
-Completed:
-  - Root AI entrypoints: AGENTS.md / CLAUDE.md`,
+3. Later, you have new material to merge
+   Put it in ai/project/inbox/
+   [Send to AI]
+
+     Reconcile the new material in ai/project/inbox/
+
+4. You have an undecided idea, product direction, or architecture change
+   Put it in ai/project/inbox/ideas/
+   [Send to AI]
+
+     Generate a direction amendment proposal from ai/project/inbox/ideas/`,
     start: "Start:",
     startPrompt: "Start initializing this project",
     then: "Then:",
@@ -587,11 +601,11 @@ function init({ lang = DEFAULT_LANG, verbose = false, quiet = false, manageEntry
 
 ${text.initGuide}${sourceNotice}
 
-${text.files}: ${summarizeChanges(changes, lang)}
 ${text.check}: ${commandHint("doctor")}
 `);
 
     if (verbose) {
+      console.log(`${text.files}: ${summarizeChanges(changes, lang)}`);
       printChanges(text.details, changes, lang);
     }
   }

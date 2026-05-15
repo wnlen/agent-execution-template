@@ -4,10 +4,11 @@
 
 已完成：
 
-- 修复 doctor 对 `ai/project/task.md` front matter 的校验，使 compact task contract 不再需要 expanded 字段。
-- 将版本 bump 到 `0.8.22`，并同步 `ai/template/VERSION`、中英文模板 VERSION 和 `docs/SPEC.md`。
-- 提交并推送到 `origin/dev`：`a1a5962 Release compact task contract support`。
-- 发布 npm：`@wnlen/agent-execution-template@0.8.22`。
+- `init` 默认输出改成四个常用场景：首次初始化、带已有资料初始化、后续合并新资料、评估未确定想法。
+- 每个场景的提示词用独立块展示，并加上 `【发给 AI】` / `[Send to AI]` 标签。
+- 默认输出移除了“项目上下文尚未初始化”、`next` 兜底命令、根目录入口说明、资料路径列表和文件数量摘要。
+- `--verbose` 仍保留文件数量摘要和详细文件变更。
+- 更新了中英文 selftest 断言。
 
 验证：
 
@@ -15,7 +16,6 @@
 - `npm run check:release`：passed
 - `git diff --check`：passed
 - `node bin/agent-execution-template.js doctor`：passed
-- `npm pack --dry-run`：passed，包版本 `0.8.22`，共 73 个文件
-- `npm view @wnlen/agent-execution-template version`：`0.8.22`
+- 临时目录中文 / 英文 `init` 输出已检查
 
 后续：无。
