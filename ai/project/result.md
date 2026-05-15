@@ -4,11 +4,9 @@
 
 已完成：
 
-- `init` 默认输出改成四个常用场景：首次初始化、带已有资料初始化、后续合并新资料、评估未确定想法。
-- 每个场景的提示词用独立块展示，并加上 `【发给 AI】` / `[Send to AI]` 标签。
-- 默认输出移除了“项目上下文尚未初始化”、`next` 兜底命令、根目录入口说明、资料路径列表和文件数量摘要。
-- `--verbose` 仍保留文件数量摘要和详细文件变更。
-- 更新了中英文 selftest 断言。
+- 提交并推送 init 输出优化：`ecafef7 Improve init usage guidance`。
+- 将版本 bump 到 `0.8.23`，同步模板 VERSION 和 SPEC 版本引用。
+- 发布 npm：`@wnlen/agent-execution-template@0.8.23`。
 
 验证：
 
@@ -16,6 +14,7 @@
 - `npm run check:release`：passed
 - `git diff --check`：passed
 - `node bin/agent-execution-template.js doctor`：passed
-- 临时目录中文 / 英文 `init` 输出已检查
+- `npm pack --dry-run`：passed，包版本 `0.8.23`，共 73 个文件
+- `npm view @wnlen/agent-execution-template version`：`0.8.23`
 
 后续：无。

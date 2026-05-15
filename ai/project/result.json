@@ -1,55 +1,82 @@
 {
   "protocol_version": "0.8",
   "status": "success",
-  "task_id": "20260515-init-output-scenarios",
-  "task_summary": "优化 init 安装后默认输出，覆盖常用场景并突出发给 AI 的提示词。",
+  "task_id": "20260515-release-init-output-scenarios",
+  "task_summary": "提交、推送 init 输出优化，并发布 @wnlen/agent-execution-template@0.8.23。",
   "scope_followed": true,
   "files_read": [
     "ai/template/prompt.md",
     "ai/project/task.md",
+    "ai/project/project.md",
     "ai/project/refs/commands.md",
+    "ai/template/protocol.md",
+    "ai/template/rules/core.md",
+    "ai/template/execution-policy.md",
+    "package.json",
     "bin/agent-execution-template.js",
-    "test/selftest.js",
-    "README.md",
-    "README.zh-CN.md",
-    "docs/SPEC.md"
+    "test/selftest.js"
   ],
   "refs_read": [
     {
       "file": "ai/project/refs/commands.md",
-      "reason": "确认本次允许的验证命令。"
+      "reason": "确认验证、版本、提交、推送和 npm 发布命令。"
     }
   ],
   "files_changed": [
     {
       "file": "bin/agent-execution-template.js",
       "change_type": "modified",
-      "reason": "将 init 默认输出改为场景驱动，并隐藏默认文件数量摘要。"
+      "reason": "优化 init 默认输出，覆盖常用场景并突出 AI 提示词。"
     },
     {
       "file": "test/selftest.js",
       "change_type": "modified",
-      "reason": "同步 init 输出断言，覆盖新文案和旧文案移除。"
+      "reason": "同步中英文 init 输出断言。"
+    },
+    {
+      "file": "package.json",
+      "change_type": "modified",
+      "reason": "版本从 0.8.22 bump 到 0.8.23。"
+    },
+    {
+      "file": "ai/template/VERSION",
+      "change_type": "modified",
+      "reason": "同步版本 0.8.23。"
+    },
+    {
+      "file": "template/zh/ai/template/VERSION",
+      "change_type": "modified",
+      "reason": "同步版本 0.8.23。"
+    },
+    {
+      "file": "template/en/ai/template/VERSION",
+      "change_type": "modified",
+      "reason": "同步版本 0.8.23。"
+    },
+    {
+      "file": "docs/SPEC.md",
+      "change_type": "modified",
+      "reason": "同步包版本和 doctor 示例版本。"
     },
     {
       "file": "ai/project/task.md",
       "change_type": "modified",
-      "reason": "记录本次任务契约和完成状态。"
+      "reason": "记录发布任务和完成状态。"
     },
     {
       "file": "ai/project/result.json",
       "change_type": "modified",
-      "reason": "记录机器可读执行结果。"
+      "reason": "记录机器可读发布结果。"
     },
     {
       "file": "ai/project/result.md",
       "change_type": "modified",
-      "reason": "记录人类可读执行结果。"
+      "reason": "记录人类可读发布结果。"
     },
     {
       "file": "ai/project/metrics.json",
       "change_type": "modified",
-      "reason": "记录本次任务指标。"
+      "reason": "记录本次发布指标。"
     }
   ],
   "commands_run": [
@@ -71,17 +98,32 @@
     {
       "command": "node bin/agent-execution-template.js doctor",
       "result": "passed",
-      "notes": "doctor 通过。"
+      "notes": "doctor 通过，模板版本 0.8.23。"
     },
     {
-      "command": "node bin/agent-execution-template.js init",
+      "command": "npm_config_cache=/tmp/npm-cache-agent-execution-template npm pack --dry-run",
       "result": "passed",
-      "notes": "临时目录中文输出覆盖四个常用场景，AI 提示词使用独立块展示。"
+      "notes": "dry-run 包版本为 0.8.23，total files: 73。"
     },
     {
-      "command": "node bin/agent-execution-template.js init --lang en",
+      "command": "git commit",
       "result": "passed",
-      "notes": "临时目录英文输出同步场景结构和提示词展示。"
+      "notes": "创建提交 ecafef7 Improve init usage guidance。"
+    },
+    {
+      "command": "git push",
+      "result": "passed",
+      "notes": "已推送 dev 到 origin/dev。"
+    },
+    {
+      "command": "npm publish",
+      "result": "passed",
+      "notes": "发布成功：+ @wnlen/agent-execution-template@0.8.23。"
+    },
+    {
+      "command": "npm view @wnlen/agent-execution-template version",
+      "result": "passed",
+      "notes": "registry latest 返回 0.8.23。"
     }
   ],
   "verification": {
@@ -92,29 +134,35 @@
       "`npm run check:release` passed.",
       "`git diff --check` passed.",
       "`node bin/agent-execution-template.js doctor` passed.",
-      "临时目录中文和英文 `init` 输出已手动检查。"
+      "`npm pack --dry-run` showed version 0.8.23.",
+      "`npm view @wnlen/agent-execution-template version` returned 0.8.23 after publish."
     ]
   },
   "evidence": {
-    "git_diff_summary": "CLI init 文案和 selftest 断言已更新；默认输出不再展示低价值状态、next 兜底、入口文件说明或文件数量摘要。",
+    "git_diff_summary": "init 默认输出优化、测试断言和 0.8.23 版本同步已提交并发布。",
     "changed_files_from_git": [
-      "bin/agent-execution-template.js",
-      "test/selftest.js",
-      "ai/project/task.md",
+      "ai/project/metrics.json",
       "ai/project/result.json",
       "ai/project/result.md",
-      "ai/project/metrics.json"
+      "ai/project/task.md",
+      "ai/template/VERSION",
+      "bin/agent-execution-template.js",
+      "docs/SPEC.md",
+      "package.json",
+      "template/en/ai/template/VERSION",
+      "template/zh/ai/template/VERSION",
+      "test/selftest.js"
     ],
     "command_outputs": [
       "npm test: selftest ok; release check ok",
       "npm run check:release: release check ok",
-      "git diff --check: passed",
-      "doctor: [通过] 已就绪"
+      "npm publish: + @wnlen/agent-execution-template@0.8.23",
+      "npm view @wnlen/agent-execution-template version: 0.8.23"
     ],
     "unverified_claims": []
   },
   "assumptions": [
-    "默认 init 输出应覆盖四个常用场景，后续仍可通过 README、next 和 doctor 获取更多细节。"
+    "0.8.23 作为 patch 发布版本，因为 0.8.22 已存在于 npm registry。"
   ],
   "issues": [],
   "next": [],

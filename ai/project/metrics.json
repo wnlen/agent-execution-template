@@ -1,7 +1,7 @@
 {
   "protocol_version": "0.8",
-  "task_id": "20260515-init-output-scenarios",
-  "task_type": "feature",
+  "task_id": "20260515-release-init-output-scenarios",
+  "task_type": "release",
   "model": "GPT-5",
   "model_tier": "cheap",
   "escalated": false,
@@ -17,7 +17,7 @@
   "failure_reason": "",
   "reuse_potential": "high",
   "notes": [
-    "init 默认输出改为场景驱动。",
-    "默认输出隐藏实现细节，AI 提示词独立展示。"
+    "init 默认输出优化已发布。",
+    "0.8.23 已提交、推送并发布到 npm。"
   ]
 }
