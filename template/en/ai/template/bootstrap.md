@@ -44,7 +44,7 @@ runtime files, result files, or metrics files during bootstrap.
 
 Read high-signal project evidence in this order:
 
-1. Root docs: `README*`, `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING*`, `CHANGELOG*`
+1. Root docs: `README*`, `CONTRIBUTING*`, `CHANGELOG*`
 2. Manifests: `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`,
    `pom.xml`, `build.gradle*`, `Makefile`
 3. Project docs: `docs/**`, preferring overview, architecture, setup, testing,
@@ -61,6 +61,9 @@ bounded read:
 - inspect route, module, config, and test files only enough to identify
   project purpose, module boundaries, commands, and constraints;
 - do not read the whole codebase unless the human explicitly authorizes it.
+
+Do not treat `AGENTS.md` or `CLAUDE.md` as project business evidence; they are
+AI entrypoint routing files only.
 
 Do not read dependency folders, build outputs, coverage outputs, lockfiles
 except to infer package manager, secret files, environment files, or archives

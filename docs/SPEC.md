@@ -8,7 +8,7 @@ Current protocol: v0.8
 
 ## 2. 一句话定位
 
-**Agent Execution Template 是一个 30 秒可安装、可升级、保护用户项目现场的 AI Coding Agent 执行协议模板。**
+**Agent Execution Template 是一个 30 秒可安装、可升级、保护用户项目现场的 AI Repo Execution Protocol。**
 
 它把 AI 编程从“聊天式执行”变成：
 
@@ -18,11 +18,13 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 当前版本的核心不是做一个新的 Agent，也不是做复杂调度系统，而是给 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 提供同一套项目内执行协议。
 
+它只管 AI 在某个仓库内怎么干活：当前任务是什么、哪些文件能改、需要读哪些上下文、执行结果怎么记录、如何审计本次任务，以及 Agent 进入项目后先读什么。
+
 ## 3. 当前版本
 
 ```text
 Protocol: v0.8
-Package: @wnlen/agent-execution-template@0.8.19
+Package: @wnlen/agent-execution-template@0.8.21
 中文安装: npx -y @wnlen/agent-execution-template init
 英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
@@ -33,6 +35,7 @@ Package: @wnlen/agent-execution-template@0.8.19
 - `init` / `next` / `refresh` / `improve-context` / `update` / `reconcile` / `strategy` / `doctor` 命令；
 - `init --lang zh|en` 双语安装入口，默认中文；
 - `template/project` 双区结构；
+- 根目录 AI 兼容入口托管块：`AGENTS.md` / `CLAUDE.md`；
 - 保护 `ai/project/**` 不被升级覆盖；
 - 模板版本文件 `ai/template/VERSION`；
 - 引导模式：通过 `ai/template/bootstrap.md` 从受控范围内的项目文档、manifest 和必要代码生成 `project.md` / refs 草稿；
@@ -70,6 +73,8 @@ Agent Execution Template 不是：
 - AI IDE；
 - Agent 平台；
 - 多 Agent 调度器；
+- workspace / sandbox / session 运行时；
+- 多仓库上下文管理器；
 - 任务队列系统；
 - 云服务；
 - Prompt Collection；
@@ -80,6 +85,20 @@ Agent Execution Template 不是：
 ```text
 AI Coding Agent 在项目里工作的文件协议和安全边界。
 ```
+
+明确禁止混淆：
+
+- Agent Execution Template 不做 workspace 切换、多仓库管理、sandbox 生命周期、session fork / rollback 或 worker 调度。
+- 与外部运行时集成时，不应把业务任务定义、项目最终形态说明、仓库内文件修改规则、acceptance criteria 或具体编码上下文移出本协议。
+
+与 `openclaw-workspaces` 这类外部运行时一起使用时，推荐分工是：
+
+```text
+openclaw-workspaces = AI Workspace & Session Runtime
+agent-execution-template = AI Repo Execution Protocol
+```
+
+外部运行时负责仓库外能力，例如创建独立 workspace、切换项目上下文、保存/恢复/打包 session、管理 worker/agent 运行环境、隔离污染，以及未来承载多 Agent Task Graph。
 
 ## 6. 安装与日常使用
 
@@ -225,6 +244,8 @@ template 是协议。
 project 是现场。
 ```
 
+这里的“项目现场”只指某个仓库内的 `ai/project/**` 执行上下文，不是跨项目 workspace/runtime。外部 workspace、session 和 sandbox 生命周期应由外部运行时管理。
+
 ## 8. template 区与 project 区
 
 ### 8.1 `ai/template/`
@@ -301,6 +322,7 @@ npx -y @wnlen/agent-execution-template init
 - 创建缺失的 `ai/project/**` 文件；
 - 不覆盖已有 `ai/project/**`；
 - 安装或覆盖 `ai/template/**`；
+- 创建或更新根目录 `AGENTS.md` / `CLAUDE.md` 中的同内容兼容托管块；
 - 支持 `--lang zh|en`，默认中文；
 - 输出下一步使用说明。
 
@@ -309,6 +331,11 @@ npx -y @wnlen/agent-execution-template init
 ```text
 init 可以安装模板协议，但不能覆盖用户现场。
 ```
+
+根目录 AI 兼容入口文件只管理 `agent-execution-template` 标记块，不能覆盖用户已有
+`AGENTS.md` 或 `CLAUDE.md` 内容。两个文件中的托管块内容必须一致；这不是两套协议，
+而是分别适配通用 Agent / Codex 和 Claude Code 的自动发现约定。托管块必须要求 AI 在“开始初始化这个项目”时先读
+`ai/template/prompt.md`，再由它路由到 `ai/template/bootstrap.md`。
 
 ### 9.2 `update`
 
@@ -319,6 +346,7 @@ npx -y @wnlen/agent-execution-template update
 作用：
 
 - 只更新 `ai/template/**`；
+- 刷新根目录 AI 兼容入口文件中的托管块；
 - 绝不修改 `ai/project/**`；
 - 默认沿用 `ai/template/LANG` 中记录的已安装语言；
 - 输出更新文件列表和模板版本。
@@ -392,7 +420,7 @@ npx -y @wnlen/agent-execution-template doctor
 ```text
 Agent Execution Template 检查
 
-模板版本: 0.8.19
+模板版本: 0.8.21
 模板语言: zh
 
 [通过] ai/template/LANG
@@ -448,6 +476,13 @@ npx -y @wnlen/agent-execution-template reconcile
 开始初始化这个项目
 ```
 
+为了让 AI 工具能发现这个入口，`init` 会在仓库根目录安装 `AGENTS.md` 和
+`CLAUDE.md` 兼容入口托管块。两个托管块内容相同，不代表两套协议；它们分别适配不同
+AI 工具的自动发现约定。兼容这些入口的 AI 工具必须先读取托管块，再读取
+`ai/template/prompt.md`，最后由 `prompt.md` 路由到 `ai/template/bootstrap.md`。
+如果宿主工具没有自动读取根目录入口，人类应先要求它读取 `AGENTS.md` 或
+`CLAUDE.md`。
+
 面向用户的任务执行入口是：
 
 ```text
@@ -469,17 +504,18 @@ npx -y @wnlen/agent-execution-template reconcile
 内部协议入口分别由 `ai/template/bootstrap.md`、`ai/template/prompt.md` 和
 `ai/template/reconcile.md` 承载，用户不需要记忆这些文件名。
 
-执行入口固定要求 AI Agent 先读：
+执行入口采用懒加载。AI Agent 先读：
 
 ```text
-1. ai/template/protocol.md
-2. ai/template/rules/core.md
-3. ai/project/project.md
-4. ai/project/runtime.md
-5. ai/project/task.md
+0. AGENTS.md 或 CLAUDE.md 中的同内容 agent-execution-template 兼容托管块
+1. ai/template/prompt.md
 ```
 
-然后执行当前任务，并写入：
+`prompt.md` 只做模式路由：初始化时再读 `bootstrap.md`；整合时再读
+`reconcile.md`；执行任务时才读 `protocol.md`、`rules/core.md`、
+`execution-policy.md`、`project.md`、`runtime.md` 和 `task.md`。
+
+执行完成后写入：
 
 ```text
 ai/project/result.json
@@ -540,11 +576,14 @@ ai/project/task.md
 
 AI 在引导模式中负责先生成项目上下文草稿。默认读取范围包括：
 
-- 根目录文档：`README*`、`AGENTS.md`、`CLAUDE.md`、`CONTRIBUTING*`、`CHANGELOG*`；
+- 根目录文档：`README*`、`CONTRIBUTING*`、`CHANGELOG*`；
 - package/build manifest：`package.json`、`pyproject.toml`、`Cargo.toml`、`go.mod`、`pom.xml`、`build.gradle*`、`Makefile`；
 - 项目文档：`docs/**`，优先 overview、architecture、setup、testing、deployment、API、ADR、decision；
 - 已有 AI refs：`ai/project/refs/*.md`；
 - source / test / config / docs 的浅层目录结构。
+
+`AGENTS.md` 和 `CLAUDE.md` 是同内容 AI 入口路由文件，只用于宿主工具自动发现，
+不作为项目业务证据读取。
 
 如果文档和 manifest 不足，允许从业务代码做有边界推断：
 
@@ -1066,6 +1105,10 @@ git diff --check
 - 自动运行 Agent；
 - 自动切换模型；
 - 多 Agent 编排；
+- workspace 切换；
+- sandbox 生命周期；
+- session fork / rollback；
+- worker 调度；
 - 云同步；
 - IDE 插件；
 - 发布流水线。
@@ -1075,7 +1118,7 @@ git diff --check
 Agent Execution Template v0.8 已经从一个 prompt/template 原型，升级为：
 
 ```text
-低摩擦、可安装、可升级、保护用户现场的 AI 执行协议 npm 包雏形。
+低摩擦、可安装、可升级、保护用户现场的 AI Repo Execution Protocol npm 包雏形。
 ```
 
 它的长期价值不在于替代任何模型或 Agent，而在于提供一套稳定协议：

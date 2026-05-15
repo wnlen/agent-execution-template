@@ -8,6 +8,9 @@ const TEMPLATE_ROOT = path.join(PACKAGE_ROOT, "template");
 const TARGET_AI = path.join(process.cwd(), "ai");
 const DEFAULT_LANG = "zh";
 const SUPPORTED_LANGS = new Set(["zh", "en"]);
+const ROOT_ENTRYPOINT_FILES = ["AGENTS.md", "CLAUDE.md"];
+const ENTRYPOINT_BLOCK_START = "<!-- agent-execution-template:start -->";
+const ENTRYPOINT_BLOCK_END = "<!-- agent-execution-template:end -->";
 
 const REQUIRED_FILES = [
   "ai/template/LANG",
@@ -74,11 +77,13 @@ const TEXT = {
 `,
     unknown: "未知",
     sourceMissing: "找不到模板来源",
-    ready: "Agent Execution Template 已就绪。",
-    initGuide: `[初始化]
-1. 直接初始化
+    ready: "Agent Execution Template 协议已安装。项目上下文尚未初始化。",
+    initGuide: `[下一步：让 AI 初始化项目上下文]
+已安装根目录 AI 兼容入口: AGENTS.md / CLAUDE.md
+
+1. 无额外资料
    对 AI 说: 开始初始化这个项目
-2. 带资料初始化
+2. 有已确定资料
    先放到: ai/project/inbox/
    对 AI 说: 开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料
 
@@ -131,6 +136,8 @@ const TEXT = {
     invalidJson: "JSON 无效",
     invalidSchema: "不符合协议 schema",
     taskFrontMatterIncomplete: "任务 front matter 缺少关键字段",
+    entrypointReady: "根目录 AI 兼容入口已安装: AGENTS.md / CLAUDE.md",
+    entrypointMissing: "缺少根目录 AI 兼容入口托管块；AI 可能不会自动读取 ai/template/prompt.md",
     versionMismatch: "模板版本与包版本不一致",
     runInit: "请运行 npx -y @wnlen/agent-execution-template init",
     readyWithWarnings: "已就绪，但存在警告",
@@ -184,11 +191,13 @@ Usage:
 `,
     unknown: "unknown",
     sourceMissing: "Template source not found",
-    ready: "Agent Execution Template ready.",
-    initGuide: `[Initialize]
-1. Initialize directly
+    ready: "Agent Execution Template protocol installed. Project context is not initialized yet.",
+    initGuide: `[Next: ask the AI to initialize project context]
+Installed root AI compatibility entrypoints: AGENTS.md / CLAUDE.md
+
+1. Without extra material
    Tell the AI: Start initializing this project
-2. Initialize with material
+2. With confirmed material
    Put it in: ai/project/inbox/
    Tell the AI: Start initializing this project and absorb the material in ai/project/inbox/
 
@@ -241,6 +250,8 @@ Usage:
     invalidJson: "contains invalid JSON",
     invalidSchema: "does not match protocol schema",
     taskFrontMatterIncomplete: "task front matter is missing required fields",
+    entrypointReady: "root AI compatibility entrypoints installed: AGENTS.md / CLAUDE.md",
+    entrypointMissing: "missing root AI compatibility entrypoint managed block; the AI may not auto-read ai/template/prompt.md",
     versionMismatch: "template version does not match package version",
     runInit: "Run npx -y @wnlen/agent-execution-template init",
     readyWithWarnings: "Ready to run with warnings",
@@ -397,6 +408,72 @@ function copyTree(sourceRoot, targetRoot, overwrite) {
   );
 }
 
+function rootEntrypointBlock(lang) {
+  if (lang === "en") {
+    return `${ENTRYPOINT_BLOCK_START}
+## Agent Execution Template
+
+This repository has Agent Execution Template installed in \`ai/\`.
+This managed block is intentionally duplicated in \`AGENTS.md\` and \`CLAUDE.md\` for different AI tool discovery conventions.
+
+Mandatory routing:
+- Before acting on any project request, first read and follow \`ai/template/prompt.md\`.
+- If the user says "Start initializing this project" or asks to initialize/bootstrap project context, do not run installs, create lockfiles, or edit app files before \`ai/template/prompt.md\` routes the workflow.
+${ENTRYPOINT_BLOCK_END}`;
+  }
+
+  return `${ENTRYPOINT_BLOCK_START}
+## Agent Execution Template
+
+本仓库已安装 Agent Execution Template，协议位于 \`ai/\`。
+此托管块会有意同时写入 \`AGENTS.md\` 和 \`CLAUDE.md\`，用于适配不同 AI 工具的自动发现约定。
+
+强制路由：
+- 处理任何项目请求前，必须先读取并遵守 \`ai/template/prompt.md\`。
+- 如果用户说“开始初始化这个项目”或要求初始化/整理项目上下文，在 \`ai/template/prompt.md\` 完成路由前，不要运行安装命令、不要创建 lockfile、不要编辑业务文件。
+${ENTRYPOINT_BLOCK_END}`;
+}
+
+function hasManagedEntrypointBlock(content) {
+  return content.includes(ENTRYPOINT_BLOCK_START) && content.includes(ENTRYPOINT_BLOCK_END);
+}
+
+function upsertManagedBlock(content, block) {
+  if (!hasManagedEntrypointBlock(content)) {
+    const separator = content.trim().length > 0 ? "\n\n" : "";
+    return `${content.replace(/\s*$/, "")}${separator}${block}\n`;
+  }
+
+  const start = content.indexOf(ENTRYPOINT_BLOCK_START);
+  const end = content.indexOf(ENTRYPOINT_BLOCK_END, start) + ENTRYPOINT_BLOCK_END.length;
+  return `${content.slice(0, start)}${block}${content.slice(end)}`;
+}
+
+function ensureRootEntrypoints(lang) {
+  const block = rootEntrypointBlock(lang);
+  const changes = [];
+  for (const file of ROOT_ENTRYPOINT_FILES) {
+    const fullPath = path.join(process.cwd(), file);
+    const existed = fs.existsSync(fullPath);
+    const current = existed ? fs.readFileSync(fullPath, "utf8") : "";
+    const next = upsertManagedBlock(current, block);
+    if (existed && current === next) {
+      changes.push({ action: "kept", path: file });
+      continue;
+    }
+    fs.writeFileSync(fullPath, next);
+    changes.push({ action: existed ? "updated" : "created", path: file });
+  }
+  return changes;
+}
+
+function hasAllRootEntrypoints() {
+  return ROOT_ENTRYPOINT_FILES.every((file) => {
+    const fullPath = path.join(process.cwd(), file);
+    return fs.existsSync(fullPath) && hasManagedEntrypointBlock(fs.readFileSync(fullPath, "utf8"));
+  });
+}
+
 function formatTimestamp(date = new Date()) {
   const pad = (value) => String(value).padStart(2, "0");
   return [
@@ -495,7 +572,7 @@ function proposalState() {
   return hasProposed ? "proposed" : null;
 }
 
-function init({ lang = DEFAULT_LANG, verbose = false, quiet = false } = {}) {
+function init({ lang = DEFAULT_LANG, verbose = false, quiet = false, manageEntrypoints = true } = {}) {
   const text = getText(lang);
   if (!SUPPORTED_LANGS.has(lang)) {
     console.error(`[${text.fail}] ${text.invalidLang}: ${lang}`);
@@ -521,6 +598,10 @@ function init({ lang = DEFAULT_LANG, verbose = false, quiet = false } = {}) {
 
   changes.push(...copyTree(path.join(sourceAi, "project"), path.join(TARGET_AI, "project"), false)
     .map((change) => ({ ...change, path: path.join("ai/project", change.path) })));
+
+  if (manageEntrypoints) {
+    changes.push(...ensureRootEntrypoints(lang));
+  }
 
   if (!quiet) {
     const sourceNotice = isSourceCheckout() ? `${text.sourceCheckoutNotice}\n\n` : "";
@@ -559,7 +640,7 @@ function refresh({ lang = DEFAULT_LANG, title } = {}) {
   const backupPath = uniqueBackupPath(path.join(TARGET_AI, `project.backup.${formatTimestamp()}`));
   fs.renameSync(projectPath, backupPath);
 
-  init({ lang, verbose: false, quiet: true });
+  init({ lang, verbose: false, quiet: true, manageEntrypoints: false });
 
   const importPath = path.join(TARGET_AI, "project", "inbox", "raw", "old-project");
   ensureDir(importPath);
@@ -653,6 +734,7 @@ function update({ lang = readInstalledLang() } = {}) {
   ensureDir(targetTemplate);
   const changes = copyTree(sourceTemplate, targetTemplate, true)
     .map((change) => ({ ...change, path: path.join("ai/template", change.path) }));
+  changes.push(...ensureRootEntrypoints(lang));
   printChanges(text.updateTitle, changes, lang);
   console.log(`[${text.pass}] ${text.updated} ${readVersion(sourceTemplate) || text.unknown}. ${text.projectNotModified}`);
 }
@@ -864,6 +946,13 @@ function doctor() {
       continue;
     }
     console.log(`[${text.pass}] ${file}`);
+  }
+
+  if (hasAllRootEntrypoints()) {
+    console.log(`[${text.pass}] ${text.entrypointReady}`);
+  } else {
+    console.log(`[${text.warn}] ${text.entrypointMissing}`);
+    warnings += 1;
   }
 
   const schemaChecks = [

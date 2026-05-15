@@ -5,23 +5,25 @@ Execute the workflow below.
 
 You are operating inside an Agent Execution Template workspace.
 
-First read:
+This file only routes the workflow. First read minimal state:
 
-1. `ai/template/protocol.md`
-2. `ai/template/rules/core.md`
-3. `ai/template/execution-policy.md`
+1. `ai/project/project.md` if present
+2. `ai/project/task.md` if present
+3. Shallow listings of `ai/project/inbox/`, `ai/project/inbox/ideas/`, and `ai/project/proposals/final-shape-updates/`
 
 Then choose the mode:
 
 - If the user asks to update the North Star, final shape, product constitution,
   module map, roadmap, or project direction, or if
   `ai/project/inbox/ideas/` contains non-`.gitkeep` ideas waiting for
-  evaluation, draft a `strategy_update` task or produce the proposal directly,
-  then stop for human confirmation.
+  evaluation, read `ai/template/protocol.md`, `ai/template/rules/core.md`, and
+  relevant direction refs, then draft a `strategy_update` task or produce the
+  proposal directly, then stop for human confirmation.
 - If the user explicitly confirms that a proposal under
   `ai/project/proposals/final-shape-updates/*.md` may be merged, draft or
-  execute an `apply_strategy_update` task. If the proposal is still
-  `proposed`, update it to `accepted` based on that explicit confirmation.
+  execute an `apply_strategy_update` task after reading
+  `ai/template/protocol.md` and `ai/template/rules/core.md`. If the proposal is
+  still `proposed`, update it to `accepted` based on that explicit confirmation.
 - If the user says "Start initializing this project and absorb the material in ai/project/inbox/",
   or asks to initialize while also absorbing material from
   `ai/project/inbox/`, inspect `ai/project/project.md` first. If it already
@@ -54,7 +56,8 @@ Then choose the mode:
   the human hunt through files for gaps.
 - Use Execution Mode only after `ai/project/project.md` and
   `ai/project/task.md` are ready enough to define identity, goal, scope,
-  permission, and acceptance.
+  permission, and acceptance. Only then read `ai/template/protocol.md`,
+  `ai/template/rules/core.md`, and `ai/template/execution-policy.md`.
 
 ## Task Draft Handoff
 

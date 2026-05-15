@@ -21,6 +21,9 @@ Start initializing this project
 ```
 
 Agent Execution Template is not another agent framework. It is the missing execution layer between your repository and tools like Codex, Claude Code, Cursor, Aider, or any other AI coding agent.
+More precisely, it is an **AI Repo Execution Protocol**: it governs how an AI reads context, confirms a task, respects file modification boundaries, verifies acceptance, and records results inside a specific repository.
+
+It does not manage workspace switching, session isolation, sandbox lifecycle, or worker scheduling. Those belong to an external workspace/session runtime.
 
 It turns AI coding from:
 
@@ -56,7 +59,7 @@ ai/template/  reusable execution protocol
 ai/project/   project-specific working context and direction layer
 ```
 
-`update` can refresh the protocol, while your project workspace stays protected.
+`update` can refresh the protocol, while your repo-local project context stays protected.
 
 ## Quick Start
 
@@ -71,6 +74,14 @@ Ask your agent to bootstrap project context from existing docs and manifests:
 ```text
 Start initializing this project
 ```
+
+`init` installs compatibility managed blocks in root `AGENTS.md` and `CLAUDE.md`.
+They have the same content and are not separate protocols; they adapt to generic
+Agent / Codex and Claude Code discovery conventions. Compatible AI tools read
+`ai/template/prompt.md` first, then route bootstrap to `ai/template/bootstrap.md`.
+If your AI tool does not auto-read those root
+entrypoints, ask it to read `AGENTS.md` or `CLAUDE.md` before sending the
+initialization instruction above.
 
 The agent will generate project context and summarize what needs confirmation,
 risks, and the recommended next step in chat:
@@ -228,7 +239,7 @@ ai/
 The split is the core design:
 
 - `ai/template/**` is reusable protocol. It can be safely updated from this package.
-- `ai/project/**` is your project workspace. It stores local context, tasks, references, results, and metrics.
+- `ai/project/**` is your repo-local project context. It stores local context, tasks, references, results, and metrics.
 
 ## Commands
 
@@ -243,6 +254,8 @@ Creates `ai/` in the current project.
 - Updates or creates `ai/template/**`.
 - Creates missing `ai/project/**` files.
 - Keeps existing `ai/project/**` files intact.
+- Creates or updates the same compatibility managed block in root `AGENTS.md` /
+  `CLAUDE.md` so different AI tools can discover the protocol entrypoint.
 - Use `--lang zh` or omit `--lang` for the Chinese template.
 
 ### `next`
@@ -425,11 +438,15 @@ Agent Execution Template is not:
 - an IDE,
 - an agent platform,
 - a multi-agent scheduler,
+- a workspace / sandbox / session runtime,
+- a multi-repository context manager,
 - a cloud service,
 - a prompt collection,
 - a replacement for Codex, Claude Code, Cursor, or Aider.
 
 It is a small file protocol for making those tools behave more consistently inside real software projects.
+
+It does not handle workspace switching, sandbox lifecycle, session fork / rollback, or worker scheduling. Conversely, an external runtime should not replace in-repository task definitions, file modification rules, acceptance criteria, or concrete coding context.
 
 ## Specification
 

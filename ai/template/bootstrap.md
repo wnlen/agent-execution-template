@@ -36,7 +36,7 @@
 
 按下面顺序读取高价值项目证据：
 
-1. 根目录文档：`README*`、`AGENTS.md`、`CLAUDE.md`、`CONTRIBUTING*`、`CHANGELOG*`
+1. 根目录文档：`README*`、`CONTRIBUTING*`、`CHANGELOG*`
 2. 清单文件：`package.json`、`pyproject.toml`、`Cargo.toml`、`go.mod`、
    `pom.xml`、`build.gradle*`、`Makefile`
 3. 项目文档：`docs/**`，优先阅读概览、架构、安装、测试、部署、API、ADR 和决策文件
@@ -50,6 +50,8 @@
   `services/`、`cmd/`、`internal/`、`server/`、`client/`、`test/`、`tests/`；
 - 只读取足够识别目的、模块边界、命令和约束的路由、模块、配置和测试文件；
 - 除非人类明确授权，不要读取整个代码库。
+
+不要把 `AGENTS.md` 或 `CLAUDE.md` 当作项目业务证据；它们只是 AI 入口路由文件。
 
 除非人类明确引用或授权，不要读取依赖目录、构建产物、覆盖率输出、锁文件
 （推断包管理器除外）、密钥文件、环境文件或归档目录。

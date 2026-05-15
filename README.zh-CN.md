@@ -27,6 +27,9 @@ npx -y @wnlen/agent-execution-template init --lang zh
 ```
 
 Agent Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
+更准确地说，它是 **AI Repo Execution Protocol**：只约束 AI 在某个仓库内如何读取上下文、确认任务、遵守文件修改边界、验收并记录结果。
+
+它不管理 workspace 切换、Session 隔离、sandbox 生命周期或 worker 调度。这些属于外部 workspace/session runtime。
 
 它把 AI 编程从：
 
@@ -82,6 +85,12 @@ npx -y @wnlen/agent-execution-template init --lang en
 ```text
 开始初始化这个项目
 ```
+
+`init` 会在仓库根目录安装 `AGENTS.md` 和 `CLAUDE.md` 兼容入口托管块。两者内容相同，
+不是两套协议；它们分别适配通用 Agent / Codex 和 Claude Code 的自动发现约定。
+支持这些入口的 AI 工具会先读取 `ai/template/prompt.md`，再路由到 `ai/template/bootstrap.md`。
+如果你的 AI 工具没有自动读取根目录入口文件，请先让它读取 `AGENTS.md` 或
+`CLAUDE.md`，再发送上面的初始化指令。
 
 Agent 会生成项目上下文，并在聊天里给出需要确认的摘要、风险和建议下一步：
 
@@ -247,6 +256,7 @@ npx -y @wnlen/agent-execution-template init
 - 更新或创建 `ai/template/**`。
 - 创建缺失的 `ai/project/**` 文件。
 - 保留已有的 `ai/project/**` 文件。
+- 创建或更新根目录 `AGENTS.md` / `CLAUDE.md` 中的同内容兼容托管块，让不同 AI 工具能发现协议入口。
 - 默认安装中文模板；英文模板使用 `--lang en`。
 
 ### `next`
@@ -426,11 +436,15 @@ Agent Execution Template 不是：
 - IDE；
 - Agent 平台；
 - 多 Agent 调度器；
+- workspace / sandbox / session 运行时；
+- 多仓库上下文管理器；
 - 云服务；
 - 提示词合集；
 - Codex、Claude Code、Cursor 或 Aider 的替代品。
 
 它是一个小型文件协议，用来让这些工具在真实软件项目中表现得更稳定。
+
+它不负责 workspace 切换、sandbox 生命周期、session fork / rollback 或 worker 调度。反过来，外部运行时不应该替代仓库内的任务定义、文件修改规则、acceptance criteria 或具体编码上下文。
 
 ## 规格
 

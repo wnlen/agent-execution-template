@@ -4,8 +4,11 @@ Copy this folder into a target software project.
 
 ```text
 template is protocol
-project is the field workspace
+project is repo-local context
 ```
+
+Here, `project` means the repo-local `ai/project/**` context. It is not an
+external workspace, session, or sandbox runtime.
 
 ## Files
 

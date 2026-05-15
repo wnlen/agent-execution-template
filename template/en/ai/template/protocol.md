@@ -5,12 +5,18 @@ execution context.
 
 ```text
 ai/template/ = reusable execution protocol
-ai/project/  = current project execution workspace
+ai/project/  = current repo execution context
 ```
 
-Template is protocol. Project is the field workspace.
+Template is protocol. Project is repo-local context.
 
-The project workspace stores both execution state and direction. The direction
+Here, "repo execution context" means the repo-local `ai/project/**` context,
+not an external workspace / session / sandbox runtime. An external
+runtime may enter the repository and read this protocol, but should not replace
+`task.md`, file modification rules, acceptance criteria, or concrete coding
+context.
+
+The repo-local context stores both execution state and direction. The direction
 layer answers "why is this worth doing and where should the project grow"; the
 execution layer answers "what is this task and how will it be accepted."
 

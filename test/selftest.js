@@ -40,6 +40,17 @@ function write(cwd, relativePath, content) {
   fs.writeFileSync(path.join(cwd, relativePath), content);
 }
 
+function countOccurrences(content, pattern) {
+  return content.split(pattern).length - 1;
+}
+
+function managedEntrypointBlock(content) {
+  const start = content.indexOf("<!-- agent-execution-template:start -->");
+  const end = content.indexOf("<!-- agent-execution-template:end -->", start);
+  assert(start >= 0 && end >= 0, "entrypoint content should include a managed block");
+  return content.slice(start, end + "<!-- agent-execution-template:end -->".length);
+}
+
 function createTempProject(name) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `${name}-`));
 }
@@ -48,6 +59,16 @@ function testInitUpdateDoctor() {
   const cwd = createTempProject("agent-execution-template-selftest");
 
   run(["init"], cwd);
+  assert(exists(cwd, "AGENTS.md"), "init should create root AGENTS.md entrypoint");
+  assert(exists(cwd, "CLAUDE.md"), "init should create root CLAUDE.md entrypoint");
+  assert(read(cwd, "AGENTS.md").includes("agent-execution-template:start"), "AGENTS.md should include managed protocol block");
+  assert(read(cwd, "AGENTS.md").includes("ai/template/prompt.md"), "AGENTS.md should route agents to the protocol prompt");
+  assert(read(cwd, "CLAUDE.md").includes("ai/template/prompt.md"), "CLAUDE.md should route Claude to the same protocol prompt");
+  assert(managedEntrypointBlock(read(cwd, "AGENTS.md")) === managedEntrypointBlock(read(cwd, "CLAUDE.md")), "AGENTS.md and CLAUDE.md should contain the same managed compatibility block");
+  assert(read(cwd, "AGENTS.md").includes("有意同时写入 `AGENTS.md` 和 `CLAUDE.md`"), "AGENTS.md should explain intentional compatibility duplication");
+  assert(read(cwd, "AGENTS.md").includes("在 `ai/template/prompt.md` 完成路由前"), "AGENTS.md should stay a short router");
+  assert(!read(cwd, "AGENTS.md").includes("ai/template/bootstrap.md"), "AGENTS.md should not duplicate bootstrap routing details");
+  assert(!read(cwd, "CLAUDE.md").includes("ai/template/bootstrap.md"), "CLAUDE.md should not duplicate bootstrap routing details");
   assert(read(cwd, "ai/template/LANG") === "zh\n", "init should default to zh template");
   assert(exists(cwd, "ai/template/VERSION"), "init should create template VERSION");
   assert(exists(cwd, "ai/template/bootstrap.md"), "init should create template bootstrap prompt");
@@ -80,7 +101,9 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/template/bootstrap.md").includes("未吸收资料"), "bootstrap handoff should audit unabsorbed material");
   assert(read(cwd, "ai/template/bootstrap.md").includes("冲突处理"), "bootstrap handoff should audit conflict handling");
   assert(read(cwd, "ai/template/prompt.md").includes("任务草稿交接"), "execution prompt should include task handoff");
-  assert(read(cwd, "ai/template/prompt.md").includes("ai/template/execution-policy.md"), "execution prompt should read execution policy");
+  assert(read(cwd, "ai/template/prompt.md").includes("本文件只负责路由"), "execution prompt should be a lightweight router");
+  assert(read(cwd, "ai/template/prompt.md").includes("才读取 `ai/template/protocol.md`"), "execution prompt should lazy-load execution policy only for execution");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("不要把 `AGENTS.md` 或 `CLAUDE.md` 当作项目业务证据"), "bootstrap should not treat root agent entrypoints as project evidence");
   assert(read(cwd, "ai/template/execution-policy.md").includes("风险分级"), "execution policy should include risk rubric");
   assert(read(cwd, "ai/template/execution-policy.md").includes("execution_policy.task_tree"), "execution policy should require task tree persistence");
   assert(read(cwd, "ai/template/prompt.md").includes("也默认只处理 `ai/project/inbox/*.md`"), "execution prompt should narrow inbox reconciliation");
@@ -132,7 +155,9 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/project/proposals/final-shape-updates/_template.md").includes("`accepted`"), "proposal template should describe accepted status");
   const initOutput = run(["init"], cwd);
   assert(initOutput.includes("开始初始化这个项目"), "init output should provide compact natural bootstrap prompt");
-  assert(initOutput.includes("[初始化]"), "init output should distinguish pre-bootstrap guidance");
+  assert(initOutput.includes("根目录 AI 兼容入口: AGENTS.md / CLAUDE.md"), "init output should mention root AI compatibility entrypoints");
+  assert(initOutput.includes("协议已安装。项目上下文尚未初始化"), "init output should distinguish protocol install from project context bootstrap");
+  assert(initOutput.includes("[下一步：让 AI 初始化项目上下文]"), "init output should guide the AI bootstrap as the next step");
   assert(initOutput.includes("开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料"), "init output should explain bootstrap with existing material");
   assert(initOutput.includes("整合 ai/project/inbox/ 里的新资料"), "init output should provide compact natural reconcile prompt");
   assert(initOutput.includes("优化上下文"), "init output should expose project context refresh in user language");
@@ -142,7 +167,11 @@ function testInitUpdateDoctor() {
   assert(!initOutput.includes("维护者提示"), "init output should not show source checkout guidance in user projects");
   assert(!initOutput.includes("[已更新]"), "init output should hide detailed file changes by default");
   assert(!initOutput.includes("Read ai/template/bootstrap.md"), "init output should not use weak Read bootstrap command");
+  assert(countOccurrences(read(cwd, "AGENTS.md"), "agent-execution-template:start") === 1, "init should not duplicate AGENTS.md managed blocks");
+  assert(countOccurrences(read(cwd, "CLAUDE.md"), "agent-execution-template:start") === 1, "init should not duplicate CLAUDE.md managed blocks");
   assert(run(["init", "--verbose"], cwd).includes("[已更新] ai/template/VERSION"), "init --verbose should show detailed file changes");
+  assert(countOccurrences(read(cwd, "AGENTS.md"), "agent-execution-template:start") === 1, "re-running init should keep one AGENTS.md managed block");
+  assert(countOccurrences(read(cwd, "CLAUDE.md"), "agent-execution-template:start") === 1, "re-running init should keep one CLAUDE.md managed block");
   const reconcileOutput = run(["reconcile"], cwd);
   assert(reconcileOutput.includes("Agent Execution Template 上下文整合"), "reconcile should use installed Chinese language");
   assert(reconcileOutput.includes("整合 ai/project/inbox/ 里的新资料"), "reconcile should print natural Chinese prompt");
@@ -154,8 +183,10 @@ function testInitUpdateDoctor() {
   write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
   run(["update"], cwd);
   assert(read(cwd, "ai/project/project.md") === "USER PROJECT MARKER\n", "update must not overwrite project.md");
+  assert(read(cwd, "AGENTS.md").includes("ai/template/prompt.md"), "update should keep root agent entrypoint block installed");
 
   const doctorOutput = run(["doctor"], cwd);
+  assert(doctorOutput.includes("根目录 AI 兼容入口已安装: AGENTS.md / CLAUDE.md"), "doctor should report root AI compatibility entrypoint status");
   assert(doctorOutput.includes("ai/project/result.json JSON"), "doctor should validate result JSON");
   assert(doctorOutput.includes("ai/project/result.json schema"), "doctor should validate result schema");
   assert(doctorOutput.includes("ai/project/metrics.json JSON"), "doctor should validate metrics JSON");
@@ -167,6 +198,15 @@ function testEnglishInitUpdateDoctor() {
   const cwd = createTempProject("agent-execution-template-en");
 
   const initOutput = run(["init", "--lang", "en"], cwd);
+  assert(exists(cwd, "AGENTS.md"), "English init should create root AGENTS.md entrypoint");
+  assert(exists(cwd, "CLAUDE.md"), "English init should create root CLAUDE.md entrypoint");
+  assert(read(cwd, "AGENTS.md").includes("ai/template/prompt.md"), "English AGENTS.md should route agents to the protocol prompt");
+  assert(read(cwd, "CLAUDE.md").includes("ai/template/prompt.md"), "English CLAUDE.md should route Claude to the same protocol prompt");
+  assert(managedEntrypointBlock(read(cwd, "AGENTS.md")) === managedEntrypointBlock(read(cwd, "CLAUDE.md")), "English AGENTS.md and CLAUDE.md should contain the same managed compatibility block");
+  assert(read(cwd, "AGENTS.md").includes("intentionally duplicated in `AGENTS.md` and `CLAUDE.md`"), "English AGENTS.md should explain intentional compatibility duplication");
+  assert(read(cwd, "AGENTS.md").includes("before `ai/template/prompt.md` routes"), "English AGENTS.md should stay a short router");
+  assert(!read(cwd, "AGENTS.md").includes("ai/template/bootstrap.md"), "English AGENTS.md should not duplicate bootstrap routing details");
+  assert(!read(cwd, "CLAUDE.md").includes("ai/template/bootstrap.md"), "English CLAUDE.md should not duplicate bootstrap routing details");
   assert(read(cwd, "ai/template/LANG") === "en\n", "init --lang en should install English template");
   assert(exists(cwd, "ai/template/execution-policy.md"), "English init should create execution policy prompt");
   assert(exists(cwd, "ai/template/schemas/result.schema.json"), "English init should create result schema");
@@ -183,7 +223,9 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/bootstrap.md").includes("Unabsorbed material"), "English bootstrap handoff should audit unabsorbed material");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Conflict handling"), "English bootstrap handoff should audit conflict handling");
   assert(read(cwd, "ai/template/prompt.md").includes("Start initializing this project"), "English execution prompt should route natural bootstrap entry");
-  assert(read(cwd, "ai/template/prompt.md").includes("ai/template/execution-policy.md"), "English execution prompt should read execution policy");
+  assert(read(cwd, "ai/template/prompt.md").includes("This file only routes the workflow"), "English execution prompt should be a lightweight router");
+  assert(read(cwd, "ai/template/prompt.md").includes("Only then read `ai/template/protocol.md`"), "English execution prompt should lazy-load execution policy only for execution");
+  assert(read(cwd, "ai/template/bootstrap.md").includes("Do not treat `AGENTS.md` or `CLAUDE.md` as project business evidence"), "English bootstrap should not treat root agent entrypoints as project evidence");
   assert(read(cwd, "ai/template/execution-policy.md").includes("Risk Rubric"), "English execution policy should include risk rubric");
   assert(read(cwd, "ai/template/execution-policy.md").includes("execution_policy.task_tree"), "English execution policy should require task tree persistence");
   assert(read(cwd, "ai/template/prompt.md").includes("default to only `ai/project/inbox/*.md`"), "English execution prompt should narrow inbox reconciliation");
@@ -232,7 +274,9 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/reconcile.md").includes("Unabsorbed material"), "English reconcile handoff should audit unabsorbed material");
   assert(read(cwd, "ai/template/reconcile.md").includes("Conflict handling"), "English reconcile handoff should audit conflict handling");
   assert(initOutput.includes("Start initializing this project"), "English init output should provide English bootstrap prompt");
-  assert(initOutput.includes("[Initialize]"), "English init output should distinguish pre-bootstrap guidance");
+  assert(initOutput.includes("root AI compatibility entrypoints: AGENTS.md / CLAUDE.md"), "English init output should mention root AI compatibility entrypoints");
+  assert(initOutput.includes("protocol installed. Project context is not initialized yet"), "English init output should distinguish protocol install from project context bootstrap");
+  assert(initOutput.includes("[Next: ask the AI to initialize project context]"), "English init output should guide the AI bootstrap as the next step");
   assert(initOutput.includes("Start initializing this project and absorb the material in ai/project/inbox/"), "English init output should explain bootstrap with existing material");
   assert(initOutput.includes("Reconcile the new material in ai/project/inbox/"), "English init output should provide English reconcile prompt");
   assert(initOutput.includes("Improve context"), "English init output should expose context refresh in user language");
@@ -250,6 +294,7 @@ function testEnglishInitUpdateDoctor() {
 
   const doctorOutput = run(["doctor"], cwd);
   assert(doctorOutput.includes("Template language: en"), "doctor should show installed English language");
+  assert(doctorOutput.includes("root AI compatibility entrypoints installed: AGENTS.md / CLAUDE.md"), "English doctor should report root AI compatibility entrypoint status");
   assert(doctorOutput.includes("ai/project/result.json JSON"), "English doctor should validate result JSON");
   assert(doctorOutput.includes("ai/project/result.json schema"), "English doctor should validate result schema");
   assert(doctorOutput.includes("ai/project/task.md front matter"), "English doctor should validate task front matter");
@@ -362,6 +407,32 @@ permission: {}
   assert(taskPolicyWarnOutput.includes("任务 front matter 缺少关键字段"), "doctor should warn when execution policy fields are incomplete");
 }
 
+function testRootEntrypointPreservesUserContent() {
+  const cwd = createTempProject("agent-execution-template-entrypoints");
+  write(cwd, "AGENTS.md", "# Existing agent rules\n\nKeep this user rule.\n");
+
+  run(["init"], cwd);
+  assert(read(cwd, "AGENTS.md").includes("Keep this user rule."), "init should preserve existing AGENTS.md content");
+  assert(read(cwd, "AGENTS.md").includes("agent-execution-template:start"), "init should append a managed AGENTS.md block");
+  assert(countOccurrences(read(cwd, "AGENTS.md"), "agent-execution-template:start") === 1, "init should append one AGENTS.md block");
+
+  run(["init"], cwd);
+  assert(read(cwd, "AGENTS.md").includes("Keep this user rule."), "re-running init should preserve existing AGENTS.md content");
+  assert(countOccurrences(read(cwd, "AGENTS.md"), "agent-execution-template:start") === 1, "re-running init should replace, not duplicate, the managed AGENTS.md block");
+
+  run(["update"], cwd);
+  assert(read(cwd, "AGENTS.md").includes("Keep this user rule."), "update should preserve existing AGENTS.md content");
+  assert(countOccurrences(read(cwd, "AGENTS.md"), "agent-execution-template:start") === 1, "update should keep one managed AGENTS.md block");
+
+  fs.unlinkSync(path.join(cwd, "CLAUDE.md"));
+  const missingClaudeOutput = run(["doctor"], cwd);
+  assert(missingClaudeOutput.includes("缺少根目录 AI 兼容入口托管块"), "doctor should warn when one root agent entrypoint is missing");
+
+  fs.unlinkSync(path.join(cwd, "AGENTS.md"));
+  const doctorOutput = run(["doctor"], cwd);
+  assert(doctorOutput.includes("缺少根目录 AI 兼容入口托管块"), "doctor should warn when root agent entrypoints are missing");
+}
+
 function testRefreshBacksUpAndImportsOldProject() {
   const cwd = createTempProject("agent-execution-template-refresh");
   run(["init"], cwd);
@@ -445,6 +516,7 @@ function main() {
   testInitUpdateDoctor();
   testEnglishInitUpdateDoctor();
   testDoctorFailureAndWarning();
+  testRootEntrypointPreservesUserContent();
   testRefreshBacksUpAndImportsOldProject();
   testNextCommandRoutesByProjectState();
   testPermissionErrorIsActionable();

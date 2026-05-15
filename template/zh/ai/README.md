@@ -7,6 +7,8 @@ template 是协议
 project 是现场工作区
 ```
 
+这里的 `project` 是仓库内 `ai/project/**` 的项目现场，不是外部 workspace、session 或 sandbox 运行时。
+
 ## 文件
 
 - `template/prompt.md`：AI 启动提示。

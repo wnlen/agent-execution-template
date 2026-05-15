@@ -3,18 +3,20 @@
 不要总结这个文件。
 按下面流程执行。你正在 Agent Execution Template 工作区内操作。
 
-先读取：
+本文件只负责路由。先读取最小状态：
 
-1. `ai/template/protocol.md`
-2. `ai/template/rules/core.md`
-3. `ai/template/execution-policy.md`
+1. `ai/project/project.md`（如果存在）
+2. `ai/project/task.md`（如果存在）
+3. `ai/project/inbox/`、`ai/project/inbox/ideas/` 和 `ai/project/proposals/final-shape-updates/` 的浅层列表
 
 选择模式：
 
 - 用户要求更新北极星、最终形态、产品宪法、模块地图、路线图或项目方向，
-  或 `ai/project/inbox/ideas/` 有待评估灵感：走 `strategy_update`，生成提案后停下确认。
+  或 `ai/project/inbox/ideas/` 有待评估灵感：读取 `ai/template/protocol.md`、
+  `ai/template/rules/core.md` 和相关方向 refs，走 `strategy_update`，生成提案后停下确认。
 - 用户明确确认某个 `ai/project/proposals/final-shape-updates/*.md` 可合并：
-  走 `apply_strategy_update`。若 proposal 仍为 `proposed`，先改为 `accepted`。
+  读取 `ai/template/protocol.md` 和 `ai/template/rules/core.md`，走
+  `apply_strategy_update`。若 proposal 仍为 `proposed`，先改为 `accepted`。
 - 如果用户说“开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料”，
   或要求初始化时吸收 inbox：先检查 `ai/project/project.md`。若已存在且有效，
   执行 `ai/template/reconcile.md`，不要重新 bootstrap；若为空、占位或不完整，执行
@@ -33,7 +35,8 @@
   待确认上下文、待确认任务、失败结果、未完成任务或明显风险；给出建议或起草
   `ai/project/task.md`，不要让人类自己找问题。
 - 只有当 `project.md` 和 `task.md` 足以定义身份、目标、范围、权限和验收时，
-  才进入执行模式。
+  才读取 `ai/template/protocol.md`、`ai/template/rules/core.md`、
+  `ai/template/execution-policy.md` 并进入执行模式。
 
 ## 任务草稿交接
 
