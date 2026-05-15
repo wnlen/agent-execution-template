@@ -1,7 +1,7 @@
 {
   "protocol_version": "0.8",
-  "task_id": "20260515-release-init-output-scenarios",
-  "task_type": "release",
+  "task_id": "20260516-slash-command-routing",
+  "task_type": "feature",
   "model": "GPT-5",
   "model_tier": "cheap",
   "escalated": false,
@@ -17,7 +17,7 @@
   "failure_reason": "",
   "reuse_potential": "high",
   "notes": [
-    "init 默认输出优化已发布。",
-    "0.8.23 已提交、推送并发布到 npm。"
+    "AI 工作流触发入口已改为 slash command。",
+    "普通问答保持只读，不进入执行工作流。"
   ]
 }

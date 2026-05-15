@@ -20,10 +20,10 @@ npx -y @wnlen/agent-execution-template init
 npx -y @wnlen/agent-execution-template init --lang zh
 ```
 
-然后告诉你的 AI 编程工具：
+然后发给你的 AI 编程工具：
 
 ```text
-开始初始化这个项目
+/init
 ```
 
 Agent Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
@@ -83,14 +83,14 @@ npx -y @wnlen/agent-execution-template init --lang en
 让 Agent 从现有文档和 manifest 里整理项目上下文：
 
 ```text
-开始初始化这个项目
+/init
 ```
 
 `init` 会在仓库根目录安装 `AGENTS.md` 和 `CLAUDE.md` 兼容入口托管块。两者内容相同，
 不是两套协议；它们分别适配通用 Agent / Codex 和 Claude Code 的自动发现约定。
 支持这些入口的 AI 工具会先读取 `ai/template/prompt.md`，再路由到 `ai/template/bootstrap.md`。
 如果你的 AI 工具没有自动读取根目录入口文件，请先让它读取 `AGENTS.md` 或
-`CLAUDE.md`，再发送上面的初始化指令。
+`CLAUDE.md`，再发送上面的 slash command。
 
 Agent 会生成项目上下文，并在聊天里给出需要确认的摘要、风险和建议下一步：
 
@@ -102,7 +102,7 @@ ai/project/refs/*
 回复修正意见，或确认后继续：
 
 ```text
-继续推进这个项目
+/continue
 ```
 
 Agent 会根据当前上下文起草或执行：
@@ -111,10 +111,10 @@ Agent 会根据当前上下文起草或执行：
 ai/project/task.md
 ```
 
-当任务草稿已确认后，也可以直接说：
+当任务草稿已确认后，也可以直接发送：
 
 ```text
-继续推进这个项目
+/continue
 ```
 
 查看执行结果：
@@ -153,6 +153,23 @@ npx -y @wnlen/agent-execution-template update
 
 ```bash
 npx -y @wnlen/agent-execution-template strategy
+```
+
+常用发给 AI 的 slash command：
+
+```text
+/init              第一次整理项目上下文
+/init-with-inbox   初始化时吸收 ai/project/inbox/ 里的资料
+/reconcile         整合新资料
+/strategy          生成方向修订提案
+/apply-strategy    合并已确认的方向提案
+/continue          继续起草或执行当前任务
+/next              只判断下一步
+/doctor            检查安装
+/update            更新协议
+/refresh           重整项目上下文
+/improve-context   优化项目上下文
+/help              查看可用命令
 ```
 
 ## 你会得到什么
@@ -366,10 +383,10 @@ Agent Execution Template 定义了一个简单循环：
 ai/project/inbox/
 ```
 
-然后告诉 AI：
+然后发给 AI：
 
 ```text
-整合 ai/project/inbox/ 里的新资料
+/reconcile
 ```
 
 AI 必须先输出整合计划，等待确认后，再把长期有效事实合并进 `project.md`、`runtime.md` 和 `refs/*`。

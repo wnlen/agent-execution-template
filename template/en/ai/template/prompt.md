@@ -5,59 +5,85 @@ Execute the workflow below.
 
 You are operating inside an Agent Execution Template workspace.
 
-This file only routes the workflow. First read minimal state:
+This file only routes the workflow. Project workflows must be triggered by
+slash commands. For ordinary questions, protocol explanations, design
+discussion, or read-only consultation, read only the files needed to answer and
+do not enter bootstrap / reconcile / strategy / execution. Do not write
+`ai/project/task.md`, `ai/project/result.*`, or `ai/project/metrics.json`.
+
+## Slash Commands
+
+Official entrypoints:
+
+- `/init`
+- `/init-with-inbox`
+- `/reconcile`
+- `/strategy`
+- `/apply-strategy`
+- `/continue`
+- `/next`
+- `/doctor`
+- `/update`
+- `/refresh`
+- `/improve-context`
+- `/help`
+
+If the user does not provide a slash command but explicitly asks to implement,
+fix, modify, commit, publish, or execute project work, treat it as the
+`/continue` execution entrypoint. Otherwise, answer read-only.
+
+## Routing
+
+After receiving a slash command, first read minimal state:
 
 1. `ai/project/project.md` if present
 2. `ai/project/task.md` if present
-3. Shallow listings of `ai/project/inbox/`, `ai/project/inbox/ideas/`, and `ai/project/proposals/final-shape-updates/`
+3. Shallow listings of `ai/project/inbox/`, `ai/project/inbox/ideas/`, and
+   `ai/project/proposals/final-shape-updates/`
 
 Then choose the mode:
 
-- If the user asks to update the North Star, final shape, product constitution,
-  module map, roadmap, or project direction, or if
-  `ai/project/inbox/ideas/` contains non-`.gitkeep` ideas waiting for
-  evaluation, read `ai/template/protocol.md`, `ai/template/rules/core.md`, and
-  relevant direction refs, then draft a `strategy_update` task or produce the
-  proposal directly, then stop for human confirmation.
-- If the user explicitly confirms that a proposal under
-  `ai/project/proposals/final-shape-updates/*.md` may be merged, draft or
-  execute an `apply_strategy_update` task after reading
-  `ai/template/protocol.md` and `ai/template/rules/core.md`. If the proposal is
-  still `proposed`, update it to `accepted` based on that explicit confirmation.
-- If the user says "Start initializing this project and absorb the material in ai/project/inbox/",
-  or asks to initialize while also absorbing material from
-  `ai/project/inbox/`, inspect `ai/project/project.md` first. If it already
+- `/help`: show the slash command list and purposes read-only.
+- `/next`: judge the next step read-only. Prioritize pending direction
+  proposals, pending ideas, material waiting in inbox, missing project context,
+  pending task confirmation, failed results, or the continue entrypoint. Do not
+  modify files.
+- `/doctor`: if the current task contract permits commands, run
+  `node bin/agent-execution-template.js doctor` or the project-approved doctor
+  command; otherwise tell the user to run
+  `npx -y @wnlen/agent-execution-template doctor`.
+- `/update`: if the current task contract explicitly permits protocol update,
+  run update; otherwise tell the user to run
+  `npx -y @wnlen/agent-execution-template update`.
+- `/refresh` or `/improve-context`: if the current task contract explicitly
+  permits context refresh, run refresh; otherwise tell the user to run
+  `npx -y @wnlen/agent-execution-template refresh`.
+- `/init`: follow `ai/template/bootstrap.md`, initialize project context, and
+  stop after project-context confirmation.
+- `/init-with-inbox`: inspect `ai/project/project.md` first. If it already
   exists and is not empty, placeholder-only, or clearly incomplete, follow
   `ai/template/reconcile.md` instead of bootstrapping again. If it is empty,
   placeholder-only, or clearly incomplete, follow `ai/template/bootstrap.md`
   and treat `ai/project/inbox/*.md` and `ai/project/inbox/raw/*.md` as part of
   the bootstrap input for this run; stop after project-context confirmation.
-- If the user says "Reconcile the new material in ai/project/inbox/", asks to
-  reconcile, merge, absorb, update context, handle new material, mentions
-  `reconcile` or `ai/project/inbox/`, or if `ai/project/inbox/` contains
-  non-`.gitkeep` material waiting to be absorbed, follow
-  `ai/template/reconcile.md` and stop or update according to its two-phase
-  workflow; `ai/project/inbox/processed/` is already processed material and
-  should not trigger reconciliation, while `ai/project/inbox/ideas/` should
-  route to `strategy_update` first. Even if the human says to reconcile the
-  whole inbox, default to only `ai/project/inbox/*.md` and
-  `ai/project/inbox/raw/*.md`.
-- If the user says "Start initializing this project", asks to initialize,
-  organize, or generate project context, or if `ai/project/project.md` is
-  empty, placeholder-only, or incomplete, follow `ai/template/bootstrap.md`
-  and stop after project-context confirmation.
-- If `ai/project/task.md` is empty, placeholder-only, or incomplete, draft it
-  from the user's current goal and confirmed project context, then stop for
-  human confirmation.
-- If the user says "Continue this project" without a more specific goal, first
-  judge the best next step globally: prioritize pending context confirmation,
-  pending task confirmation, failed results, unfinished tasks, or obvious
-  risks; then recommend a next step or draft `ai/project/task.md`. Do not make
-  the human hunt through files for gaps.
-- Use Execution Mode only after `ai/project/project.md` and
-  `ai/project/task.md` are ready enough to define identity, goal, scope,
-  permission, and acceptance. Only then read `ai/template/protocol.md`,
-  `ai/template/rules/core.md`, and `ai/template/execution-policy.md`.
+- `/reconcile`: follow `ai/template/reconcile.md`. Default to only
+  `ai/project/inbox/*.md` and `ai/project/inbox/raw/*.md`; `processed/` does
+  not trigger reconciliation, while `ideas/` should route to `/strategy` first.
+- `/strategy`: read `ai/template/protocol.md`, `ai/template/rules/core.md`, and
+  relevant direction refs, then follow `strategy_update`; produce the proposal
+  and stop for human confirmation.
+- `/apply-strategy`: read `ai/template/protocol.md` and
+  `ai/template/rules/core.md`, and only apply a proposal the human has
+  explicitly confirmed. If the proposal is still `proposed`, update it to
+  `accepted` first.
+- `/continue`: if `ai/project/project.md` is empty, placeholder-only, or
+  incomplete, run `/init` first. If `ai/project/task.md` is empty,
+  placeholder-only, or incomplete, draft it from the user's current goal and
+  confirmed project context, then stop for human confirmation. Use Execution
+  Mode only after `project.md` and `task.md` are ready enough to define
+  identity, goal, scope, permission, and acceptance. Only then read
+  `ai/template/protocol.md`, `ai/template/rules/core.md`, and
+  `ai/template/execution-policy.md`.
 
 ## Task Draft Handoff
 
@@ -100,7 +126,7 @@ Confirm or correct:
 3. Permissions, commands, and risk level
 
 Reply with:
-- Confirmed, execute
+- /continue
 - Or corrections
 ```
 
@@ -125,7 +151,7 @@ Please review:
 - ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
 
 Reply with:
-- Confirmed, merge this proposal
+- /apply-strategy
 - Or corrections
 ```
 
@@ -148,7 +174,7 @@ needed. When an L1 is complete, check it off and strike it through; write back
 at final wrap-up. Only Red stops for human confirmation; Green continues
 automatically, and Yellow only permits local low-risk correction inside the
 current L1/L2. User-visible output follows the "User-Visible Output" rules in
-`ai/template/execution-policy.md`. Write results to:
+`ai/template/execution-policy.md`. Finally write:
 
 - `ai/project/result.json`
 - `ai/project/result.md`

@@ -79,33 +79,34 @@ const TEXT = {
 1. 第一次整理项目上下文
    【发给 AI】
 
-     开始初始化这个项目
+     /init
 
 2. 已有 README、PRD、架构文档或业务规则
    先放到 ai/project/inbox/
    【发给 AI】
 
-     开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料
+     /init-with-inbox
 
 3. 后续有新资料要合并
    放到 ai/project/inbox/
    【发给 AI】
 
-     整合 ai/project/inbox/ 里的新资料
+     /reconcile
 
 4. 有还没确定的新想法、产品方向或架构调整
    放到 ai/project/inbox/ideas/
    【发给 AI】
 
-     把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案`,
+     /strategy`,
     start: "开始:",
-    startPrompt: "开始初始化这个项目",
+    startPrompt: "/init",
+    initWithInboxPrompt: "/init-with-inbox",
     then: "然后:",
     reviewProject: "按 AI 输出确认或修正项目上下文",
-    giveTask: "需要执行任务时，说：继续推进这个项目",
-    confirmTask: "需要吸收新资料时，先放入 ai/project/inbox/，然后说:",
-    executePrompt: "整合 ai/project/inbox/ 里的新资料",
-    strategyHint: "需要修订方向时，先放入 ai/project/inbox/ideas/，然后生成 strategy_update 提案。",
+    giveTask: "需要执行任务时，发给 AI:",
+    confirmTask: "需要吸收新资料时，先放入 ai/project/inbox/，然后发给 AI:",
+    executePrompt: "/reconcile",
+    strategyHint: "需要修订方向时，先放入 ai/project/inbox/ideas/，然后发给 AI: /strategy",
     files: "文件已就绪",
     check: "检查安装",
     details: "详情:",
@@ -114,7 +115,7 @@ const TEXT = {
     refreshBackedUp: "已备份旧项目上下文",
     refreshImported: "已将旧项目上下文放入",
     refreshReady: "新的 ai/project/** 已生成。",
-    refreshPrompt: "整合 ai/project/inbox/ 里的新资料，基于旧上下文重新生成更精良的 ai/project/",
+    refreshPrompt: "/reconcile",
     refreshNoProject: "未发现旧 ai/project/**，已执行普通初始化。",
     updateTitle: "Agent Execution Template 更新",
     updated: "已将 ai/template/** 更新到",
@@ -139,20 +140,20 @@ const TEXT = {
     invalidLang: "不支持的语言，请使用 zh 或 en",
     reconcileTitle: "Agent Execution Template 上下文整合",
     reconcilePut: "把新的业务、产品、架构或流程资料放到:",
-    reconcileAsk: "然后对 AI 说:",
-    reconcilePrompt: "整合 ai/project/inbox/ 里的新资料",
+    reconcileAsk: "然后发给 AI:",
+    reconcilePrompt: "/reconcile",
     strategyTitle: "Agent Execution Template 方向修订",
     strategyPut: "把新的产品、业务、架构或方向灵感放到:",
-    strategyAsk: "然后对 AI 说:",
-    strategyPrompt: "把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案",
-    strategyReview: "人类确认提案后，再说:",
-    strategyApplyPrompt: "确认，合并这个提案",
+    strategyAsk: "然后发给 AI:",
+    strategyPrompt: "/strategy",
+    strategyReview: "人类确认提案后，再发给 AI:",
+    strategyApplyPrompt: "/apply-strategy",
     nextTitle: "Agent Execution Template 下一步",
     nextRunInit: "当前项目还没有安装模板。先运行:",
-    nextTellAgent: "把这句话发给你的 AI coding 工具:",
+    nextTellAgent: "把这个命令发给你的 AI:",
     nextRunCommand: "运行这个命令:",
-    nextReviewProposal: "已有方向修订提案。先审查提案；确认后对 AI 说:",
-    nextContinuePrompt: "继续推进这个项目。执行前先拆 L1 任务；若 L1 >= 2，自动启用边界内连续执行；只有 Red 风险停下来确认。",
+    nextReviewProposal: "已有方向修订提案。先审查提案；确认后发给 AI:",
+    nextContinuePrompt: "/continue",
     repairHint: "缺失的 project 推荐文件可通过重新运行 init 安全补齐；已有 ai/project/** 不会被覆盖。",
     sourceCheckoutNotice: `维护者提示: 当前目录看起来是 @wnlen/agent-execution-template 源码仓库。
   源码仓库内调试请使用: node bin/agent-execution-template.js <command>
@@ -191,33 +192,34 @@ Usage:
 1. Set up project context for the first time
    [Send to AI]
 
-     Start initializing this project
+     /init
 
 2. You already have a README, PRD, architecture doc, or business rules
    Put them in ai/project/inbox/
    [Send to AI]
 
-     Start initializing this project and absorb the material in ai/project/inbox/
+     /init-with-inbox
 
 3. Later, you have new material to merge
    Put it in ai/project/inbox/
    [Send to AI]
 
-     Reconcile the new material in ai/project/inbox/
+     /reconcile
 
 4. You have an undecided idea, product direction, or architecture change
    Put it in ai/project/inbox/ideas/
    [Send to AI]
 
-     Generate a direction amendment proposal from ai/project/inbox/ideas/`,
+     /strategy`,
     start: "Start:",
-    startPrompt: "Start initializing this project",
+    startPrompt: "/init",
+    initWithInboxPrompt: "/init-with-inbox",
     then: "Then:",
     reviewProject: "Confirm or correct the project context from the agent output",
-    giveTask: "When you want to execute work, say: Continue this project",
-    confirmTask: "When you need to absorb new material, put it in ai/project/inbox/, then say:",
-    executePrompt: "Reconcile the new material in ai/project/inbox/",
-    strategyHint: "When direction changes, put ideas in ai/project/inbox/ideas/ and produce a strategy_update proposal.",
+    giveTask: "When you want to execute work, send to AI:",
+    confirmTask: "When you need to absorb new material, put it in ai/project/inbox/, then send to AI:",
+    executePrompt: "/reconcile",
+    strategyHint: "When direction changes, put ideas in ai/project/inbox/ideas/, then send to AI: /strategy.",
     files: "Files ready",
     check: "Check install",
     details: "Details:",
@@ -226,7 +228,7 @@ Usage:
     refreshBackedUp: "Backed up old project context",
     refreshImported: "Imported old project context into",
     refreshReady: "Generated a fresh ai/project/**.",
-    refreshPrompt: "Reconcile the new material in ai/project/inbox/ and regenerate a stronger ai/project/ from the old context",
+    refreshPrompt: "/reconcile",
     refreshNoProject: "No old ai/project/** found; ran normal init.",
     updateTitle: "Agent Execution Template update",
     updated: "Updated ai/template/** to",
@@ -251,20 +253,20 @@ Usage:
     invalidLang: "Unsupported language. Use zh or en",
     reconcileTitle: "Agent Execution Template Context Reconcile",
     reconcilePut: "Put new business, product, architecture, or process material in:",
-    reconcileAsk: "Then tell your agent:",
-    reconcilePrompt: "Reconcile the new material in ai/project/inbox/",
+    reconcileAsk: "Then send to AI:",
+    reconcilePrompt: "/reconcile",
     strategyTitle: "Agent Execution Template Strategy Update",
     strategyPut: "Put new product, business, architecture, or direction ideas in:",
-    strategyAsk: "Then tell your agent:",
-    strategyPrompt: "Generate a direction amendment proposal from ai/project/inbox/ideas/",
-    strategyReview: "After human confirmation, say:",
-    strategyApplyPrompt: "Confirmed, merge this proposal",
+    strategyAsk: "Then send to AI:",
+    strategyPrompt: "/strategy",
+    strategyReview: "After human confirmation, send to AI:",
+    strategyApplyPrompt: "/apply-strategy",
     nextTitle: "Agent Execution Template next step",
     nextRunInit: "This project has not installed the template yet. Run:",
-    nextTellAgent: "Send this to your AI coding tool:",
+    nextTellAgent: "Send this command to your AI:",
     nextRunCommand: "Run this command:",
-    nextReviewProposal: "A direction amendment proposal exists. Review it first; after confirmation, tell the AI:",
-    nextContinuePrompt: "Continue this project. Before execution, decompose L1 tasks; if L1 >= 2, automatically use bounded continuous execution; only Red risk stops for confirmation.",
+    nextReviewProposal: "A direction amendment proposal exists. Review it first; after confirmation, send to AI:",
+    nextContinuePrompt: "/continue",
     repairHint: "Missing recommended project files can be safely added by running init again; existing ai/project/** files are not overwritten.",
     sourceCheckoutNotice: `Maintainer note: this directory looks like the @wnlen/agent-execution-template source checkout.
   In the source repository, test with: node bin/agent-execution-template.js <command>
@@ -409,8 +411,9 @@ This repository has Agent Execution Template installed in \`ai/\`.
 This managed block is intentionally duplicated in \`AGENTS.md\` and \`CLAUDE.md\` for different AI tool discovery conventions.
 
 Mandatory routing:
-- Before acting on any project request, first read and follow \`ai/template/prompt.md\`.
-- If the user says "Start initializing this project" or asks to initialize/bootstrap project context, do not run installs, create lockfiles, or edit app files before \`ai/template/prompt.md\` routes the workflow.
+- Before acting on any project execution request, first read and follow \`ai/template/prompt.md\`.
+- Project workflows are triggered by slash commands such as \`/init\`, \`/reconcile\`, \`/strategy\`, and \`/continue\`.
+- For ordinary questions or design discussion, answer read-only and do not enter the execution workflow unless a slash command is present.
 ${ENTRYPOINT_BLOCK_END}`;
   }
 
@@ -421,8 +424,9 @@ ${ENTRYPOINT_BLOCK_END}`;
 此托管块会有意同时写入 \`AGENTS.md\` 和 \`CLAUDE.md\`，用于适配不同 AI 工具的自动发现约定。
 
 强制路由：
-- 处理任何项目请求前，必须先读取并遵守 \`ai/template/prompt.md\`。
-- 如果用户说“开始初始化这个项目”或要求初始化/整理项目上下文，在 \`ai/template/prompt.md\` 完成路由前，不要运行安装命令、不要创建 lockfile、不要编辑业务文件。
+- 处理任何项目执行请求前，必须先读取并遵守 \`ai/template/prompt.md\`。
+- 项目工作流由 \`/init\`、\`/reconcile\`、\`/strategy\`、\`/continue\` 等 slash command 触发。
+- 普通问答或设计讨论只做只读回答；除非用户给出 slash command，否则不要进入执行工作流。
 ${ENTRYPOINT_BLOCK_END}`;
 }
 

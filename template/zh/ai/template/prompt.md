@@ -3,38 +3,67 @@
 不要总结这个文件。
 按下面流程执行。你正在 Agent Execution Template 工作区内操作。
 
-本文件只负责路由。先读取最小状态：
+本文件只负责路由。项目工作流必须由 slash command 触发；普通问答、协议解释、
+设计讨论或只读咨询只读取回答所需文件，不进入 bootstrap / reconcile / strategy /
+execution，不写 `ai/project/task.md`、`ai/project/result.*` 或
+`ai/project/metrics.json`。
+
+## Slash Commands
+
+正式入口：
+
+- `/init`
+- `/init-with-inbox`
+- `/reconcile`
+- `/strategy`
+- `/apply-strategy`
+- `/continue`
+- `/next`
+- `/doctor`
+- `/update`
+- `/refresh`
+- `/improve-context`
+- `/help`
+
+如果用户没有给出 slash command，但明确要求实现、修复、修改、提交、发布或执行项目任务，
+按 `/continue` 的执行入口处理；否则保持只读回答。
+
+## 路由
+
+收到 slash command 后，先读取最小状态：
 
 1. `ai/project/project.md`（如果存在）
 2. `ai/project/task.md`（如果存在）
-3. `ai/project/inbox/`、`ai/project/inbox/ideas/` 和 `ai/project/proposals/final-shape-updates/` 的浅层列表
+3. `ai/project/inbox/`、`ai/project/inbox/ideas/` 和
+   `ai/project/proposals/final-shape-updates/` 的浅层列表
 
-选择模式：
+然后选择模式：
 
-- 用户要求更新北极星、最终形态、产品宪法、模块地图、路线图或项目方向，
-  或 `ai/project/inbox/ideas/` 有待评估灵感：读取 `ai/template/protocol.md`、
-  `ai/template/rules/core.md` 和相关方向 refs，走 `strategy_update`，生成提案后停下确认。
-- 用户明确确认某个 `ai/project/proposals/final-shape-updates/*.md` 可合并：
-  读取 `ai/template/protocol.md` 和 `ai/template/rules/core.md`，走
-  `apply_strategy_update`。若 proposal 仍为 `proposed`，先改为 `accepted`。
-- 如果用户说“开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料”，
-  或要求初始化时吸收 inbox：先检查 `ai/project/project.md`。若已存在且有效，
-  执行 `ai/template/reconcile.md`，不要重新 bootstrap；若为空、占位或不完整，执行
+- `/help`：只读展示 slash command 列表和用途，不修改文件。
+- `/next`：只读判断下一步。优先提示待确认方向提案、待处理 ideas、待吸收 inbox、
+  待初始化上下文、待确认任务、失败结果或继续执行入口；不修改文件。
+- `/doctor`：如果当前任务契约允许运行命令，可运行
+  `node bin/agent-execution-template.js doctor` 或项目约定的 doctor 命令；否则只提示用户运行
+  `npx -y @wnlen/agent-execution-template doctor`。
+- `/update`：如果当前任务契约明确允许更新协议，可运行 update；否则只提示用户运行
+  `npx -y @wnlen/agent-execution-template update`。
+- `/refresh` 或 `/improve-context`：如果当前任务契约明确允许重整上下文，可执行 refresh；
+  否则只提示用户运行 `npx -y @wnlen/agent-execution-template refresh`。
+- `/init`：执行 `ai/template/bootstrap.md`，初始化项目上下文，写完上下文确认后停止。
+- `/init-with-inbox`：先检查 `ai/project/project.md`。若已存在且有效，执行
+  `ai/template/reconcile.md`，不要重新 bootstrap；若为空、占位或不完整，执行
   `ai/template/bootstrap.md`，并把 `ai/project/inbox/*.md` 与
   `ai/project/inbox/raw/*.md` 纳入引导输入；上下文确认后停止。
-- 用户说“整合 ai/project/inbox/ 里的新资料”，要求整合/合并/吸收/更新上下文/处理新资料，提到 `reconcile` 或
-  `ai/project/inbox/`，或 inbox 有待吸收资料：执行 `ai/template/reconcile.md`。
-  `processed/` 不触发整合，`ideas/` 优先走 `strategy_update`。即使用户说
-  “整合整个 inbox”，也默认只处理 `ai/project/inbox/*.md` 和 `ai/project/inbox/raw/*.md`。
-- 如果用户说“开始初始化这个项目”、要求初始化/整理/生成项目上下文，
-  或 `ai/project/project.md` 为空、占位或不完整：执行 `ai/template/bootstrap.md`，
-  上下文确认后停止。
-- `ai/project/task.md` 为空、占位或不完整：按当前目标和已确认上下文起草任务，
-  然后停下确认。
-- 用户说“继续推进这个项目”且无更具体目标：先判断最值得做的下一步，优先处理
-  待确认上下文、待确认任务、失败结果、未完成任务或明显风险；给出建议或起草
-  `ai/project/task.md`，不要让人类自己找问题。
-- 只有当 `project.md` 和 `task.md` 足以定义身份、目标、范围、权限和验收时，
+- `/reconcile`：执行 `ai/template/reconcile.md`。默认只处理
+  `ai/project/inbox/*.md` 和 `ai/project/inbox/raw/*.md`；`processed/` 不触发整合，
+  `ideas/` 优先走 `/strategy`。
+- `/strategy`：读取 `ai/template/protocol.md`、`ai/template/rules/core.md` 和相关方向 refs，
+  走 `strategy_update`，生成提案后停下确认。
+- `/apply-strategy`：读取 `ai/template/protocol.md` 和 `ai/template/rules/core.md`，
+  只应用人类已经明确确认的 proposal。若 proposal 仍为 `proposed`，先改为 `accepted`。
+- `/continue`：如果 `ai/project/project.md` 为空、占位或不完整，先执行 `/init`。
+  如果 `ai/project/task.md` 为空、占位或不完整，按当前目标和已确认上下文起草任务，
+  然后停下确认。只有当 `project.md` 和 `task.md` 足以定义身份、目标、范围、权限和验收时，
   才读取 `ai/template/protocol.md`、`ai/template/rules/core.md`、
   `ai/template/execution-policy.md` 并进入执行模式。
 
@@ -71,7 +100,7 @@
 3. 权限、命令和风险等级
 
 请回复：
-- 已确认，执行
+- /continue
 - 或修正意见
 ```
 
@@ -94,7 +123,7 @@
 - ai/project/proposals/final-shape-updates/YYYYMMDD-topic.md
 
 请回复：
-- 确认，合并这个提案
+- /apply-strategy
 - 或修正意见
 ```
 

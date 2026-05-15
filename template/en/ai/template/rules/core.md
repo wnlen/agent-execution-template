@@ -83,8 +83,8 @@ Task Draft Mode must end with the Task Draft Handoff from
 ## Context Reconcile Gate
 
 If the user provides new authoritative business, product, architecture, or
-process material and wants it merged into existing context, or says
-"Reconcile the new material in ai/project/inbox/", follow
+process material and wants it merged into existing context, or sends
+`/reconcile`, follow
 `ai/template/reconcile.md`. Do not re-bootstrap and do not overwrite the whole
 context set.
 

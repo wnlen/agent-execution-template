@@ -14,10 +14,10 @@ English | [简体中文](README.zh-CN.md)
 npx -y @wnlen/agent-execution-template init --lang en
 ```
 
-Then tell your coding agent:
+Then send to your coding agent:
 
 ```text
-Start initializing this project
+/init
 ```
 
 Agent Execution Template is not another agent framework. It is the missing execution layer between your repository and tools like Codex, Claude Code, Cursor, Aider, or any other AI coding agent.
@@ -72,7 +72,7 @@ npx -y @wnlen/agent-execution-template init --lang en
 Ask your agent to bootstrap project context from existing docs and manifests:
 
 ```text
-Start initializing this project
+/init
 ```
 
 `init` installs compatibility managed blocks in root `AGENTS.md` and `CLAUDE.md`.
@@ -81,7 +81,7 @@ Agent / Codex and Claude Code discovery conventions. Compatible AI tools read
 `ai/template/prompt.md` first, then route bootstrap to `ai/template/bootstrap.md`.
 If your AI tool does not auto-read those root
 entrypoints, ask it to read `AGENTS.md` or `CLAUDE.md` before sending the
-initialization instruction above.
+slash command above.
 
 The agent will generate project context and summarize what needs confirmation,
 risks, and the recommended next step in chat:
@@ -94,7 +94,7 @@ ai/project/refs/*
 Reply with corrections, or confirm and continue:
 
 ```text
-Continue this project
+/continue
 ```
 
 The agent will draft or execute from current context:
@@ -106,7 +106,7 @@ ai/project/task.md
 After the task draft is confirmed, you can also say:
 
 ```text
-Continue this project
+/continue
 ```
 
 Review the execution output:
@@ -145,6 +145,23 @@ Print the direction-amendment entrypoint:
 
 ```bash
 npx -y @wnlen/agent-execution-template strategy --lang en
+```
+
+Common slash commands to send to the AI:
+
+```text
+/init              Set up project context for the first time
+/init-with-inbox   Initialize while absorbing ai/project/inbox/ material
+/reconcile         Merge new material
+/strategy          Create a direction proposal
+/apply-strategy    Apply a confirmed direction proposal
+/continue          Continue drafting or executing the current task
+/next              Judge the next step only
+/doctor            Check the installation
+/update            Update the protocol
+/refresh           Refresh project context
+/improve-context   Improve project context
+/help              Show available commands
 ```
 
 ## What You Get
@@ -368,10 +385,10 @@ When a more complete or more authoritative document appears after the project ha
 ai/project/inbox/
 ```
 
-Then ask your agent:
+Then send to your agent:
 
 ```text
-Reconcile the new material in ai/project/inbox/
+/reconcile
 ```
 
 The agent must produce a reconciliation plan first, wait for confirmation, then merge long-lived facts into `project.md`, `runtime.md`, and `refs/*`.

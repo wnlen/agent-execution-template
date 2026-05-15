@@ -189,7 +189,7 @@ L1 必须是可独立验收的垂直切片。只有既有任务 `readiness = rea
 
 已整合资料统一移动到 `ai/project/inbox/processed/`，默认不再作为待吸收资料读取。
 
-用户可直接说“整合 ai/project/inbox/ 里的新资料”。整合时执行 `ai/template/reconcile.md`。
+用户可发送 `/reconcile`。整合时执行 `ai/template/reconcile.md`。
 
 上下文整合模式必须：
 

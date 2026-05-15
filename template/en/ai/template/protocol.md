@@ -220,7 +220,7 @@ New material should usually live in:
 Processed material is moved to `ai/project/inbox/processed/` and is not read
 again as pending intake by default.
 
-The user can simply say "Reconcile the new material in ai/project/inbox/".
+The user can send `/reconcile`.
 Use Context Reconcile Mode by following `ai/template/reconcile.md`.
 
 Context Reconcile Mode must:

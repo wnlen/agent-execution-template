@@ -66,7 +66,8 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "CLAUDE.md").includes("ai/template/prompt.md"), "CLAUDE.md should route Claude to the same protocol prompt");
   assert(managedEntrypointBlock(read(cwd, "AGENTS.md")) === managedEntrypointBlock(read(cwd, "CLAUDE.md")), "AGENTS.md and CLAUDE.md should contain the same managed compatibility block");
   assert(read(cwd, "AGENTS.md").includes("有意同时写入 `AGENTS.md` 和 `CLAUDE.md`"), "AGENTS.md should explain intentional compatibility duplication");
-  assert(read(cwd, "AGENTS.md").includes("在 `ai/template/prompt.md` 完成路由前"), "AGENTS.md should stay a short router");
+  assert(read(cwd, "AGENTS.md").includes("slash command 触发"), "AGENTS.md should route project workflows through slash commands");
+  assert(read(cwd, "AGENTS.md").includes("普通问答或设计讨论只做只读回答"), "AGENTS.md should keep ordinary questions read-only");
   assert(!read(cwd, "AGENTS.md").includes("ai/template/bootstrap.md"), "AGENTS.md should not duplicate bootstrap routing details");
   assert(!read(cwd, "CLAUDE.md").includes("ai/template/bootstrap.md"), "CLAUDE.md should not duplicate bootstrap routing details");
   assert(read(cwd, "ai/template/LANG") === "zh\n", "init should default to zh template");
@@ -102,11 +103,11 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/template/bootstrap.md").includes("冲突处理"), "bootstrap handoff should audit conflict handling");
   assert(read(cwd, "ai/template/prompt.md").includes("任务草稿交接"), "execution prompt should include task handoff");
   assert(read(cwd, "ai/template/prompt.md").includes("本文件只负责路由"), "execution prompt should be a lightweight router");
-  assert(read(cwd, "ai/template/prompt.md").includes("才读取 `ai/template/protocol.md`"), "execution prompt should lazy-load execution policy only for execution");
+  assert(read(cwd, "ai/template/prompt.md").includes("普通问答、协议解释"), "execution prompt should keep non-workflow requests read-only");
   assert(read(cwd, "ai/template/bootstrap.md").includes("不要把 `AGENTS.md` 或 `CLAUDE.md` 当作项目业务证据"), "bootstrap should not treat root agent entrypoints as project evidence");
   assert(read(cwd, "ai/template/execution-policy.md").includes("风险分级"), "execution policy should include risk rubric");
   assert(read(cwd, "ai/template/execution-policy.md").includes("execution_policy.task_tree"), "execution policy should require task tree persistence");
-  assert(read(cwd, "ai/template/prompt.md").includes("也默认只处理 `ai/project/inbox/*.md`"), "execution prompt should narrow inbox reconciliation");
+  assert(read(cwd, "ai/template/prompt.md").includes("默认只处理\n  `ai/project/inbox/*.md`"), "execution prompt should narrow inbox reconciliation");
   assert(read(cwd, "ai/template/protocol.md").includes("`bounded_continuous`"), "protocol should include bounded continuous execution");
   assert(read(cwd, "ai/template/execution-policy.md").includes("垂直切片"), "protocol should require vertical-slice progress for continuous execution");
   assert(read(cwd, "ai/template/execution-policy.md").includes("可独立验收的垂直切片"), "execution policy should define L1 granularity");
@@ -132,11 +133,12 @@ function testInitUpdateDoctor() {
   assert(!read(cwd, "ai/project/task.md").includes("checkpoint_budget:"), "task template should not default to checkpoint budget fields");
   assert(!read(cwd, "ai/project/task.md").includes("model_policy:"), "task template should not default to model policy fields");
   assert(read(cwd, "ai/project/task.md").includes("status: \"pending | running | done | blocked\""), "task template should define task tree node status");
-  assert(read(cwd, "ai/template/prompt.md").includes("开始初始化这个项目"), "execution prompt should route natural bootstrap entry");
-  assert(read(cwd, "ai/template/prompt.md").includes("开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料"), "execution prompt should route bootstrap with inbox material");
+  assert(read(cwd, "ai/template/prompt.md").includes("/init"), "execution prompt should route slash bootstrap entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("/init-with-inbox"), "execution prompt should route bootstrap with inbox material");
   assert(read(cwd, "ai/template/prompt.md").includes("不要重新 bootstrap"), "execution prompt should reconcile inbox material when project context already exists");
-  assert(read(cwd, "ai/template/prompt.md").includes("整合 ai/project/inbox/ 里的新资料"), "execution prompt should route natural reconcile entry");
-  assert(read(cwd, "ai/template/prompt.md").includes("继续推进这个项目"), "execution prompt should route natural continue entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("/reconcile"), "execution prompt should route slash reconcile entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("/continue"), "execution prompt should route slash continue entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("普通问答"), "execution prompt should keep ordinary questions read-only");
   assert(read(cwd, "ai/template/prompt.md").includes("草稿不能直接执行"), "execution prompt should stop after drafting a task");
   assert(read(cwd, "ai/template/prompt.md").includes("用户可见输出"), "execution prompt should reference user-visible output rules");
   assert(read(cwd, "ai/template/prompt.md").includes("strategy_update"), "execution prompt should route strategy updates");
@@ -157,13 +159,15 @@ function testInitUpdateDoctor() {
   assert(initOutput.includes("Agent Execution Template 已安装。"), "init output should confirm installation");
   assert(initOutput.includes("你现在可以这样用:"), "init output should introduce scenario-based usage");
   assert(initOutput.includes("1. 第一次整理项目上下文"), "init output should cover first-time project context setup");
-  assert(initOutput.includes("【发给 AI】\n\n     开始初始化这个项目"), "init output should make the bootstrap prompt visually prominent");
+  assert(initOutput.includes("【发给 AI】\n\n     /init"), "init output should make the bootstrap command visually prominent");
   assert(initOutput.includes("2. 已有 README、PRD、架构文档或业务规则"), "init output should cover initialization with existing material");
-  assert(initOutput.includes("开始初始化这个项目，并吸收 ai/project/inbox/ 里的资料"), "init output should explain bootstrap with existing material");
+  assert(initOutput.includes("/init-with-inbox"), "init output should explain bootstrap with existing material");
   assert(initOutput.includes("3. 后续有新资料要合并"), "init output should cover later material reconciliation");
-  assert(initOutput.includes("整合 ai/project/inbox/ 里的新资料"), "init output should show the reconcile prompt");
+  assert(initOutput.includes("/reconcile"), "init output should show the reconcile command");
   assert(initOutput.includes("4. 有还没确定的新想法、产品方向或架构调整"), "init output should cover undecided ideas");
-  assert(initOutput.includes("把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案"), "init output should show the strategy proposal prompt");
+  assert(initOutput.includes("/strategy"), "init output should show the strategy proposal command");
+  assert(!initOutput.includes("开始初始化这个项目"), "init output should not show old natural bootstrap prompt");
+  assert(!initOutput.includes("整合 ai/project/inbox/ 里的新资料"), "init output should not show old natural reconcile prompt");
   assert(!initOutput.includes("项目上下文尚未初始化"), "init output should not state the obvious uninitialized context");
   assert(!initOutput.includes("忘了下一步时运行"), "init output should not show next as the default fallback");
   assert(!initOutput.includes("根目录 AI 入口"), "init output should not mention root AI entrypoint implementation details");
@@ -185,11 +189,11 @@ function testInitUpdateDoctor() {
   assert(countOccurrences(read(cwd, "CLAUDE.md"), "agent-execution-template:start") === 1, "re-running init should keep one CLAUDE.md managed block");
   const reconcileOutput = run(["reconcile"], cwd);
   assert(reconcileOutput.includes("Agent Execution Template 上下文整合"), "reconcile should use installed Chinese language");
-  assert(reconcileOutput.includes("整合 ai/project/inbox/ 里的新资料"), "reconcile should print natural Chinese prompt");
+  assert(reconcileOutput.includes("/reconcile"), "reconcile should print slash command");
   const strategyOutput = run(["strategy"], cwd);
   assert(strategyOutput.includes("Agent Execution Template 方向修订"), "strategy should use installed Chinese language");
   assert(strategyOutput.includes("ai/project/inbox/ideas/"), "strategy should point to ideas inbox");
-  assert(strategyOutput.includes("方向修订提案"), "strategy should print natural Chinese strategy prompt");
+  assert(strategyOutput.includes("/strategy"), "strategy should print slash strategy command");
 
   write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
   run(["update"], cwd);
@@ -215,7 +219,8 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "CLAUDE.md").includes("ai/template/prompt.md"), "English CLAUDE.md should route Claude to the same protocol prompt");
   assert(managedEntrypointBlock(read(cwd, "AGENTS.md")) === managedEntrypointBlock(read(cwd, "CLAUDE.md")), "English AGENTS.md and CLAUDE.md should contain the same managed compatibility block");
   assert(read(cwd, "AGENTS.md").includes("intentionally duplicated in `AGENTS.md` and `CLAUDE.md`"), "English AGENTS.md should explain intentional compatibility duplication");
-  assert(read(cwd, "AGENTS.md").includes("before `ai/template/prompt.md` routes"), "English AGENTS.md should stay a short router");
+  assert(read(cwd, "AGENTS.md").includes("triggered by slash commands"), "English AGENTS.md should route project workflows through slash commands");
+  assert(read(cwd, "AGENTS.md").includes("ordinary questions or design discussion"), "English AGENTS.md should keep ordinary questions read-only");
   assert(!read(cwd, "AGENTS.md").includes("ai/template/bootstrap.md"), "English AGENTS.md should not duplicate bootstrap routing details");
   assert(!read(cwd, "CLAUDE.md").includes("ai/template/bootstrap.md"), "English CLAUDE.md should not duplicate bootstrap routing details");
   assert(read(cwd, "ai/template/LANG") === "en\n", "init --lang en should install English template");
@@ -233,13 +238,13 @@ function testEnglishInitUpdateDoctor() {
   assert(read(cwd, "ai/template/bootstrap.md").includes("Absorbed material"), "English bootstrap handoff should audit absorbed material");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Unabsorbed material"), "English bootstrap handoff should audit unabsorbed material");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Conflict handling"), "English bootstrap handoff should audit conflict handling");
-  assert(read(cwd, "ai/template/prompt.md").includes("Start initializing this project"), "English execution prompt should route natural bootstrap entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("/init"), "English execution prompt should route slash bootstrap entry");
   assert(read(cwd, "ai/template/prompt.md").includes("This file only routes the workflow"), "English execution prompt should be a lightweight router");
-  assert(read(cwd, "ai/template/prompt.md").includes("Only then read `ai/template/protocol.md`"), "English execution prompt should lazy-load execution policy only for execution");
+  assert(read(cwd, "ai/template/prompt.md").includes("ordinary questions"), "English execution prompt should keep ordinary questions read-only");
   assert(read(cwd, "ai/template/bootstrap.md").includes("Do not treat `AGENTS.md` or `CLAUDE.md` as project business evidence"), "English bootstrap should not treat root agent entrypoints as project evidence");
   assert(read(cwd, "ai/template/execution-policy.md").includes("Risk Rubric"), "English execution policy should include risk rubric");
   assert(read(cwd, "ai/template/execution-policy.md").includes("execution_policy.task_tree"), "English execution policy should require task tree persistence");
-  assert(read(cwd, "ai/template/prompt.md").includes("default to only `ai/project/inbox/*.md`"), "English execution prompt should narrow inbox reconciliation");
+  assert(read(cwd, "ai/template/prompt.md").includes("Default to only\n  `ai/project/inbox/*.md`"), "English execution prompt should narrow inbox reconciliation");
   assert(read(cwd, "ai/template/protocol.md").includes("`bounded_continuous`"), "English protocol should include bounded continuous execution");
   assert(read(cwd, "ai/template/execution-policy.md").includes("vertical"), "English protocol should require vertical-slice progress for continuous execution");
   assert(read(cwd, "ai/template/execution-policy.md").includes("independently acceptable vertical slice"), "English execution policy should define L1 granularity");
@@ -265,10 +270,10 @@ function testEnglishInitUpdateDoctor() {
   assert(!read(cwd, "ai/project/task.md").includes("checkpoint_budget:"), "English task template should not default to checkpoint budget fields");
   assert(!read(cwd, "ai/project/task.md").includes("model_policy:"), "English task template should not default to model policy fields");
   assert(read(cwd, "ai/project/task.md").includes("status: \"pending | running | done | blocked\""), "English task template should define task tree node status");
-  assert(read(cwd, "ai/template/prompt.md").includes("Start initializing this project and absorb the material in ai/project/inbox/"), "English execution prompt should route bootstrap with inbox material");
+  assert(read(cwd, "ai/template/prompt.md").includes("/init-with-inbox"), "English execution prompt should route bootstrap with inbox material");
   assert(read(cwd, "ai/template/prompt.md").includes("instead of bootstrapping again"), "English execution prompt should reconcile inbox material when project context already exists");
-  assert(read(cwd, "ai/template/prompt.md").includes("Reconcile the new material in ai/project/inbox/"), "English execution prompt should route natural reconcile entry");
-  assert(read(cwd, "ai/template/prompt.md").includes("Continue this project"), "English execution prompt should route natural continue entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("/reconcile"), "English execution prompt should route slash reconcile entry");
+  assert(read(cwd, "ai/template/prompt.md").includes("/continue"), "English execution prompt should route slash continue entry");
   assert(read(cwd, "ai/template/prompt.md").includes("do not execute while the\n   task is still a draft"), "English execution prompt should stop after drafting a task");
   assert(read(cwd, "ai/template/prompt.md").includes("User-Visible Output"), "English execution prompt should reference user-visible output rules");
   assert(read(cwd, "ai/template/prompt.md").includes("strategy_update"), "English execution prompt should route strategy updates");
@@ -287,13 +292,15 @@ function testEnglishInitUpdateDoctor() {
   assert(initOutput.includes("Agent Execution Template installed."), "English init output should confirm installation");
   assert(initOutput.includes("You can use it like this:"), "English init output should introduce scenario-based usage");
   assert(initOutput.includes("1. Set up project context for the first time"), "English init output should cover first-time project context setup");
-  assert(initOutput.includes("[Send to AI]\n\n     Start initializing this project"), "English init output should make the bootstrap prompt visually prominent");
+  assert(initOutput.includes("[Send to AI]\n\n     /init"), "English init output should make the bootstrap command visually prominent");
   assert(initOutput.includes("2. You already have a README, PRD, architecture doc, or business rules"), "English init output should cover initialization with existing material");
-  assert(initOutput.includes("Start initializing this project and absorb the material in ai/project/inbox/"), "English init output should explain bootstrap with existing material");
+  assert(initOutput.includes("/init-with-inbox"), "English init output should explain bootstrap with existing material");
   assert(initOutput.includes("3. Later, you have new material to merge"), "English init output should cover later material reconciliation");
-  assert(initOutput.includes("Reconcile the new material in ai/project/inbox/"), "English init output should show the reconcile prompt");
+  assert(initOutput.includes("/reconcile"), "English init output should show the reconcile command");
   assert(initOutput.includes("4. You have an undecided idea, product direction, or architecture change"), "English init output should cover undecided ideas");
-  assert(initOutput.includes("Generate a direction amendment proposal from ai/project/inbox/ideas/"), "English init output should show the strategy proposal prompt");
+  assert(initOutput.includes("/strategy"), "English init output should show the strategy proposal command");
+  assert(!initOutput.includes("Start initializing this project"), "English init output should not show old natural bootstrap prompt");
+  assert(!initOutput.includes("Reconcile the new material in ai/project/inbox/"), "English init output should not show old natural reconcile prompt");
   assert(!initOutput.includes("Project context is not initialized yet"), "English init output should not state the obvious uninitialized context");
   assert(!initOutput.includes("If you forget the next step"), "English init output should not show next as the default fallback");
   assert(!initOutput.includes("Root AI entrypoints"), "English init output should not mention root AI entrypoint implementation details");
@@ -321,13 +328,13 @@ function testEnglishInitUpdateDoctor() {
   assert(doctorOutput.includes("[OK] Ready to run"), "doctor should use installed English language");
   const reconcileOutput = run(["reconcile"], cwd);
   assert(reconcileOutput.includes("Agent Execution Template Context Reconcile"), "reconcile should use installed English language");
-  assert(reconcileOutput.includes("Reconcile the new material in ai/project/inbox/"), "reconcile should print natural English prompt");
+  assert(reconcileOutput.includes("/reconcile"), "reconcile should print slash command");
   const strategyOutput = run(["strategy"], cwd);
   assert(strategyOutput.includes("Agent Execution Template Strategy Update"), "strategy should use installed English language");
   assert(strategyOutput.includes("ai/project/inbox/ideas/"), "strategy should point to ideas inbox");
-  assert(strategyOutput.includes("direction amendment proposal"), "strategy should print natural English strategy prompt");
-  assert(run(["reconcile", "--lang", "zh"], cwd).includes("整合 ai/project/inbox/ 里的新资料"), "reconcile --lang zh should override installed language");
-  assert(run(["strategy", "--lang", "zh"], cwd).includes("方向修订提案"), "strategy --lang zh should override installed language");
+  assert(strategyOutput.includes("/strategy"), "strategy should print slash strategy command");
+  assert(run(["reconcile", "--lang", "zh"], cwd).includes("/reconcile"), "reconcile --lang zh should override installed language");
+  assert(run(["strategy", "--lang", "zh"], cwd).includes("/strategy"), "strategy --lang zh should override installed language");
 }
 
 function testDoctorFailureAndWarning() {
@@ -469,11 +476,11 @@ function testRefreshBacksUpAndImportsOldProject() {
     "refresh should import old project context into the new inbox"
   );
   assert(output.includes("Agent Execution Template 项目上下文重整"), "refresh should print a refresh summary");
-  assert(output.includes("基于旧上下文重新生成更精良的 ai/project/"), "refresh should print the next agent prompt");
+  assert(output.includes("/reconcile"), "refresh should print the next slash command");
 
   const improveOutput = run(["improve-context"], cwd);
   assert(improveOutput.includes("Agent Execution Template 上下文总结优化"), "improve-context should use user-facing context improvement language");
-  assert(improveOutput.includes("基于旧上下文重新生成更精良的 ai/project/"), "improve-context should reuse refresh behavior");
+  assert(improveOutput.includes("/reconcile"), "improve-context should reuse refresh behavior");
 }
 
 function testNextCommandRoutesByProjectState() {
@@ -483,28 +490,28 @@ function testNextCommandRoutesByProjectState() {
 
   const cwd = createTempProject("agent-execution-template-next");
   run(["init"], cwd);
-  assert(run(["next"], cwd).includes("开始初始化这个项目"), "next should bootstrap a freshly installed project");
+  assert(run(["next"], cwd).includes("/init"), "next should bootstrap a freshly installed project");
 
   write(cwd, "ai/project/project.md", "USER PROJECT MARKER\n");
-  assert(run(["next"], cwd).includes("执行前先拆 L1 任务"), "next should continue with automatic execution guidance when no intake is waiting");
+  assert(run(["next"], cwd).includes("/continue"), "next should continue when no intake is waiting");
 
   write(cwd, "ai/project/inbox/product.md", "# Product material\n");
-  assert(run(["next"], cwd).includes("整合 ai/project/inbox/ 里的新资料"), "next should route material inbox to reconcile");
+  assert(run(["next"], cwd).includes("/reconcile"), "next should route material inbox to reconcile");
   fs.unlinkSync(path.join(cwd, "ai/project/inbox/product.md"));
 
   write(cwd, "ai/project/inbox/processed/product.md", "# Processed material\n");
-  assert(run(["next"], cwd).includes("执行前先拆 L1 任务"), "next should ignore processed inbox material");
+  assert(run(["next"], cwd).includes("/continue"), "next should ignore processed inbox material");
   fs.unlinkSync(path.join(cwd, "ai/project/inbox/processed/product.md"));
 
   write(cwd, "ai/project/inbox/ideas/new-direction.md", "# Direction idea\n");
-  assert(run(["next"], cwd).includes("方向修订提案"), "next should route ideas inbox to strategy update");
+  assert(run(["next"], cwd).includes("/strategy"), "next should route ideas inbox to strategy update");
   fs.unlinkSync(path.join(cwd, "ai/project/inbox/ideas/new-direction.md"));
 
   write(cwd, "ai/project/proposals/final-shape-updates/proposal.md", "---\nstatus: \"applied\"\n---\n");
-  assert(run(["next"], cwd).includes("执行前先拆 L1 任务"), "next should ignore already applied proposals");
+  assert(run(["next"], cwd).includes("/continue"), "next should ignore already applied proposals");
 
   write(cwd, "ai/project/proposals/final-shape-updates/proposal.md", "---\nstatus: \"proposed\"\n---\n");
-  assert(run(["next"], cwd).includes("已有方向修订提案"), "next should route existing proposals to human review");
+  assert(run(["next"], cwd).includes("/apply-strategy"), "next should route existing proposals to human review");
 }
 
 function testPermissionErrorIsActionable() {

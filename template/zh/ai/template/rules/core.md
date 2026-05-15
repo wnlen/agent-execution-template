@@ -70,8 +70,8 @@
 
 ## 上下文整合门
 
-用户提供新权威业务、产品、架构或流程资料并希望合并，或说
-“整合 ai/project/inbox/ 里的新资料”时，执行 `ai/template/reconcile.md`。
+用户提供新权威业务、产品、架构或流程资料并希望合并，或发送 `/reconcile` 时，
+执行 `ai/template/reconcile.md`。
 不要重新 bootstrap，也不要全量覆盖。
 
 新资料优先放在：

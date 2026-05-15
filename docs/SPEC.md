@@ -24,7 +24,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/agent-execution-template@0.8.23
+Package: @wnlen/agent-execution-template@0.8.24
 中文安装: npx -y @wnlen/agent-execution-template init
 英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
@@ -117,7 +117,7 @@ npx -y @wnlen/agent-execution-template init --lang en
 然后让 AI Agent 先整理项目上下文：
 
 ```text
-开始初始化这个项目
+/init
 ```
 
 AI 会在聊天里给出项目上下文摘要、需要确认的问题和建议下一步，对应文件是：
@@ -127,10 +127,10 @@ ai/project/project.md
 ai/project/refs/*
 ```
 
-之后人类回复修正意见，或说：
+之后人类回复修正意见，或发送：
 
 ```text
-继续推进这个项目
+/continue
 ```
 
 AI 会根据当前现场判断下一步，必要时生成并等待确认：
@@ -142,7 +142,7 @@ ai/project/task.md
 确认后启动 AI Agent 执行：
 
 ```text
-继续推进这个项目
+/continue
 ```
 
 如果后续出现更权威的新资料，先放入：
@@ -154,7 +154,7 @@ ai/project/inbox/
 再执行上下文整合：
 
 ```text
-整合 ai/project/inbox/ 里的新资料
+/reconcile
 ```
 
 整合会先输出计划，等人类确认后再更新 `project.md`、`runtime.md` 和 `refs/*`。
@@ -334,7 +334,7 @@ init 可以安装模板协议，但不能覆盖用户现场。
 
 根目录 AI 兼容入口文件只管理 `agent-execution-template` 标记块，不能覆盖用户已有
 `AGENTS.md` 或 `CLAUDE.md` 内容。两个文件中的托管块内容必须一致；这不是两套协议，
-而是分别适配通用 Agent / Codex 和 Claude Code 的自动发现约定。托管块必须要求 AI 在“开始初始化这个项目”时先读
+而是分别适配通用 Agent / Codex 和 Claude Code 的自动发现约定。托管块必须要求 AI 在收到 slash command 项目工作流时先读
 `ai/template/prompt.md`，再由它路由到 `ai/template/bootstrap.md`。
 
 ### 9.2 `update`
@@ -420,7 +420,7 @@ npx -y @wnlen/agent-execution-template doctor
 ```text
 Agent Execution Template 检查
 
-模板版本: 0.8.23
+模板版本: 0.8.24
 模板语言: zh
 
 [通过] ai/template/LANG
@@ -473,10 +473,10 @@ npx -y @wnlen/agent-execution-template reconcile
 面向用户的项目上下文启动入口是：
 
 ```text
-开始初始化这个项目
+/init
 ```
 
-为了让 AI 工具能发现这个入口，`init` 会在仓库根目录安装 `AGENTS.md` 和
+为了让 AI 工具能发现这些入口，`init` 会在仓库根目录安装 `AGENTS.md` 和
 `CLAUDE.md` 兼容入口托管块。两个托管块内容相同，不代表两套协议；它们分别适配不同
 AI 工具的自动发现约定。兼容这些入口的 AI 工具必须先读取托管块，再读取
 `ai/template/prompt.md`，最后由 `prompt.md` 路由到 `ai/template/bootstrap.md`。
@@ -486,19 +486,36 @@ AI 工具的自动发现约定。兼容这些入口的 AI 工具必须先读取�
 面向用户的任务执行入口是：
 
 ```text
-继续推进这个项目
+/continue
 ```
 
 面向用户的上下文整合入口是：
 
 ```text
-整合 ai/project/inbox/ 里的新资料
+/reconcile
 ```
 
-面向用户的方向修订入口可以是：
+面向用户的方向修订入口是：
 
 ```text
-把 ai/project/inbox/ideas/ 里的新灵感生成方向修订提案
+/strategy
+```
+
+完整 slash command 集合：
+
+```text
+/init
+/init-with-inbox
+/reconcile
+/strategy
+/apply-strategy
+/continue
+/next
+/doctor
+/update
+/refresh
+/improve-context
+/help
 ```
 
 内部协议入口分别由 `ai/template/bootstrap.md`、`ai/template/prompt.md` 和
@@ -824,7 +841,7 @@ ai/project/inbox/processed/business-context.md
 当 inbox 中的资料需要吸收时，执行：
 
 ```text
-整合 ai/project/inbox/ 里的新资料
+/reconcile
 ```
 
 AI 必须先输出整合计划，等人类确认后，才更新 `project.md`、`runtime.md` 和 `refs/*`。

@@ -1,82 +1,117 @@
 {
   "protocol_version": "0.8",
   "status": "success",
-  "task_id": "20260515-release-init-output-scenarios",
-  "task_summary": "提交、推送 init 输出优化，并发布 @wnlen/agent-execution-template@0.8.23。",
+  "task_id": "20260516-slash-command-routing",
+  "task_summary": "将 AI 工作流触发入口改为 slash command，并同步 CLI 输出、协议路由、文档和测试。",
   "scope_followed": true,
   "files_read": [
     "ai/template/prompt.md",
     "ai/project/task.md",
-    "ai/project/project.md",
     "ai/project/refs/commands.md",
-    "ai/template/protocol.md",
-    "ai/template/rules/core.md",
-    "ai/template/execution-policy.md",
-    "package.json",
     "bin/agent-execution-template.js",
-    "test/selftest.js"
+    "test/selftest.js",
+    "README.md",
+    "README.zh-CN.md",
+    "docs/SPEC.md",
+    "template/en/ai/template/prompt.md",
+    "template/zh/ai/template/prompt.md"
   ],
   "refs_read": [
     {
       "file": "ai/project/refs/commands.md",
-      "reason": "确认验证、版本、提交、推送和 npm 发布命令。"
+      "reason": "确认本次允许的验证命令。"
     }
   ],
   "files_changed": [
     {
       "file": "bin/agent-execution-template.js",
       "change_type": "modified",
-      "reason": "优化 init 默认输出，覆盖常用场景并突出 AI 提示词。"
+      "reason": "CLI 输出和根入口托管块改为 slash command 触发模型。"
     },
     {
-      "file": "test/selftest.js",
+      "file": "ai/template/prompt.md",
       "change_type": "modified",
-      "reason": "同步中英文 init 输出断言。"
+      "reason": "正式路由改为 slash command，并让普通问答保持只读。"
     },
     {
-      "file": "package.json",
+      "file": "template/zh/ai/template/prompt.md",
       "change_type": "modified",
-      "reason": "版本从 0.8.22 bump 到 0.8.23。"
+      "reason": "同步中文模板 prompt。"
     },
     {
-      "file": "ai/template/VERSION",
+      "file": "template/en/ai/template/prompt.md",
       "change_type": "modified",
-      "reason": "同步版本 0.8.23。"
+      "reason": "同步英文模板 prompt。"
     },
     {
-      "file": "template/zh/ai/template/VERSION",
+      "file": "ai/template/protocol.md",
       "change_type": "modified",
-      "reason": "同步版本 0.8.23。"
+      "reason": "上下文整合入口改为 /reconcile。"
     },
     {
-      "file": "template/en/ai/template/VERSION",
+      "file": "template/zh/ai/template/protocol.md",
       "change_type": "modified",
-      "reason": "同步版本 0.8.23。"
+      "reason": "同步中文模板协议。"
+    },
+    {
+      "file": "template/en/ai/template/protocol.md",
+      "change_type": "modified",
+      "reason": "同步英文模板协议。"
+    },
+    {
+      "file": "ai/template/rules/core.md",
+      "change_type": "modified",
+      "reason": "上下文整合门改为识别 /reconcile。"
+    },
+    {
+      "file": "template/zh/ai/template/rules/core.md",
+      "change_type": "modified",
+      "reason": "同步中文核心规则。"
+    },
+    {
+      "file": "template/en/ai/template/rules/core.md",
+      "change_type": "modified",
+      "reason": "同步英文核心规则。"
+    },
+    {
+      "file": "README.md",
+      "change_type": "modified",
+      "reason": "英文文档改为 slash command 示例并补充命令表。"
+    },
+    {
+      "file": "README.zh-CN.md",
+      "change_type": "modified",
+      "reason": "中文文档改为 slash command 示例并补充命令表。"
     },
     {
       "file": "docs/SPEC.md",
       "change_type": "modified",
-      "reason": "同步包版本和 doctor 示例版本。"
+      "reason": "规格文档改为 slash command 入口。"
+    },
+    {
+      "file": "test/selftest.js",
+      "change_type": "modified",
+      "reason": "测试 slash command 输出、路由和旧自然语言触发语移除。"
     },
     {
       "file": "ai/project/task.md",
       "change_type": "modified",
-      "reason": "记录发布任务和完成状态。"
+      "reason": "记录本次任务契约和完成状态。"
     },
     {
       "file": "ai/project/result.json",
       "change_type": "modified",
-      "reason": "记录机器可读发布结果。"
+      "reason": "记录机器可读执行结果。"
     },
     {
       "file": "ai/project/result.md",
       "change_type": "modified",
-      "reason": "记录人类可读发布结果。"
+      "reason": "记录人类可读执行结果。"
     },
     {
       "file": "ai/project/metrics.json",
       "change_type": "modified",
-      "reason": "记录本次发布指标。"
+      "reason": "记录本次任务指标。"
     }
   ],
   "commands_run": [
@@ -98,32 +133,17 @@
     {
       "command": "node bin/agent-execution-template.js doctor",
       "result": "passed",
-      "notes": "doctor 通过，模板版本 0.8.23。"
+      "notes": "doctor 通过。"
     },
     {
-      "command": "npm_config_cache=/tmp/npm-cache-agent-execution-template npm pack --dry-run",
+      "command": "node bin/agent-execution-template.js init",
       "result": "passed",
-      "notes": "dry-run 包版本为 0.8.23，total files: 73。"
+      "notes": "临时目录中文 init 输出展示 /init、/init-with-inbox、/reconcile、/strategy。"
     },
     {
-      "command": "git commit",
+      "command": "node bin/agent-execution-template.js init --lang en",
       "result": "passed",
-      "notes": "创建提交 ecafef7 Improve init usage guidance。"
-    },
-    {
-      "command": "git push",
-      "result": "passed",
-      "notes": "已推送 dev 到 origin/dev。"
-    },
-    {
-      "command": "npm publish",
-      "result": "passed",
-      "notes": "发布成功：+ @wnlen/agent-execution-template@0.8.23。"
-    },
-    {
-      "command": "npm view @wnlen/agent-execution-template version",
-      "result": "passed",
-      "notes": "registry latest 返回 0.8.23。"
+      "notes": "临时目录英文 init 输出展示相同 slash command。"
     }
   ],
   "verification": {
@@ -134,35 +154,42 @@
       "`npm run check:release` passed.",
       "`git diff --check` passed.",
       "`node bin/agent-execution-template.js doctor` passed.",
-      "`npm pack --dry-run` showed version 0.8.23.",
-      "`npm view @wnlen/agent-execution-template version` returned 0.8.23 after publish."
+      "旧自然语言触发语已从产品文件中清空，测试仅保留负向断言。"
     ]
   },
   "evidence": {
-    "git_diff_summary": "init 默认输出优化、测试断言和 0.8.23 版本同步已提交并发布。",
+    "git_diff_summary": "slash command 触发模型已落到 CLI、prompt、协议、README、SPEC 和测试。",
     "changed_files_from_git": [
+      "README.md",
+      "README.zh-CN.md",
       "ai/project/metrics.json",
       "ai/project/result.json",
       "ai/project/result.md",
       "ai/project/task.md",
-      "ai/template/VERSION",
+      "ai/template/prompt.md",
+      "ai/template/protocol.md",
+      "ai/template/rules/core.md",
       "bin/agent-execution-template.js",
       "docs/SPEC.md",
-      "package.json",
-      "template/en/ai/template/VERSION",
-      "template/zh/ai/template/VERSION",
+      "template/en/ai/template/prompt.md",
+      "template/en/ai/template/protocol.md",
+      "template/en/ai/template/rules/core.md",
+      "template/zh/ai/template/prompt.md",
+      "template/zh/ai/template/protocol.md",
+      "template/zh/ai/template/rules/core.md",
       "test/selftest.js"
     ],
     "command_outputs": [
       "npm test: selftest ok; release check ok",
       "npm run check:release: release check ok",
-      "npm publish: + @wnlen/agent-execution-template@0.8.23",
-      "npm view @wnlen/agent-execution-template version: 0.8.23"
+      "git diff --check: passed",
+      "doctor: [通过] 已就绪"
     ],
     "unverified_claims": []
   },
   "assumptions": [
-    "0.8.23 作为 patch 发布版本，因为 0.8.22 已存在于 npm registry。"
+    "slash command 是发给 AI 的聊天命令，不是 shell 命令。",
+    "旧自然语言触发语作为正式入口移除。"
   ],
   "issues": [],
   "next": [],
