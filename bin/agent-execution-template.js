@@ -63,13 +63,13 @@ const TEXT = {
 
 用法:
   agent-execution-template init [--lang zh|en] [--verbose]
-  agent-execution-template next [--lang zh|en]
+  agent-execution-template next [--lang zh|en] [--verbose]
   agent-execution-template refresh [--lang zh|en]
   agent-execution-template improve-context [--lang zh|en]
   agent-execution-template update [--lang zh|en]
   agent-execution-template reconcile [--lang zh|en]
   agent-execution-template strategy [--lang zh|en]
-  agent-execution-template doctor
+  agent-execution-template doctor [--verbose]
 `,
     unknown: "未知",
     sourceMissing: "找不到模板来源",
@@ -137,6 +137,10 @@ const TEXT = {
     runInit: "请运行 npx -y @wnlen/agent-execution-template init",
     readyWithWarnings: "已就绪，但存在警告",
     readyToRun: "已就绪",
+    needsRepair: "需要修复",
+    status: "状态",
+    nextAction: "下一步",
+    diagnosticDetails: "详情",
     invalidLang: "不支持的语言，请使用 zh 或 en",
     reconcileTitle: "Agent Execution Template 上下文整合",
     reconcilePut: "把新的业务、产品、架构或流程资料放到:",
@@ -154,6 +158,20 @@ const TEXT = {
     nextRunCommand: "运行这个命令:",
     nextReviewProposal: "已有方向修订提案。先审查提案；确认后发给 AI:",
     nextContinuePrompt: "/continue",
+    nextNoAction: "暂无必须动作。可以提出下一个具体目标。",
+    nextReason: "原因",
+    nextReasons: {
+      missingInstall: "当前项目还没有安装协议。",
+      proposalAccepted: "存在已接受但尚未应用的方向修订提案。",
+      proposalProposed: "存在待审查的方向修订提案。",
+      ideas: "ai/project/inbox/ideas/ 中有待评估想法。",
+      inbox: "ai/project/inbox/ 中有待吸收资料。",
+      freshProject: "项目上下文仍是初始模板。",
+      draftTask: "当前任务仍是草稿，需要先确认任务契约。",
+      readyTask: "当前任务已 ready，可以继续执行。",
+      failedResult: "上次执行未成功，需要继续处理。",
+      clean: "没有待处理 inbox、proposal 或失败结果。"
+    },
     repairHint: "缺失的 project 推荐文件可通过重新运行 init 安全补齐；已有 ai/project/** 不会被覆盖。",
     sourceCheckoutNotice: `维护者提示: 当前目录看起来是 @wnlen/agent-execution-template 源码仓库。
   源码仓库内调试请使用: node bin/agent-execution-template.js <command>
@@ -176,13 +194,13 @@ const TEXT = {
 
 Usage:
   agent-execution-template init [--lang zh|en] [--verbose]
-  agent-execution-template next [--lang zh|en]
+  agent-execution-template next [--lang zh|en] [--verbose]
   agent-execution-template refresh [--lang zh|en]
   agent-execution-template improve-context [--lang zh|en]
   agent-execution-template update [--lang zh|en]
   agent-execution-template reconcile [--lang zh|en]
   agent-execution-template strategy [--lang zh|en]
-  agent-execution-template doctor
+  agent-execution-template doctor [--verbose]
 `,
     unknown: "unknown",
     sourceMissing: "Template source not found",
@@ -250,6 +268,10 @@ Usage:
     runInit: "Run npx -y @wnlen/agent-execution-template init",
     readyWithWarnings: "Ready to run with warnings",
     readyToRun: "Ready to run",
+    needsRepair: "Needs repair",
+    status: "Status",
+    nextAction: "Next",
+    diagnosticDetails: "Details",
     invalidLang: "Unsupported language. Use zh or en",
     reconcileTitle: "Agent Execution Template Context Reconcile",
     reconcilePut: "Put new business, product, architecture, or process material in:",
@@ -267,6 +289,20 @@ Usage:
     nextRunCommand: "Run this command:",
     nextReviewProposal: "A direction amendment proposal exists. Review it first; after confirmation, send to AI:",
     nextContinuePrompt: "/continue",
+    nextNoAction: "No required action. Give the agent the next concrete goal.",
+    nextReason: "Reason",
+    nextReasons: {
+      missingInstall: "This project has not installed the protocol.",
+      proposalAccepted: "An accepted direction amendment proposal has not been applied.",
+      proposalProposed: "A direction amendment proposal is waiting for review.",
+      ideas: "ai/project/inbox/ideas/ contains ideas to evaluate.",
+      inbox: "ai/project/inbox/ contains material to absorb.",
+      freshProject: "Project context is still the initial template.",
+      draftTask: "The current task is still a draft and needs contract confirmation.",
+      readyTask: "The current task is ready to execute.",
+      failedResult: "The last execution did not succeed and needs follow-up.",
+      clean: "No pending inbox, proposal, or failed result was found."
+    },
     repairHint: "Missing recommended project files can be safely added by running init again; existing ai/project/** files are not overwritten.",
     sourceCheckoutNotice: `Maintainer note: this directory looks like the @wnlen/agent-execution-template source checkout.
   In the source repository, test with: node bin/agent-execution-template.js <command>
@@ -568,6 +604,40 @@ function proposalState() {
   return hasProposed ? "proposed" : null;
 }
 
+function readTaskReadiness() {
+  const taskPath = path.join(TARGET_AI, "project", "task.md");
+  if (!fs.existsSync(taskPath)) return null;
+  const content = fs.readFileSync(taskPath, "utf8");
+  const match = content.match(/^readiness:\s*["']?([^"'\s]+)["']?\s*$/m);
+  return match ? match[1] : null;
+}
+
+function readResultStatus() {
+  const resultPath = path.join(TARGET_AI, "project", "result.json");
+  if (!fs.existsSync(resultPath)) return null;
+  try {
+    const result = JSON.parse(fs.readFileSync(resultPath, "utf8"));
+    return result && typeof result.status === "string" ? result.status : null;
+  } catch {
+    return "invalid";
+  }
+}
+
+function printNextDecision(text, command, reason, { verbose = false, commandType = "agent" } = {}) {
+  console.log(`${text.nextAction}:`);
+  if (command) {
+    const intro = commandType === "shell" ? text.nextRunCommand : text.nextTellAgent;
+    console.log(`${intro}
+  ${command}`);
+  } else {
+    console.log(`  ${text.nextNoAction}`);
+  }
+  if (verbose && reason) {
+    console.log(`
+${text.nextReason}: ${reason}`);
+  }
+}
+
 function init({ lang = DEFAULT_LANG, verbose = false, quiet = false, manageEntrypoints = true } = {}) {
   const text = getText(lang);
   if (!SUPPORTED_LANGS.has(lang)) {
@@ -651,7 +721,7 @@ ${text.then}
 `);
 }
 
-function next({ lang = readInstalledLang() } = {}) {
+function next({ lang = readInstalledLang(), verbose = false } = {}) {
   const text = getText(lang);
   if (!SUPPORTED_LANGS.has(lang)) {
     console.error(`[${text.fail}] ${text.invalidLang}: ${lang}`);
@@ -660,55 +730,67 @@ function next({ lang = readInstalledLang() } = {}) {
   }
 
   console.log(`${text.nextTitle}\n`);
-  printSourceCheckoutNotice(lang);
+  if (verbose) {
+    printSourceCheckoutNotice(lang);
+  }
 
   const templatePath = path.join(TARGET_AI, "template");
   const projectPath = path.join(TARGET_AI, "project");
   if (!fs.existsSync(templatePath) || !fs.existsSync(projectPath)) {
-    console.log(`${text.nextRunInit}
-  ${commandHint("init")}
-`);
+    printNextDecision(text, commandHint("init"), text.nextReasons.missingInstall, {
+      verbose,
+      commandType: "shell"
+    });
     return;
   }
 
   const state = proposalState();
   if (state === "accepted") {
-    console.log(`${text.nextTellAgent}
-  ${text.strategyApplyPrompt}
-`);
+    printNextDecision(text, text.strategyApplyPrompt, text.nextReasons.proposalAccepted, { verbose });
     return;
   }
   if (state === "proposed") {
-    console.log(`${text.nextReviewProposal}
-  ${text.strategyApplyPrompt}
-`);
+    if (!verbose) {
+      console.log(`${text.nextReviewProposal}`);
+    }
+    printNextDecision(text, text.strategyApplyPrompt, text.nextReasons.proposalProposed, { verbose });
     return;
   }
 
   if (hasUsefulFile(path.join(projectPath, "inbox", "ideas"))) {
-    console.log(`${text.nextTellAgent}
-  ${text.strategyPrompt}
-`);
+    printNextDecision(text, text.strategyPrompt, text.nextReasons.ideas, { verbose });
     return;
   }
 
   if (hasUsefulFile(path.join(projectPath, "inbox"), { excludeDirs: ["ideas", "processed"] })) {
-    console.log(`${text.nextTellAgent}
-  ${text.executePrompt}
-`);
+    printNextDecision(text, text.executePrompt, text.nextReasons.inbox, { verbose });
     return;
   }
 
   if (projectStillLooksFresh(lang)) {
-    console.log(`${text.nextTellAgent}
-  ${text.startPrompt}
-`);
+    printNextDecision(text, text.startPrompt, text.nextReasons.freshProject, { verbose });
     return;
   }
 
-  console.log(`${text.nextTellAgent}
-  ${text.nextContinuePrompt}
-`);
+  const readiness = readTaskReadiness();
+  if (readiness && readiness !== "ready_to_execute") {
+    printNextDecision(text, text.nextContinuePrompt, text.nextReasons.draftTask, { verbose });
+    return;
+  }
+
+  const resultStatus = readResultStatus();
+  if (readiness === "ready_to_execute" && resultStatus !== "success") {
+    const reason = resultStatus ? text.nextReasons.failedResult : text.nextReasons.readyTask;
+    printNextDecision(text, text.nextContinuePrompt, reason, { verbose });
+    return;
+  }
+
+  if (resultStatus && resultStatus !== "success") {
+    printNextDecision(text, text.nextContinuePrompt, text.nextReasons.failedResult, { verbose });
+    return;
+  }
+
+  printNextDecision(text, null, text.nextReasons.clean, { verbose });
 }
 
 function update({ lang = readInstalledLang() } = {}) {
@@ -854,38 +936,33 @@ function validateJsonSchema(value, schema, location = "$") {
   return errors;
 }
 
-function printSchemaValidation(file, schemaFile, text) {
+function checkSchemaValidation(file, schemaFile, text) {
   const fullPath = path.join(process.cwd(), file);
   const schemaPath = path.join(process.cwd(), schemaFile);
   if (!fs.existsSync(fullPath) || !fs.existsSync(schemaPath)) {
-    return 0;
+    return { ok: true, messages: [] };
   }
 
   let value;
   try {
     value = parseJsonFile(fullPath);
-    console.log(`[${text.pass}] ${file} JSON`);
   } catch {
-    console.log(`[${text.fail}] ${file} ${text.invalidJson}`);
-    return 1;
+    return { ok: false, messages: [`${file} ${text.invalidJson}`] };
   }
 
   let schema;
   try {
     schema = parseJsonFile(schemaPath);
   } catch {
-    console.log(`[${text.fail}] ${schemaFile} ${text.invalidJson}`);
-    return 1;
+    return { ok: false, messages: [`${schemaFile} ${text.invalidJson}`] };
   }
 
   const errors = validateJsonSchema(value, schema);
   if (errors.length > 0) {
-    console.log(`[${text.fail}] ${file} ${text.invalidSchema}: ${errors.slice(0, 3).join("; ")}`);
-    return 1;
+    return { ok: false, messages: [`${file} ${text.invalidSchema}: ${errors.slice(0, 3).join("; ")}`] };
   }
 
-  console.log(`[${text.pass}] ${file} schema`);
-  return 0;
+  return { ok: true, messages: [`${file} JSON`, `${file} schema`] };
 }
 
 function printFatal(error, lang) {
@@ -901,23 +978,26 @@ function printFatal(error, lang) {
   process.exitCode = 1;
 }
 
-function doctor() {
+function doctor({ verbose = false } = {}) {
   const lang = readInstalledLang();
   const text = getText(lang);
   console.log(`${text.doctorTitle}\n`);
-  printSourceCheckoutNotice(lang);
-  console.log(`${text.templateVersion}: ${readVersion(path.join(TARGET_AI, "template")) || text.unknown}`);
-  console.log(`${text.templateLang}: ${lang}\n`);
+  if (verbose) {
+    printSourceCheckoutNotice(lang);
+    console.log(`${text.templateVersion}: ${readVersion(path.join(TARGET_AI, "template")) || text.unknown}`);
+    console.log(`${text.templateLang}: ${lang}\n`);
+  }
 
   let missing = 0;
   let warnings = 0;
+  const detailLines = [];
   const installedVersion = readVersion(path.join(TARGET_AI, "template"));
   const packageVersion = readPackageVersion();
 
   for (const file of REQUIRED_FILES) {
     const fullPath = path.join(process.cwd(), file);
     if (!fs.existsSync(fullPath)) {
-      console.log(`[${text.missing}] ${file}`);
+      detailLines.push(`[${text.missing}] ${file}`);
       missing += 1;
       continue;
     }
@@ -926,27 +1006,33 @@ function doctor() {
       ["ai/project/project.md", "ai/project/runtime.md", "ai/project/task.md"].includes(file) &&
       content.trim().length === 0
     ) {
-      console.log(`[${text.warn}] ${file} ${text.empty}`);
+      detailLines.push(`[${text.warn}] ${file} ${text.empty}`);
       warnings += 1;
       continue;
     }
-    console.log(`[${text.pass}] ${file}`);
+    if (verbose) {
+      detailLines.push(`[${text.pass}] ${file}`);
+    }
   }
 
   for (const file of RECOMMENDED_FILES) {
     const fullPath = path.join(process.cwd(), file);
     if (!fs.existsSync(fullPath)) {
-      console.log(`[${text.warn}] ${file} ${text.missing}`);
+      detailLines.push(`[${text.warn}] ${file} ${text.missing}`);
       warnings += 1;
       continue;
     }
-    console.log(`[${text.pass}] ${file}`);
+    if (verbose) {
+      detailLines.push(`[${text.pass}] ${file}`);
+    }
   }
 
   if (hasAllRootEntrypoints()) {
-    console.log(`[${text.pass}] ${text.entrypointReady}`);
+    if (verbose) {
+      detailLines.push(`[${text.pass}] ${text.entrypointReady}`);
+    }
   } else {
-    console.log(`[${text.warn}] ${text.entrypointMissing}`);
+    detailLines.push(`[${text.warn}] ${text.entrypointMissing}`);
     warnings += 1;
   }
 
@@ -955,7 +1041,17 @@ function doctor() {
     ["ai/project/metrics.json", "ai/template/schemas/metrics.schema.json"]
   ];
   for (const [file, schemaFile] of schemaChecks) {
-    missing += printSchemaValidation(file, schemaFile, text);
+    const check = checkSchemaValidation(file, schemaFile, text);
+    if (!check.ok) {
+      missing += 1;
+      for (const message of check.messages) {
+        detailLines.push(`[${text.fail}] ${message}`);
+      }
+    } else if (verbose) {
+      for (const message of check.messages) {
+        detailLines.push(`[${text.pass}] ${message}`);
+      }
+    }
   }
 
   const taskPath = path.join(process.cwd(), "ai/project/task.md");
@@ -964,26 +1060,36 @@ function doctor() {
     const hasFrontMatter = taskContent.startsWith("---\n");
     const hasRequiredTaskFields = TASK_HEALTH_PATTERNS.every((pattern) => pattern.test(taskContent));
     if (hasFrontMatter && hasRequiredTaskFields) {
-      console.log(`[${text.pass}] ai/project/task.md front matter`);
+      if (verbose) {
+        detailLines.push(`[${text.pass}] ai/project/task.md front matter`);
+      }
     } else {
-      console.log(`[${text.warn}] ai/project/task.md ${text.taskFrontMatterIncomplete}`);
+      detailLines.push(`[${text.warn}] ai/project/task.md ${text.taskFrontMatterIncomplete}`);
       warnings += 1;
     }
   }
 
   if (installedVersion && packageVersion && installedVersion !== packageVersion) {
-    console.log(`[${text.warn}] ai/template/VERSION ${text.versionMismatch}: ${installedVersion} != ${packageVersion}`);
+    detailLines.push(`[${text.warn}] ai/template/VERSION ${text.versionMismatch}: ${installedVersion} != ${packageVersion}`);
     warnings += 1;
   }
 
   if (missing > 0) {
-    console.log(`\n[${text.fail}] ${commandHint("init")}`);
+    console.log(`${text.status}: ${text.needsRepair}`);
+    console.log(`${text.nextAction}: ${commandHint("init")}`);
     process.exitCode = 1;
   } else if (warnings > 0) {
-    console.log(`\n[${text.pass}] ${text.readyWithWarnings}`);
-    console.log(text.repairHint);
+    console.log(`${text.status}: ${text.readyWithWarnings}`);
+    console.log(`${text.nextAction}: ${text.repairHint}`);
   } else {
-    console.log(`\n[${text.pass}] ${text.readyToRun}`);
+    console.log(`${text.status}: ${text.readyToRun}`);
+  }
+
+  if (detailLines.length > 0) {
+    console.log(`\n${text.diagnosticDetails}:`);
+    for (const line of detailLines) {
+      console.log(line);
+    }
   }
 }
 
@@ -1007,7 +1113,7 @@ try {
   if (command === "init") {
     init({ lang: requestedLang, verbose });
   } else if (command === "next") {
-    next({ lang: requestedLang });
+    next({ lang: requestedLang, verbose });
   } else if (command === "refresh") {
     refresh({ lang: requestedLang });
   } else if (command === "improve-context") {
@@ -1019,7 +1125,7 @@ try {
   } else if (command === "strategy") {
     strategy({ lang: requestedLang });
   } else if (command === "doctor") {
-    doctor();
+    doctor({ verbose });
   } else {
     usage(requestedLang);
     if (command !== "help" && command !== "--help" && command !== "-h") {

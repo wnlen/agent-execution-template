@@ -5,6 +5,7 @@
 此托管块会有意同时写入 `AGENTS.md` 和 `CLAUDE.md`，用于适配不同 AI 工具的自动发现约定。
 
 强制路由：
-- 处理任何项目请求前，必须先读取并遵守 `ai/template/prompt.md`。
-- 如果用户说“开始初始化这个项目”或要求初始化/整理项目上下文，在 `ai/template/prompt.md` 完成路由前，不要运行安装命令、不要创建 lockfile、不要编辑业务文件。
+- 处理任何项目执行请求前，必须先读取并遵守 `ai/template/prompt.md`。
+- 项目工作流由 `/init`、`/reconcile`、`/strategy`、`/continue` 等 slash command 触发。
+- 普通问答或设计讨论只做只读回答；除非用户给出 slash command，否则不要进入执行工作流。
 <!-- agent-execution-template:end -->

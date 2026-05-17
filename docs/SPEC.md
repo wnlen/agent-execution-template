@@ -24,7 +24,7 @@ npx 安装协议 -> AI 整理项目上下文 -> 人类确认 -> AI 生成任务�
 
 ```text
 Protocol: v0.8
-Package: @wnlen/agent-execution-template@0.8.24
+Package: @wnlen/agent-execution-template@0.8.25
 中文安装: npx -y @wnlen/agent-execution-template init
 英文安装: npx -y @wnlen/agent-execution-template init --lang en
 ```
@@ -369,7 +369,10 @@ npx -y @wnlen/agent-execution-template next
 - `ai/project/inbox/` 有待吸收资料时，提示上下文整合入口；
 - `ai/project/inbox/ideas/` 有待评估灵感时，提示方向修订提案入口；
 - 存在待确认方向提案时，提示人类审查和确认；
-- 没有待处理输入时，提示继续推进项目。
+- 任务草稿待确认、ready 任务待执行或上次执行失败时，提示 `/continue`；
+- 没有待处理事项时，提示暂无必须动作。
+
+默认只输出用户需要的决策和下一步。`--verbose` 输出判断依据、源码仓库维护者提示等排查信息。
 
 安全原则：
 
@@ -410,37 +413,26 @@ npx -y @wnlen/agent-execution-template doctor
 
 作用：
 
-- 输出当前模板版本；
 - 检查必需文件是否存在；
 - 对空的项目文件给出警告；
-- 输出是否 ready。
+- 检查 result/metrics JSON 和 schema；
+- 检查任务 front matter 健康度；
+- 默认输出总体状态、下一步和需要处理的问题。
+
+默认状态分为：
+
+- `已就绪`
+- `已就绪，但存在警告`
+- `需要修复`
+
+`--verbose` 才输出模板版本、模板语言、通过项、文件路径和源码仓库维护者提示。
 
 示例输出：
 
 ```text
 Agent Execution Template 检查
 
-模板版本: 0.8.24
-模板语言: zh
-
-[通过] ai/template/LANG
-[通过] ai/template/VERSION
-[通过] ai/template/bootstrap.md
-[通过] ai/template/execution-policy.md
-[通过] ai/template/prompt.md
-[通过] ai/template/reconcile.md
-[通过] ai/template/protocol.md
-[通过] ai/template/rules/core.md
-[通过] ai/template/rules/output.md
-[通过] ai/project/inbox/.gitkeep
-[通过] ai/project/project.md
-[通过] ai/project/runtime.md
-[通过] ai/project/task.md
-[通过] ai/project/result.json
-[通过] ai/project/result.md
-[通过] ai/project/metrics.json
-
-[通过] 已就绪
+状态: 已就绪
 ```
 
 ### 9.5 `strategy`

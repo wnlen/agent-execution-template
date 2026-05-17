@@ -200,13 +200,16 @@ function testInitUpdateDoctor() {
   assert(read(cwd, "ai/project/project.md") === "USER PROJECT MARKER\n", "update must not overwrite project.md");
   assert(read(cwd, "AGENTS.md").includes("ai/template/prompt.md"), "update should keep root agent entrypoint block installed");
 
-  const doctorOutput = run(["doctor"], cwd);
+  const doctorOutput = run(["doctor", "--verbose"], cwd);
   assert(doctorOutput.includes("根目录 AI 兼容入口已安装: AGENTS.md / CLAUDE.md"), "doctor should report root AI compatibility entrypoint status");
   assert(doctorOutput.includes("ai/project/result.json JSON"), "doctor should validate result JSON");
   assert(doctorOutput.includes("ai/project/result.json schema"), "doctor should validate result schema");
   assert(doctorOutput.includes("ai/project/metrics.json JSON"), "doctor should validate metrics JSON");
   assert(doctorOutput.includes("ai/project/metrics.json schema"), "doctor should validate metrics schema");
   assert(doctorOutput.includes("ai/project/task.md front matter"), "doctor should validate task front matter");
+  const quietDoctorOutput = run(["doctor"], cwd);
+  assert(quietDoctorOutput.includes("状态: 已就绪"), "doctor should show a concise ready state by default");
+  assert(!quietDoctorOutput.includes("ai/project/result.json JSON"), "doctor should hide successful check details by default");
 }
 
 function testEnglishInitUpdateDoctor() {
@@ -319,13 +322,16 @@ function testEnglishInitUpdateDoctor() {
   assert(updateOutput.includes("Agent Execution Template update"), "update should use installed English language");
   assert(read(cwd, "ai/project/project.md") === "USER PROJECT MARKER\n", "English update must not overwrite project.md");
 
-  const doctorOutput = run(["doctor"], cwd);
+  const doctorOutput = run(["doctor", "--verbose"], cwd);
   assert(doctorOutput.includes("Template language: en"), "doctor should show installed English language");
   assert(doctorOutput.includes("root AI compatibility entrypoints installed: AGENTS.md / CLAUDE.md"), "English doctor should report root AI compatibility entrypoint status");
   assert(doctorOutput.includes("ai/project/result.json JSON"), "English doctor should validate result JSON");
   assert(doctorOutput.includes("ai/project/result.json schema"), "English doctor should validate result schema");
   assert(doctorOutput.includes("ai/project/task.md front matter"), "English doctor should validate task front matter");
-  assert(doctorOutput.includes("[OK] Ready to run"), "doctor should use installed English language");
+  assert(doctorOutput.includes("Status: Ready to run"), "doctor should use installed English language");
+  const quietDoctorOutput = run(["doctor"], cwd);
+  assert(quietDoctorOutput.includes("Status: Ready to run"), "English doctor should show a concise ready state by default");
+  assert(!quietDoctorOutput.includes("ai/project/result.json JSON"), "English doctor should hide successful check details by default");
   const reconcileOutput = run(["reconcile"], cwd);
   assert(reconcileOutput.includes("Agent Execution Template Context Reconcile"), "reconcile should use installed English language");
   assert(reconcileOutput.includes("/reconcile"), "reconcile should print slash command");
@@ -512,6 +518,68 @@ function testNextCommandRoutesByProjectState() {
 
   write(cwd, "ai/project/proposals/final-shape-updates/proposal.md", "---\nstatus: \"proposed\"\n---\n");
   assert(run(["next"], cwd).includes("/apply-strategy"), "next should route existing proposals to human review");
+
+  fs.unlinkSync(path.join(cwd, "ai/project/proposals/final-shape-updates/proposal.md"));
+  write(cwd, "ai/project/task.md", `---
+task_id: "done"
+type: "feature"
+priority: "P2"
+risk_level: "low"
+readiness: "ready_to_execute"
+execution_policy:
+  mode: "normal"
+  task_tree:
+    - id: "L1-1"
+      title: "Done"
+      risk: "Green"
+      status: "done"
+refs:
+  required: []
+permission:
+  modify:
+    allowed: []
+    denied: []
+  commands:
+    allowed: []
+    denied: []
+---
+# Task
+`);
+  write(cwd, "ai/project/result.json", JSON.stringify({
+    protocol_version: "0.8",
+    status: "success",
+    task_id: "done",
+    task_summary: "Done",
+    scope_followed: true,
+    files_read: [],
+    refs_read: [],
+    files_changed: [],
+    commands_run: [],
+    verification: {
+      level: "none",
+      passed: true,
+      evidence: []
+    },
+    evidence: {
+      git_diff_summary: "",
+      changed_files_from_git: [],
+      command_outputs: [],
+      unverified_claims: []
+    },
+    assumptions: [],
+    issues: [],
+    next: [],
+    runtime_update: {
+      required: false,
+      changes: [],
+      reason: ""
+    }
+  }, null, 2));
+  const cleanOutput = run(["next"], cwd);
+  assert(cleanOutput.includes("暂无必须动作"), "next should avoid telling users to continue after a successful clean state");
+  assert(!cleanOutput.includes("原因:"), "next should hide decision details by default");
+  const verboseOutput = run(["next", "--verbose"], cwd);
+  assert(verboseOutput.includes("原因:"), "next --verbose should show the decision reason");
 }
 
 function testPermissionErrorIsActionable() {
@@ -530,12 +598,18 @@ function testPermissionErrorIsActionable() {
 }
 
 function testSourceCheckoutNotice() {
-  const doctorOutput = run(["doctor"], repoRoot);
+  const quietDoctorOutput = run(["doctor"], repoRoot);
+  assert(!quietDoctorOutput.includes("维护者提示"), "doctor should hide source checkout notice by default");
+
+  const doctorOutput = run(["doctor", "--verbose"], repoRoot);
   assert(doctorOutput.includes("维护者提示"), "doctor should warn when run in the package source checkout");
   assert(doctorOutput.includes("node bin/agent-execution-template.js <command>"), "source checkout notice should show local node command");
   assert(doctorOutput.includes("不要把维护者本地初始化产生的 ai/project/** 当成产品改动提交"), "source checkout notice should warn against committing local bootstrap context");
 
-  const nextOutput = run(["next"], repoRoot);
+  const quietNextOutput = run(["next"], repoRoot);
+  assert(!quietNextOutput.includes("维护者提示"), "next should hide source checkout notice by default");
+
+  const nextOutput = run(["next", "--verbose"], repoRoot);
   assert(nextOutput.includes("维护者提示"), "next should warn when run in the package source checkout");
 }
 
