@@ -6,20 +6,32 @@ AI 只能运行 `ai/project/task.md` 和本文件允许的命令。
 ## 安全验证命令
 
 ```bash
-# 在这里添加项目专属的安全命令
-# 示例：
-# npm run lint
-# npm run build
-# mvn test
+npm test
+npm run check:release
+git diff --check
+node bin/agent-execution-template.js doctor
 ```
 
 ## 本地运行命令
 
 ```bash
-# 在这里添加本地启动命令
-# 示例：
-# npm run dev
-# mvn spring-boot:run
+node bin/agent-execution-template.js init
+node bin/agent-execution-template.js init --lang en
+node bin/agent-execution-template.js next
+node bin/agent-execution-template.js refresh
+node bin/agent-execution-template.js improve-context
+node bin/agent-execution-template.js update
+node bin/agent-execution-template.js reconcile
+node bin/agent-execution-template.js strategy
+node bin/agent-execution-template.js doctor
+```
+
+## 发布 / 打包检查命令
+
+这些命令只用于维护者确认发布内容，不代表授权发布：
+
+```bash
+npm_config_cache=/tmp/npm-cache-agent-execution-template npm pack --dry-run
 ```
 
 ## 危险命令
@@ -27,17 +39,19 @@ AI 只能运行 `ai/project/task.md` 和本文件允许的命令。
 这些命令需要任务级明确授权：
 
 ```bash
-# 数据库迁移
-# 部署
-# 分支重置
-# 文件删除
+npm publish
+git tag
+git push
+git reset --hard
+rm -rf
 ```
 
 ## 未明确允许则禁止
 
 ```bash
-# 生产部署
-# 生产数据迁移
-# 破坏性清理
+# 发布到 npm
+# 修改远端分支或 tag
+# 删除大量文件
+# 重置工作区
 # 会暴露密钥的命令
 ```

@@ -1,32 +1,20 @@
-# 结果
+# 执行结果
 
-## 状态
+状态：success
 
-blocked
+已完成：
 
-## 摘要
+- 提交并推送 slash command 路由改造：`2af0046 Use slash commands for agent workflows`。
+- 将版本 bump 到 `0.8.24`，同步模板 VERSION 和 SPEC 版本引用。
+- 发布 npm：`@wnlen/agent-execution-template@0.8.24`。
 
-尚未执行任务。
+验证：
 
-## 变更
+- `npm test`：passed
+- `npm run check:release`：passed
+- `git diff --check`：passed
+- `node bin/agent-execution-template.js doctor`：passed
+- `npm pack --dry-run`：passed，包版本 `0.8.24`，共 73 个文件
+- `npm view @wnlen/agent-execution-template version`：`0.8.24`
 
-- 无
-
-## 验证
-
-- 未验证
-
-## 指标
-
-- 模型：未记录
-- 耗时：0 分钟
-- 成功：false
-- 需要人工修复：false
-
-## 问题
-
-- 尚未执行当前任务。
-
-## 下一步
-
-- 读取 `ai/template/bootstrap.md`，确认项目上下文，然后在运行 `ai/template/prompt.md` 前起草并确认 `ai/project/task.md`。
+后续：无。

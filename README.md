@@ -14,13 +14,16 @@ English | [简体中文](README.zh-CN.md)
 npx -y @wnlen/agent-execution-template init --lang en
 ```
 
-Then tell your coding agent:
+Then send to your coding agent:
 
 ```text
-Start initializing this project
+/init
 ```
 
 Agent Execution Template is not another agent framework. It is the missing execution layer between your repository and tools like Codex, Claude Code, Cursor, Aider, or any other AI coding agent.
+More precisely, it is an **AI Repo Execution Protocol**: it governs how an AI reads context, confirms a task, respects file modification boundaries, verifies acceptance, and records results inside a specific repository.
+
+It does not manage workspace switching, session isolation, sandbox lifecycle, or worker scheduling. Those belong to an external workspace/session runtime.
 
 It turns AI coding from:
 
@@ -56,7 +59,7 @@ ai/template/  reusable execution protocol
 ai/project/   project-specific working context and direction layer
 ```
 
-`update` can refresh the protocol, while your project workspace stays protected.
+`update` can refresh the protocol, while your repo-local project context stays protected.
 
 ## Quick Start
 
@@ -69,8 +72,16 @@ npx -y @wnlen/agent-execution-template init --lang en
 Ask your agent to bootstrap project context from existing docs and manifests:
 
 ```text
-Start initializing this project
+/init
 ```
+
+`init` installs compatibility managed blocks in root `AGENTS.md` and `CLAUDE.md`.
+They have the same content and are not separate protocols; they adapt to generic
+Agent / Codex and Claude Code discovery conventions. Compatible AI tools read
+`ai/template/prompt.md` first, then route bootstrap to `ai/template/bootstrap.md`.
+If your AI tool does not auto-read those root
+entrypoints, ask it to read `AGENTS.md` or `CLAUDE.md` before sending the
+slash command above.
 
 The agent will generate project context and summarize what needs confirmation,
 risks, and the recommended next step in chat:
@@ -83,7 +94,7 @@ ai/project/refs/*
 Reply with corrections, or confirm and continue:
 
 ```text
-Continue this project
+/continue
 ```
 
 The agent will draft or execute from current context:
@@ -95,7 +106,7 @@ ai/project/task.md
 After the task draft is confirmed, you can also say:
 
 ```text
-Continue this project
+/continue
 ```
 
 Review the execution output:
@@ -136,6 +147,23 @@ Print the direction-amendment entrypoint:
 npx -y @wnlen/agent-execution-template strategy --lang en
 ```
 
+Common slash commands to send to the AI:
+
+```text
+/init              Set up project context for the first time
+/init-with-inbox   Initialize while absorbing ai/project/inbox/ material
+/reconcile         Merge new material
+/strategy          Create a direction proposal
+/apply-strategy    Apply a confirmed direction proposal
+/continue          Continue drafting or executing the current task
+/next              Judge the next step only
+/doctor            Check the installation
+/update            Update the protocol
+/refresh           Refresh project context
+/improve-context   Improve project context
+/help              Show available commands
+```
+
 ## What You Get
 
 | Capability | What it means |
@@ -169,6 +197,12 @@ acceptable vertical slice, not a mechanical step checklist:
 - [ ] L1-2 Notification toggles Green
 - [ ] L1-3 Export entrypoint Yellow
 ```
+
+Simple tasks are not buried under a full process form. A single-L1, Green,
+low-risk task uses a compact task contract with only the goal, scope,
+acceptance, permissions, verification commands, and minimal `task_tree`.
+Multi-L1, Yellow/Red, cross-module, continuously executed, or highly uncertain
+tasks use an expanded task contract.
 
 Because there are two or more L1 tasks, the protocol automatically uses bounded
 continuous execution. Before each L1, the AI plans naturally derived L2/L3 work.
@@ -228,7 +262,7 @@ ai/
 The split is the core design:
 
 - `ai/template/**` is reusable protocol. It can be safely updated from this package.
-- `ai/project/**` is your project workspace. It stores local context, tasks, references, results, and metrics.
+- `ai/project/**` is your repo-local project context. It stores local context, tasks, references, results, and metrics.
 
 ## Commands
 
@@ -243,6 +277,8 @@ Creates `ai/` in the current project.
 - Updates or creates `ai/template/**`.
 - Creates missing `ai/project/**` files.
 - Keeps existing `ai/project/**` files intact.
+- Creates or updates the same compatibility managed block in root `AGENTS.md` /
+  `CLAUDE.md` so different AI tools can discover the protocol entrypoint.
 - Use `--lang zh` or omit `--lang` for the Chinese template.
 
 ### `next`
@@ -257,7 +293,10 @@ Prints the next step based on the current project state:
 - If `ai/project/inbox/` has material, it routes to context reconcile.
 - If `ai/project/inbox/ideas/` has ideas, it routes to a direction amendment proposal.
 - If a direction proposal exists, it asks for human review and confirmation.
-- If no intake is waiting, it tells the agent to continue the project.
+- If a task draft needs confirmation, a ready task needs execution, or the last result failed, it routes to `/continue`.
+- If nothing is waiting, it says there is no required action.
+
+By default it prints only the decision and next action. Use `--verbose` to show the reason.
 
 ### `update`
 
@@ -297,11 +336,13 @@ npx -y @wnlen/agent-execution-template doctor
 
 Checks the installed template version and required files.
 
-It reports:
+By default it reports only overall status, next action, and problems that need attention:
 
-- `[OK]` for present and usable files.
-- `[WARN]` for empty required project context files.
-- `[MISSING]` for missing required files.
+- `Ready to run`
+- `Ready to run with warnings`
+- `Needs repair`
+
+Successful checks, version details, source-checkout maintainer notices, and per-file diagnostics are shown only with `--verbose`.
 
 ### `reconcile`
 
@@ -349,10 +390,10 @@ When a more complete or more authoritative document appears after the project ha
 ai/project/inbox/
 ```
 
-Then ask your agent:
+Then send to your agent:
 
 ```text
-Reconcile the new material in ai/project/inbox/
+/reconcile
 ```
 
 The agent must produce a reconciliation plan first, wait for confirmation, then merge long-lived facts into `project.md`, `runtime.md`, and `refs/*`.
@@ -425,11 +466,15 @@ Agent Execution Template is not:
 - an IDE,
 - an agent platform,
 - a multi-agent scheduler,
+- a workspace / sandbox / session runtime,
+- a multi-repository context manager,
 - a cloud service,
 - a prompt collection,
 - a replacement for Codex, Claude Code, Cursor, or Aider.
 
 It is a small file protocol for making those tools behave more consistently inside real software projects.
+
+It does not handle workspace switching, sandbox lifecycle, session fork / rollback, or worker scheduling. Conversely, an external runtime should not replace in-repository task definitions, file modification rules, acceptance criteria, or concrete coding context.
 
 ## Specification
 

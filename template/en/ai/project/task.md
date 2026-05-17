@@ -7,61 +7,11 @@ readiness: "draft_for_confirmation | ready_to_execute | blocked"
 depends_on_previous_result: false
 execution_policy:
   mode: "auto | normal | bounded_continuous"
-  activation_rule: "auto_enable_when_l1_count_gte_2"
-  max_depth: 3
-  allow_depth_4_when_needed: true
-  progress_unit: "vertical_slice"
-  l1_granularity: "independently_acceptable_vertical_slice"
-  write_back_policy: "l1_start_done_red_blocked_scope_change_final"
   task_tree:
     - id: "L1-1"
       title: ""
       risk: "Green | Yellow | Red"
       status: "pending | running | done | blocked"
-      scope:
-        allowed: []
-        denied: []
-      acceptance: []
-      evidence: []
-      children: []
-  checkpoint_budget:
-    l1: 0
-    l2: 0
-    l3: 0
-    l4: 0
-  checkpoint_triggers:
-    - before_crossing_boundary
-    - after_vertical_slice
-    - before_final_review
-  auto_continue:
-    green: true
-    yellow: "low_risk_only"
-    red: false
-  risk_gate:
-    green: "continue"
-    yellow: "continue_with_local_fix"
-    red: "stop_for_human"
-  evidence_required: true
-model_policy:
-  default_tier: "cheap"
-  allowed_tiers:
-    - cheap
-    - standard
-    - strong
-  escalation_allowed: true
-  escalation_triggers:
-    - ambiguous_goal
-    - ambiguous_acceptance
-    - high_risk_change
-    - architecture_boundary
-    - repeated_failure
-    - verification_dispute
-  strong_model_roles:
-    - planning
-    - risk_judgment
-    - architecture_review
-    - failure_review
-    - acceptance_judgment
 refs:
   required: []
   optional: []
@@ -91,6 +41,13 @@ cannot be defined, set `readiness` to `blocked` or mark the relevant task node
 If this run creates or rewrites the task contract, keep
 `readiness = draft_for_confirmation` by default and stop at the handoff. Enter
 execution only when an existing task is explicitly `ready_to_execute`.
+
+Default to a compact task contract. A single-L1, Green, low-risk task should
+write only the goal, scope, acceptance, permissions, verification commands, and
+minimal `execution_policy.task_tree`. Multi-L1, Yellow/Red, cross-module,
+continuously executed, or highly uncertain tasks may expand checkpoint, model
+policy, risk gate, and fuller task-tree fields as needed. The complete default
+rules live in `ai/template/execution-policy.md`.
 
 ## Goal
 
@@ -135,7 +92,8 @@ The task is complete when:
 Default to `auto`. The AI decides during pre-execution planning whether to use
 continuous execution; it does not wait for a human keyword. If planning finds
 fewer than 2 L1 tasks, use `normal`; if it finds 2 or more L1 tasks, use
-`bounded_continuous` automatically.
+`bounded_continuous` automatically. Each L1 must be an independently acceptable
+vertical slice.
 
 `bounded_continuous` means bounded continuous execution:
 
@@ -167,8 +125,10 @@ fewer than 2 L1 tasks, use `normal`; if it finds 2 or more L1 tasks, use
   architecture direction, or acceptance.
 - `progress_unit` defaults to `vertical_slice`: each work loop should produce
   a reviewable increment.
-- `checkpoint_budget` is the maximum checkpoint budget, not a required count;
-  do not report just to spend the budget.
+- Compact tasks should not expand internal control fields such as
+  `checkpoint_budget` or `model_policy`.
+- Expanded tasks may add checkpoint budgets, model policy, risk gates, and
+  fuller node fields as needed.
 - Emit checkpoints only when risk changes from Green to Yellow/Red, scope or
   permission is about to expand, an L1 vertical slice is complete, verification
   failed but execution is about to continue, or final wrap-up is about to start.

@@ -20,13 +20,16 @@ npx -y @wnlen/agent-execution-template init
 npx -y @wnlen/agent-execution-template init --lang zh
 ```
 
-然后告诉你的 AI 编程工具：
+然后发给你的 AI 编程工具：
 
 ```text
-开始初始化这个项目
+/init
 ```
 
 Agent Execution Template 不是新的 Agent 框架。它是代码仓库和 Codex、Claude Code、Cursor、Aider 等 AI Coding Agent 之间缺失的执行层。
+更准确地说，它是 **AI Repo Execution Protocol**：只约束 AI 在某个仓库内如何读取上下文、确认任务、遵守文件修改边界、验收并记录结果。
+
+它不管理 workspace 切换、Session 隔离、sandbox 生命周期或 worker 调度。这些属于外部 workspace/session runtime。
 
 它把 AI 编程从：
 
@@ -80,8 +83,14 @@ npx -y @wnlen/agent-execution-template init --lang en
 让 Agent 从现有文档和 manifest 里整理项目上下文：
 
 ```text
-开始初始化这个项目
+/init
 ```
+
+`init` 会在仓库根目录安装 `AGENTS.md` 和 `CLAUDE.md` 兼容入口托管块。两者内容相同，
+不是两套协议；它们分别适配通用 Agent / Codex 和 Claude Code 的自动发现约定。
+支持这些入口的 AI 工具会先读取 `ai/template/prompt.md`，再路由到 `ai/template/bootstrap.md`。
+如果你的 AI 工具没有自动读取根目录入口文件，请先让它读取 `AGENTS.md` 或
+`CLAUDE.md`，再发送上面的 slash command。
 
 Agent 会生成项目上下文，并在聊天里给出需要确认的摘要、风险和建议下一步：
 
@@ -93,7 +102,7 @@ ai/project/refs/*
 回复修正意见，或确认后继续：
 
 ```text
-继续推进这个项目
+/continue
 ```
 
 Agent 会根据当前上下文起草或执行：
@@ -102,10 +111,10 @@ Agent 会根据当前上下文起草或执行：
 ai/project/task.md
 ```
 
-当任务草稿已确认后，也可以直接说：
+当任务草稿已确认后，也可以直接发送：
 
 ```text
-继续推进这个项目
+/continue
 ```
 
 查看执行结果：
@@ -146,6 +155,23 @@ npx -y @wnlen/agent-execution-template update
 npx -y @wnlen/agent-execution-template strategy
 ```
 
+常用发给 AI 的 slash command：
+
+```text
+/init              第一次整理项目上下文
+/init-with-inbox   初始化时吸收 ai/project/inbox/ 里的资料
+/reconcile         整合新资料
+/strategy          生成方向修订提案
+/apply-strategy    合并已确认的方向提案
+/continue          继续起草或执行当前任务
+/next              只判断下一步
+/doctor            检查安装
+/update            更新协议
+/refresh           重整项目上下文
+/improve-context   优化项目上下文
+/help              查看可用命令
+```
+
 ## 你会得到什么
 
 | 能力 | 含义 |
@@ -178,6 +204,10 @@ AI 会在执行前先拆 L1 任务。L1 必须是可独立验收的垂直切片�
 - [ ] L1-2 通知开关 Green
 - [ ] L1-3 导出入口 Yellow
 ```
+
+简单任务不会被完整流程表单淹没。单 L1、Green、低风险任务使用 compact task
+contract，只保留目标、范围、验收、权限、验证命令和最小 `task_tree`。多 L1、
+Yellow/Red、跨模块、连续执行或高不确定任务才使用 expanded task contract。
 
 因为 L1 有两个以上，协议会自动使用边界内连续执行。执行每个 L1 前，AI 再规划
 自然衍生的 L2/L3；完成一个 L1 后，在清单中打勾并划掉。`task_tree` 只在
@@ -247,6 +277,7 @@ npx -y @wnlen/agent-execution-template init
 - 更新或创建 `ai/template/**`。
 - 创建缺失的 `ai/project/**` 文件。
 - 保留已有的 `ai/project/**` 文件。
+- 创建或更新根目录 `AGENTS.md` / `CLAUDE.md` 中的同内容兼容托管块，让不同 AI 工具能发现协议入口。
 - 默认安装中文模板；英文模板使用 `--lang en`。
 
 ### `next`
@@ -261,7 +292,10 @@ npx -y @wnlen/agent-execution-template next
 - `ai/project/inbox/` 有资料时，提示执行上下文整合。
 - `ai/project/inbox/ideas/` 有灵感时，提示生成方向修订提案。
 - 有待确认方向提案时，提示先审查并确认。
-- 没有待处理输入时，提示继续推进项目。
+- 任务草稿待确认、ready 任务待执行、失败结果待处理时，提示 `/continue`。
+- 没有待处理事项时，提示暂无必须动作。
+
+默认只输出决策和下一步；使用 `--verbose` 查看判断依据。
 
 ### `update`
 
@@ -301,11 +335,13 @@ npx -y @wnlen/agent-execution-template doctor
 
 检查已安装模板版本和必要文件。
 
-输出状态包括：
+默认只输出总体状态、下一步和需要修复的问题：
 
-- `[通过]` 文件存在且可用。
-- `[警告]` 必要的项目上下文文件为空。
-- `[缺失]` 必要文件缺失。
+- `已就绪`
+- `已就绪，但存在警告`
+- `需要修复`
+
+通过项、版本详情、源码仓库维护者提示和逐项检查只在 `--verbose` 下展示。
 
 ### `reconcile`
 
@@ -352,10 +388,10 @@ Agent Execution Template 定义了一个简单循环：
 ai/project/inbox/
 ```
 
-然后告诉 AI：
+然后发给 AI：
 
 ```text
-整合 ai/project/inbox/ 里的新资料
+/reconcile
 ```
 
 AI 必须先输出整合计划，等待确认后，再把长期有效事实合并进 `project.md`、`runtime.md` 和 `refs/*`。
@@ -426,11 +462,15 @@ Agent Execution Template 不是：
 - IDE；
 - Agent 平台；
 - 多 Agent 调度器；
+- workspace / sandbox / session 运行时；
+- 多仓库上下文管理器；
 - 云服务；
 - 提示词合集；
 - Codex、Claude Code、Cursor 或 Aider 的替代品。
 
 它是一个小型文件协议，用来让这些工具在真实软件项目中表现得更稳定。
+
+它不负责 workspace 切换、sandbox 生命周期、session fork / rollback 或 worker 调度。反过来，外部运行时不应该替代仓库内的任务定义、文件修改规则、acceptance criteria 或具体编码上下文。
 
 ## 规格
 

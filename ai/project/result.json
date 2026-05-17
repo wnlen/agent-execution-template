@@ -1,31 +1,204 @@
 {
   "protocol_version": "0.8",
-  "status": "blocked",
-  "task_id": "",
-  "task_summary": "尚未执行任务。",
+  "status": "success",
+  "task_id": "20260516-release-slash-command-routing",
+  "task_summary": "提交、推送 slash command 路由改造，并发布 @wnlen/agent-execution-template@0.8.24。",
   "scope_followed": true,
-  "files_read": [],
-  "refs_read": [],
-  "files_changed": [],
-  "commands_run": [],
+  "files_read": [
+    "ai/template/prompt.md",
+    "ai/project/task.md",
+    "ai/project/project.md",
+    "ai/project/refs/commands.md",
+    "package.json",
+    "bin/agent-execution-template.js",
+    "test/selftest.js"
+  ],
+  "refs_read": [
+    {
+      "file": "ai/project/refs/commands.md",
+      "reason": "确认验证、版本、提交、推送和 npm 发布命令。"
+    }
+  ],
+  "files_changed": [
+    {
+      "file": "bin/agent-execution-template.js",
+      "change_type": "modified",
+      "reason": "CLI 输出和根入口托管块改为 slash command 触发模型。"
+    },
+    {
+      "file": "ai/template/prompt.md",
+      "change_type": "modified",
+      "reason": "正式路由改为 slash command，并让普通问答保持只读。"
+    },
+    {
+      "file": "template/zh/ai/template/prompt.md",
+      "change_type": "modified",
+      "reason": "同步中文模板 prompt。"
+    },
+    {
+      "file": "template/en/ai/template/prompt.md",
+      "change_type": "modified",
+      "reason": "同步英文模板 prompt。"
+    },
+    {
+      "file": "README.md",
+      "change_type": "modified",
+      "reason": "英文文档改为 slash command 示例并补充命令表。"
+    },
+    {
+      "file": "README.zh-CN.md",
+      "change_type": "modified",
+      "reason": "中文文档改为 slash command 示例并补充命令表。"
+    },
+    {
+      "file": "docs/SPEC.md",
+      "change_type": "modified",
+      "reason": "规格文档改为 slash command 入口并同步 0.8.24。"
+    },
+    {
+      "file": "package.json",
+      "change_type": "modified",
+      "reason": "版本从 0.8.23 bump 到 0.8.24。"
+    },
+    {
+      "file": "ai/template/VERSION",
+      "change_type": "modified",
+      "reason": "同步版本 0.8.24。"
+    },
+    {
+      "file": "template/zh/ai/template/VERSION",
+      "change_type": "modified",
+      "reason": "同步版本 0.8.24。"
+    },
+    {
+      "file": "template/en/ai/template/VERSION",
+      "change_type": "modified",
+      "reason": "同步版本 0.8.24。"
+    },
+    {
+      "file": "test/selftest.js",
+      "change_type": "modified",
+      "reason": "测试 slash command 输出、路由和旧自然语言触发语移除。"
+    },
+    {
+      "file": "ai/project/task.md",
+      "change_type": "modified",
+      "reason": "记录发布任务和完成状态。"
+    },
+    {
+      "file": "ai/project/result.json",
+      "change_type": "modified",
+      "reason": "记录机器可读发布结果。"
+    },
+    {
+      "file": "ai/project/result.md",
+      "change_type": "modified",
+      "reason": "记录人类可读发布结果。"
+    },
+    {
+      "file": "ai/project/metrics.json",
+      "change_type": "modified",
+      "reason": "记录本次发布指标。"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "npm test",
+      "result": "passed",
+      "notes": "selftest ok；release check ok。"
+    },
+    {
+      "command": "npm run check:release",
+      "result": "passed",
+      "notes": "release check ok。"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed",
+      "notes": "无空白错误。"
+    },
+    {
+      "command": "node bin/agent-execution-template.js doctor",
+      "result": "passed",
+      "notes": "doctor 通过，模板版本 0.8.24。"
+    },
+    {
+      "command": "npm_config_cache=/tmp/npm-cache-agent-execution-template npm pack --dry-run",
+      "result": "passed",
+      "notes": "dry-run 包版本为 0.8.24，total files: 73。"
+    },
+    {
+      "command": "git commit",
+      "result": "passed",
+      "notes": "创建提交 2af0046 Use slash commands for agent workflows。"
+    },
+    {
+      "command": "git push",
+      "result": "passed",
+      "notes": "已推送 dev 到 origin/dev。"
+    },
+    {
+      "command": "npm publish",
+      "result": "passed",
+      "notes": "发布成功：+ @wnlen/agent-execution-template@0.8.24。"
+    },
+    {
+      "command": "npm view @wnlen/agent-execution-template version",
+      "result": "passed",
+      "notes": "registry latest 返回 0.8.24。"
+    }
+  ],
   "verification": {
-    "level": "none",
-    "passed": false,
-    "evidence": []
+    "level": "test",
+    "passed": true,
+    "evidence": [
+      "`npm test` passed.",
+      "`npm run check:release` passed.",
+      "`git diff --check` passed.",
+      "`node bin/agent-execution-template.js doctor` passed.",
+      "`npm pack --dry-run` showed version 0.8.24.",
+      "`npm view @wnlen/agent-execution-template version` returned 0.8.24 after publish."
+    ]
   },
   "evidence": {
-    "git_diff_summary": "",
-    "changed_files_from_git": [],
-    "command_outputs": [],
+    "git_diff_summary": "slash command 触发模型已提交、推送并发布为 0.8.24。",
+    "changed_files_from_git": [
+      "README.md",
+      "README.zh-CN.md",
+      "ai/project/metrics.json",
+      "ai/project/result.json",
+      "ai/project/result.md",
+      "ai/project/task.md",
+      "ai/template/VERSION",
+      "ai/template/prompt.md",
+      "ai/template/protocol.md",
+      "ai/template/rules/core.md",
+      "bin/agent-execution-template.js",
+      "docs/SPEC.md",
+      "package.json",
+      "template/en/ai/template/VERSION",
+      "template/en/ai/template/prompt.md",
+      "template/en/ai/template/protocol.md",
+      "template/en/ai/template/rules/core.md",
+      "template/zh/ai/template/VERSION",
+      "template/zh/ai/template/prompt.md",
+      "template/zh/ai/template/protocol.md",
+      "template/zh/ai/template/rules/core.md",
+      "test/selftest.js"
+    ],
+    "command_outputs": [
+      "npm test: selftest ok; release check ok",
+      "npm run check:release: release check ok",
+      "npm publish: + @wnlen/agent-execution-template@0.8.24",
+      "npm view @wnlen/agent-execution-template version: 0.8.24"
+    ],
     "unverified_claims": []
   },
-  "assumptions": [],
-  "issues": [
-    "尚未执行当前任务。"
+  "assumptions": [
+    "0.8.24 作为 patch 发布版本，因为 0.8.23 已存在于 npm registry。"
   ],
-  "next": [
-    "让 Agent 读取 ai/template/bootstrap.md，确认项目上下文，然后在运行 ai/template/prompt.md 前起草并确认 ai/project/task.md。"
-  ],
+  "issues": [],
+  "next": [],
   "runtime_update": {
     "required": false,
     "changes": [],

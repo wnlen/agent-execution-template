@@ -5,12 +5,18 @@ execution context.
 
 ```text
 ai/template/ = reusable execution protocol
-ai/project/  = current project execution workspace
+ai/project/  = current repo execution context
 ```
 
-Template is protocol. Project is the field workspace.
+Template is protocol. Project is repo-local context.
 
-The project workspace stores both execution state and direction. The direction
+Here, "repo execution context" means the repo-local `ai/project/**` context,
+not an external workspace / session / sandbox runtime. An external
+runtime may enter the repository and read this protocol, but should not replace
+`task.md`, file modification rules, acceptance criteria, or concrete coding
+context.
+
+The repo-local context stores both execution state and direction. The direction
 layer answers "why is this worth doing and where should the project grow"; the
 execution layer answers "what is this task and how will it be accepted."
 
@@ -60,6 +66,13 @@ existing task with `readiness = ready_to_execute`; if this run creates or
 rewrites the task contract, stop at the confirmation handoff. Only Red stops for
 human confirmation, and Yellow only permits local low-risk correction inside the
 current L1/L2.
+
+Task contracts are layered by complexity. A single-L1, Green, low-risk task uses
+a compact task contract with only the goal, scope, acceptance, permissions,
+verification commands, and minimal `execution_policy.task_tree`. Multi-L1,
+Yellow/Red, cross-module, continuously executed, or highly uncertain tasks use
+an expanded task contract and may include checkpoint, model policy, and fuller
+task-tree fields as needed.
 
 Task tree, risk rubric, checkpoint evidence, and `task_tree` write-back rules
 are defined in `ai/template/execution-policy.md`.
@@ -207,7 +220,7 @@ New material should usually live in:
 Processed material is moved to `ai/project/inbox/processed/` and is not read
 again as pending intake by default.
 
-The user can simply say "Reconcile the new material in ai/project/inbox/".
+The user can send `/reconcile`.
 Use Context Reconcile Mode by following `ai/template/reconcile.md`.
 
 Context Reconcile Mode must:
